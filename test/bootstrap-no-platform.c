@@ -4,8 +4,9 @@
 #include <uv.h>
 
 #include "../include/holepunch.h"
+#include "fixtures/app.h"
 
-#define EXE "test/fixtures/app/darwin-arm64/Example.app/Contents/MacOS/Example"
+#define EXE "test/fixtures/app/" HOLEPUNCH_RUNTIME "/" HOLEPUNCH_TEST_EXE
 
 uv_loop_t *loop;
 

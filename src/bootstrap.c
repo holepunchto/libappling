@@ -165,7 +165,7 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
   if (status >= 0) {
     req->buf.base[req->buf.len - 1] = '\0';
 
-    sscanf(req->buf.base, "%i %i %s %s", &req->app.platform.fork, &req->app.platform.len, req->app.platform.key, req->app.key);
+    sscanf(req->buf.base, "%i %i %64s %64s", &req->app.platform.fork, &req->app.platform.len, req->app.platform.key, req->app.key);
   } else {
     req->status = status; // Propagate
   }

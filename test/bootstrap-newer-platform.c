@@ -40,4 +40,6 @@ main () {
   uv_run(loop, UV_RUN_DEFAULT);
 
   assert(bootstrap_called);
+
+  return 0;
 }

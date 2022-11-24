@@ -41,4 +41,6 @@ main () {
   uv_run(loop, UV_RUN_DEFAULT);
 
   assert(resolve_called);
+
+  return 0;
 }

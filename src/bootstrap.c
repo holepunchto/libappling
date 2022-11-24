@@ -19,17 +19,16 @@ should_replace_platform (const holepunch_platform_t *platform, const holepunch_a
 }
 
 static void
-on_rmdir (uv_fs_t *uv_req) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) uv_req->data;
+on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
 
-  // Disregard errors
+  status = req->status;
 
-  uv_fs_req_cleanup(uv_req);
-
-  int status = req->status;
-
-  if (status >= 0) req->cb(req, status, &req->app);
-  else req->cb(req, status, NULL);
+  if (status >= 0) {
+    req->cb(req, status, &req->app);
+  } else {
+    req->cb(req, status, NULL);
+  }
 }
 
 static void
@@ -44,45 +43,80 @@ discard_tmp (holepunch_bootstrap_t *req) {
     path_separator_system
   );
 
-  uv_fs_rmdir(req->loop, &req->req, path, on_rmdir);
+  fs_rmdir(req->loop, &req->rmdir, path, true, on_rmdir_tmp);
 }
 
 static void
-on_rename (uv_fs_t *uv_req) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) uv_req->data;
+on_rename (fs_rename_t *fs_req, int status) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
 
-  // Disregard errors
-
-  uv_fs_req_cleanup(uv_req);
+  if (status >= 0) {
+    req->status = 0;
+  } else {
+    req->status = status; // Propagate
+  }
 
   discard_tmp(req);
+}
+
+static inline void
+rename_platform (holepunch_bootstrap_t *req) {
+  char path[PATH_MAX];
+  size_t path_len = PATH_MAX;
+
+  path_join(
+    (const char *[]){req->dir, "platform", NULL},
+    path,
+    &path_len,
+    path_separator_system
+  );
+
+  fs_rename(req->loop, &req->rename, req->path, path, on_rename);
+}
+
+static void
+on_swap (fs_swap_t *fs_req, int status) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+
+  if (status >= 0) {
+    discard_tmp(req);
+  } else {
+    req->status = status; // Propagate
+
+    rename_platform(req);
+  }
+}
+
+static inline void
+swap_platform (holepunch_bootstrap_t *req) {
+  char path[PATH_MAX];
+  size_t path_len = PATH_MAX;
+
+  path_join(
+    (const char *[]){req->dir, "platform", NULL},
+    path,
+    &path_len,
+    path_separator_system
+  );
+
+  fs_swap(req->loop, &req->swap, req->path, path, on_swap);
 }
 
 static void
 on_extract (holepunch_extract_t *extract, int status) {
   holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) extract->data;
 
-  if (status < 0) req->status = status; // Propagate
-
   if (status >= 0) {
-    char path[PATH_MAX];
-    size_t path_len = PATH_MAX;
-
-    path_join(
-      (const char *[]){req->dir, "platform", NULL},
-      path,
-      &path_len,
-      path_separator_system
-    );
-
-    uv_fs_rename(req->loop, &req->req, req->path, path, on_rename);
+    swap_platform(req);
   } else {
+    req->status = status; // Propagate
+
     discard_tmp(req);
   }
 }
 
-static void
-extract_bundled_platform (holepunch_bootstrap_t *req) {
+static inline void
+extract_platform (holepunch_bootstrap_t *req) {
   char path[PATH_MAX];
   size_t path_len = PATH_MAX;
 
@@ -106,18 +140,14 @@ extract_bundled_platform (holepunch_bootstrap_t *req) {
 }
 
 static void
-on_close_checkout (uv_fs_t *uv_req) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) uv_req->data;
+on_close_checkout (fs_close_t *fs_req, int status) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
 
-  // Disregard errors
-
-  uv_fs_req_cleanup(uv_req);
-
-  int status = req->status;
+  if (req->status < 0) status = req->status;
 
   if (status >= 0) {
     if (!req->has_platform || should_replace_platform(&req->platform, &req->app)) {
-      extract_bundled_platform(req);
+      extract_platform(req);
     } else {
       memcpy(&req->app.platform, &req->platform, sizeof(holepunch_platform_t));
 
@@ -129,66 +159,54 @@ on_close_checkout (uv_fs_t *uv_req) {
 }
 
 static void
-on_read_checkout (uv_fs_t *uv_req) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) uv_req->data;
-
-  int status = uv_req->result;
-  uv_fs_req_cleanup(uv_req);
-
-  if (status < 0) req->status = status; // Propagate
+on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
     req->buf.base[req->buf.len - 1] = '\0';
 
     sscanf(req->buf.base, "%i %i %s %s", &req->app.platform.fork, &req->app.platform.len, req->app.platform.key, req->app.key);
+  } else {
+    req->status = status; // Propagate
   }
 
   free(req->buf.base);
 
-  uv_fs_close(req->loop, &req->req, req->fd, on_close_checkout);
+  fs_close(req->loop, &req->close, req->file, on_close_checkout);
 }
 
 static void
-on_open_checkout (uv_fs_t *uv_req) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) uv_req->data;
-
-  int status = uv_req->result;
-  uv_fs_req_cleanup(uv_req);
+on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
-    req->fd = status;
-
-    uv_fs_read(req->loop, &req->req, req->fd, &req->buf, 1, 0, on_read_checkout);
-  } else {
-    free(req->buf.base);
-
-    req->cb(req, status, NULL);
-  }
-}
-
-static void
-on_stat_checkout (uv_fs_t *uv_req) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) uv_req->data;
-
-  int status = uv_req->result;
-
-  if (status >= 0) {
-    size_t len = uv_req->statbuf.st_size;
-
-    uv_fs_req_cleanup(uv_req);
+    size_t len = stat->st_size;
 
     req->buf = uv_buf_init(malloc(len), len);
 
-    uv_fs_open(req->loop, &req->req, req->path, 0, O_RDONLY, on_open_checkout);
+    fs_read(req->loop, &req->read, req->file, &req->buf, 1, 0, on_read_checkout);
   } else {
-    uv_fs_req_cleanup(uv_req);
+    req->status = status; // Propagate
 
+    fs_close(req->loop, &req->close, req->file, on_close_checkout);
+  }
+}
+
+static void
+on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+
+  if (status >= 0) {
+    req->file = file;
+
+    fs_stat(req->loop, &req->stat, req->file, on_stat_checkout);
+  } else {
     req->cb(req, status, NULL);
   }
 }
 
 static void
-resolve_checkout (holepunch_bootstrap_t *req) {
+open_checkout (holepunch_bootstrap_t *req) {
   char path[PATH_MAX];
   size_t path_len = PATH_MAX;
 
@@ -212,7 +230,7 @@ resolve_checkout (holepunch_bootstrap_t *req) {
     path_separator_system
   );
 
-  uv_fs_stat(req->loop, &req->req, req->path, on_stat_checkout);
+  fs_open(req->loop, &req->open, req->path, 0, O_RDONLY, on_open_checkout);
 }
 
 int
@@ -221,7 +239,13 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
   req->cb = cb;
   req->status = 0;
   req->has_platform = platform != NULL;
-  req->req.data = (void *) req;
+  req->open.data = (void *) req;
+  req->close.data = (void *) req;
+  req->stat.data = (void *) req;
+  req->read.data = (void *) req;
+  req->swap.data = (void *) req;
+  req->rename.data = (void *) req;
+  req->rmdir.data = (void *) req;
   req->extract.data = (void *) req;
 
   strcpy(req->exe, exe);
@@ -253,7 +277,7 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
     );
   }
 
-  resolve_checkout(req);
+  open_checkout(req);
 
   return 0;
 }

@@ -15,8 +15,6 @@ static void
 on_extract (holepunch_extract_t *req, int status) {
   extract_called = true;
 
-  if (req->err) printf("err=%s\n", req->err);
-
   assert(status == 0);
 
   {

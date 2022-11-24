@@ -40,7 +40,6 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
   int r = archive_read_open_filename(reader, archive, 10240);
   if (r) {
     req->status = -r;
-    req->err = strdup(archive_error_string(reader));
     goto done;
   }
 
@@ -54,7 +53,6 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
     if (r == ARCHIVE_EOF) break;
     if (r != ARCHIVE_OK) {
       req->status = r;
-      req->err = strdup(archive_error_string(reader));
       goto done;
     }
 
@@ -72,21 +70,18 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
     r = archive_write_header(writer, entry);
     if (r != ARCHIVE_OK) {
       req->status = r;
-      req->err = strdup(archive_error_string(writer));
       goto done;
     }
 
     r = copy(reader, writer);
     if (r != ARCHIVE_OK) {
       req->status = r;
-      req->err = strdup(archive_error_string(writer));
       goto done;
     }
 
     r = archive_write_finish_entry(writer);
     if (r != ARCHIVE_OK) {
       req->status = r;
-      req->err = strdup(archive_error_string(writer));
       goto done;
     }
   }
@@ -107,21 +102,21 @@ static void
 on_after_work (uv_work_t *handle, int status) {
   holepunch_extract_t *req = (holepunch_extract_t *) handle->data;
 
-  if (status >= 0) status = req->status;
+  if (req->status < 0) status = req->status;
+
+  free(req->archive);
+  free(req->dest);
 
   if (req->cb) req->cb(req, status);
-
-  if (req->err) free(req->err);
 }
 
 int
 holepunch_extract (uv_loop_t *loop, holepunch_extract_t *req, const char *archive, const char *dest, holepunch_extract_cb cb) {
   req->loop = loop;
-  req->archive = archive;
-  req->dest = dest;
   req->cb = cb;
+  req->archive = strdup(archive);
+  req->dest = strdup(dest);
   req->status = 0;
-  req->err = NULL;
   req->req.data = (void *) req;
 
   return uv_queue_work(loop, &req->req, on_work, on_after_work);

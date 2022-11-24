@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include <fs.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -42,19 +43,26 @@ struct holepunch_app_s {
 
 struct holepunch_resolve_s {
   uv_loop_t *loop;
-  uv_fs_t req;
 
   holepunch_resolve_cb cb;
 
+  fs_open_t open;
+  fs_close_t close;
+  fs_realpath_t realpath;
+  fs_stat_t stat;
+  fs_read_t read;
+
   char path[PATH_MAX];
 
-  int fd;
+  uv_file file;
   uv_buf_t buf;
 
   size_t bin_candidate;
   size_t exe_candidate;
 
   holepunch_platform_t platform;
+
+  int status;
 
   void *data;
 };
@@ -63,28 +71,33 @@ struct holepunch_extract_s {
   uv_loop_t *loop;
   uv_work_t req;
 
+  char *archive;
+  char *dest;
+
   holepunch_extract_cb cb;
 
-  const char *archive;
-  const char *dest;
-
   int status;
-  char *err;
 
   void *data;
 };
 
 struct holepunch_bootstrap_s {
   uv_loop_t *loop;
-  uv_fs_t req;
 
   holepunch_bootstrap_cb cb;
+
+  fs_open_t open;
+  fs_close_t close;
+  fs_stat_t stat;
+  fs_read_t read;
+  fs_swap_t swap;
+  fs_rename_t rename;
+  fs_rmdir_t rmdir;
 
   holepunch_extract_t extract;
 
   bool has_platform;
   holepunch_platform_t platform;
-
   holepunch_app_t app;
 
   char exe[PATH_MAX];
@@ -94,7 +107,7 @@ struct holepunch_bootstrap_s {
 
   char path[PATH_MAX];
 
-  int fd;
+  uv_file file;
   uv_buf_t buf;
 
   int status;

@@ -1,6 +1,9 @@
 [submodule "vendor/libarchive"]
 	path = vendor/libarchive
 	url = git@github.com:libarchive/libarchive.git
+[submodule "vendor/libfs"]
+	path = vendor/libfs
+	url = git@github.com:holepunchto/libfs.git
 [submodule "vendor/libpath"]
 	path = vendor/libpath
 	url = git@github.com:holepunchto/libpath.git

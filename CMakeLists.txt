@@ -36,6 +36,10 @@ if(NOT TARGET archive)
   add_subdirectory(vendor/libarchive EXCLUDE_FROM_ALL)
 endif()
 
+if(NOT TARGET fs)
+  add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
+endif()
+
 if(NOT TARGET path)
   add_subdirectory(vendor/libpath EXCLUDE_FROM_ALL)
 endif()
@@ -70,6 +74,7 @@ target_include_directories(
   PUBLIC
     include
     $<TARGET_PROPERTY:uv,INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:fs,INCLUDE_DIRECTORIES>
   PRIVATE
     $<TARGET_PROPERTY:archive,INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INCLUDE_DIRECTORIES>
@@ -89,6 +94,7 @@ target_link_libraries(
     uv
   PRIVATE
     archive_static
+    fs_static
     path_static
 )
 

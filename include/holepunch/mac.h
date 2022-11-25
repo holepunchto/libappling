@@ -4,6 +4,7 @@
 #include "posix.h"
 
 #define HOLEPUNCH_OS "darwin"
+#define HOLEPUNCH_OS_DARWIN
 
 #define HOLEPUNCH_DIR "Library/Application Support/Holepunch"
 

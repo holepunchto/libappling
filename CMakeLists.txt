@@ -36,12 +36,12 @@ if(NOT TARGET archive)
   add_subdirectory(vendor/libarchive EXCLUDE_FROM_ALL)
 endif()
 
-if(NOT TARGET fs)
-  add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
-endif()
-
 if(NOT TARGET path)
   add_subdirectory(vendor/libpath EXCLUDE_FROM_ALL)
+endif()
+
+if(NOT TARGET fs)
+  add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
 endif()
 
 add_library(holepunch OBJECT)

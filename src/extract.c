@@ -38,8 +38,8 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
   archive_read_support_format_tar(reader);
 
   int r = archive_read_open_filename(reader, archive, 10240);
-  if (r) {
-    req->status = -r;
+  if (r < 0) {
+    req->status = archive_errno(reader);
     goto done;
   }
 
@@ -51,8 +51,8 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
     r = archive_read_next_header(reader, &entry);
 
     if (r == ARCHIVE_EOF) break;
-    if (r != ARCHIVE_OK) {
-      req->status = r;
+    if (r < 0) {
+      req->status = archive_errno(reader);
       goto done;
     }
 
@@ -68,20 +68,20 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
     archive_entry_set_pathname(entry, path);
 
     r = archive_write_header(writer, entry);
-    if (r != ARCHIVE_OK) {
-      req->status = r;
+    if (r < 0) {
+      req->status = archive_errno(writer);
       goto done;
     }
 
     r = copy(reader, writer);
-    if (r != ARCHIVE_OK) {
-      req->status = r;
+    if (r < 0) {
+      req->status = archive_errno(writer);
       goto done;
     }
 
     r = archive_write_finish_entry(writer);
-    if (r != ARCHIVE_OK) {
-      req->status = r;
+    if (r < 0) {
+      req->status = archive_errno(writer);
       goto done;
     }
   }
@@ -89,6 +89,8 @@ extract (holepunch_extract_t *req, const char *archive, const char *dest) {
 done:
   archive_read_free(reader);
   archive_write_free(writer);
+
+  if (req->status) req->status = uv_translate_sys_error(req->status);
 }
 
 static void
@@ -107,7 +109,7 @@ on_after_work (uv_work_t *handle, int status) {
   free(req->archive);
   free(req->dest);
 
-  if (req->cb) req->cb(req, status);
+  req->cb(req, status);
 }
 
 int

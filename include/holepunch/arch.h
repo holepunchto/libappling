@@ -3,10 +3,13 @@
 
 #if defined(__aarch64__) || defined(_M_ARM64)
 #define HOLEPUNCH_ARCH "arm64"
+#define HOLEPUNCH_ARCH_ARM64
 #elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
 #define HOLEPUNCH_ARCH "ia32"
+#define HOLEPUNCH_ARCH_IA32
 #elif defined(__x86_64__) || defined(_M_X64)
 #define HOLEPUNCH_ARCH "x64"
+#define HOLEPUNCH_ARCH_X64
 #else
 #error Unsupported architecture
 #endif

@@ -286,11 +286,11 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
   req->extract.data = (void *) req;
   req->resolve.data = (void *) req;
 
-  if (exe) strcpy(req->exe, exe);
+  if (exe) strcpy(req->app.exe, exe);
   else {
     size_t path_len = PATH_MAX;
 
-    uv_exepath(req->exe, &path_len);
+    uv_exepath(req->app.exe, &path_len);
   }
 
   if (dir) strcpy(req->dir, dir);
@@ -313,9 +313,9 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
 
   size_t dirname = 0;
 
-  path_dirname(req->exe, &dirname, path_separator_system);
+  path_dirname(req->app.exe, &dirname, path_separator_system);
 
-  strncpy(req->exe_dir, req->exe, dirname - 1);
+  strncpy(req->exe_dir, req->app.exe, dirname - 1);
 
   if (platform) memcpy(&req->platform, platform, sizeof(holepunch_platform_t));
 

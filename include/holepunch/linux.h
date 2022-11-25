@@ -4,6 +4,7 @@
 #include "posix.h"
 
 #define HOLEPUNCH_OS "linux"
+#define HOLEPUNCH_OS_LINUX
 
 #define HOLEPUNCH_DIR ".config/Holepunch"
 

@@ -46,6 +46,7 @@ struct holepunch_platform_s {
 
 struct holepunch_app_s {
   holepunch_platform_t platform;
+  char exe[PATH_MAX];
   holepunch_key_t key;
 };
 
@@ -131,7 +132,6 @@ struct holepunch_bootstrap_s {
   holepunch_platform_t platform;
   holepunch_app_t app;
 
-  char exe[PATH_MAX];
   char exe_dir[PATH_MAX];
 
   char dir[PATH_MAX];

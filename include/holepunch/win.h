@@ -4,6 +4,7 @@
 #define HOLEPUNCH_PATH_SEPARATOR "\\"
 
 #define HOLEPUNCH_OS "win32"
+#define HOLEPUNCH_OS_WIN32
 
 #define HOLEPUNCH_DIR "AppData\\Roaming\\Holepunch"
 

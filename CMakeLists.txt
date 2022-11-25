@@ -110,4 +110,7 @@ install(DIRECTORY include/holepunch DESTINATION include)
 if(PROJECT_IS_TOP_LEVEL)
   enable_testing()
   add_subdirectory(test)
+
+  add_subdirectory(example/app/darwin-arm64 EXCLUDE_FROM_ALL)
+  add_subdirectory(example/app/darwin-x64 EXCLUDE_FROM_ALL)
 endif()

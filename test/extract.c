@@ -3,16 +3,16 @@
 #include <stdio.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 uv_loop_t *loop;
 
-holepunch_extract_t req;
+appling_extract_t req;
 
 bool extract_called = false;
 
 static void
-on_extract (holepunch_extract_t *req, int status) {
+on_extract (appling_extract_t *req, int status) {
   extract_called = true;
 
   assert(status == 0);
@@ -29,7 +29,7 @@ int
 main () {
   loop = uv_default_loop();
 
-  int err = holepunch_extract(loop, &req, "test/fixtures/extract/archive.tar", "test/fixtures/extract/archive", on_extract);
+  int err = appling_extract(loop, &req, "test/fixtures/extract/archive.tar", "test/fixtures/extract/archive", on_extract);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

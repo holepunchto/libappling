@@ -3,23 +3,23 @@
 #include <stdlib.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 static void
 on_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
-  holepunch_process_t *process = (holepunch_process_t *) handle;
+  appling_process_t *process = (appling_process_t *) handle;
 
   process->on_exit(process, exit_status, term_signal);
 }
 
 static inline void
 get_app_root (const char *exe, char *result) {
-#if defined(HOLEPUNCH_OS_LINUX)
+#if defined(APPLING_OS_LINUX)
   const char *app = getenv("APPIMAGE");
   strcpy(result, app ? app : exe);
-#elif defined(HOLEPUNCH_OS_WIN32)
+#elif defined(APPLING_OS_WIN32)
   strcpy(result, exe);
-#elif defined(HOLEPUNCH_OS_DARWIN)
+#elif defined(APPLING_OS_DARWIN)
   size_t path_len = PATH_MAX;
   path_join(
     (const char *[]){exe, "..", "..", "..", NULL},
@@ -31,7 +31,7 @@ get_app_root (const char *exe, char *result) {
 }
 
 int
-holepunch_launch (uv_loop_t *loop, holepunch_process_t *process, const holepunch_link_t *link, const holepunch_app_t *app, holepunch_exit_cb cb) {
+appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_t *link, const appling_app_t *app, appling_exit_cb cb) {
   process->on_exit = cb;
   process->process.data = (void *) process;
 

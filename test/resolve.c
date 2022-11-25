@@ -4,16 +4,16 @@
 #include <string.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 uv_loop_t *loop;
 
-holepunch_resolve_t req;
+appling_resolve_t req;
 
 bool resolve_called = false;
 
 static void
-on_resolve (holepunch_resolve_t *req, int status, const holepunch_platform_t *platform) {
+on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
   resolve_called = true;
 
   assert(status == 0);
@@ -35,7 +35,7 @@ int
 main () {
   loop = uv_default_loop();
 
-  int err = holepunch_resolve(loop, &req, "test/fixtures", on_resolve);
+  int err = appling_resolve(loop, &req, "test/fixtures", on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 static inline int
 copy (struct archive *from, struct archive *to) {
@@ -28,7 +28,7 @@ copy (struct archive *from, struct archive *to) {
 }
 
 static inline void
-extract (holepunch_extract_t *req, const char *archive, const char *dest) {
+extract (appling_extract_t *req, const char *archive, const char *dest) {
   struct archive *reader;
   struct archive *writer;
 
@@ -95,14 +95,14 @@ done:
 
 static void
 on_work (uv_work_t *handle) {
-  holepunch_extract_t *req = (holepunch_extract_t *) handle->data;
+  appling_extract_t *req = (appling_extract_t *) handle->data;
 
   extract(req, req->archive, req->dest);
 }
 
 static void
 on_after_work (uv_work_t *handle, int status) {
-  holepunch_extract_t *req = (holepunch_extract_t *) handle->data;
+  appling_extract_t *req = (appling_extract_t *) handle->data;
 
   if (req->status < 0) status = req->status;
 
@@ -113,7 +113,7 @@ on_after_work (uv_work_t *handle, int status) {
 }
 
 int
-holepunch_extract (uv_loop_t *loop, holepunch_extract_t *req, const char *archive, const char *dest, holepunch_extract_cb cb) {
+appling_extract (uv_loop_t *loop, appling_extract_t *req, const char *archive, const char *dest, appling_extract_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->archive = strdup(archive);

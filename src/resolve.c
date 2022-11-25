@@ -6,11 +6,11 @@
 #include <string.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 static void
 on_close_checkout (fs_close_t *fs_req, int status) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (req->status < 0) status = req->status;
 
@@ -23,7 +23,7 @@ on_close_checkout (fs_close_t *fs_req, int status) {
 
 static void
 on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
     req->buf.base[read - 1] = '\0';
@@ -40,7 +40,7 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
 
 static void
 on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
     size_t len = stat->st_size;
@@ -57,7 +57,7 @@ on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
 
 static void
 on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
     req->file = file;
@@ -69,7 +69,7 @@ on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
 }
 
 static inline void
-open_checkout (holepunch_resolve_t *req) {
+open_checkout (appling_resolve_t *req) {
   char bin[PATH_MAX];
 
   strcpy(bin, req->platform.exe);
@@ -79,7 +79,7 @@ open_checkout (holepunch_resolve_t *req) {
   bool is_bin = false;
 
   while (dirname > 4 && !is_bin) {
-    is_bin = strcmp(HOLEPUNCH_PATH_SEPARATOR "bin", &bin[dirname - 5]) == 0;
+    is_bin = strcmp(APPLING_PATH_SEPARATOR "bin", &bin[dirname - 5]) == 0;
 
     path_dirname(bin, &dirname, path_separator_system);
 
@@ -99,11 +99,11 @@ open_checkout (holepunch_resolve_t *req) {
 }
 
 static void
-realpath_exe (holepunch_resolve_t *req);
+realpath_exe (appling_resolve_t *req);
 
 static void
 on_realpath_exe (fs_realpath_t *fs_req, int status, const char *path) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
     strcpy(req->platform.exe, path);
@@ -112,13 +112,13 @@ on_realpath_exe (fs_realpath_t *fs_req, int status, const char *path) {
   } else {
     size_t i = ++req->exe_candidate;
 
-    if (holepunch_exe_candidates[i]) realpath_exe(req);
+    if (appling_exe_candidates[i]) realpath_exe(req);
     else req->cb(req, status, NULL);
   }
 }
 
 static void
-realpath_exe (holepunch_resolve_t *req) {
+realpath_exe (appling_resolve_t *req) {
   size_t i = req->bin_candidate;
   size_t j = req->exe_candidate;
 
@@ -126,7 +126,7 @@ realpath_exe (holepunch_resolve_t *req) {
   size_t path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){req->path, holepunch_bin_candidates[i], holepunch_exe_candidates[j], NULL},
+    (const char *[]){req->path, appling_bin_candidates[i], appling_exe_candidates[j], NULL},
     path,
     &path_len,
     path_separator_system
@@ -137,37 +137,37 @@ realpath_exe (holepunch_resolve_t *req) {
 
 static void
 on_close_bin (fs_close_t *fs_req, int status) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   realpath_exe(req);
 }
 
 static void
-open_bin (holepunch_resolve_t *req);
+open_bin (appling_resolve_t *req);
 
 static void
 on_open_bin (fs_open_t *fs_req, int status, uv_file file) {
-  holepunch_resolve_t *req = (holepunch_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
     fs_close(req->loop, &req->close, file, on_close_bin);
   } else {
     size_t i = ++req->bin_candidate;
 
-    if (holepunch_bin_candidates[i]) open_bin(req);
+    if (appling_bin_candidates[i]) open_bin(req);
     else req->cb(req, status, NULL);
   }
 }
 
 static void
-open_bin (holepunch_resolve_t *req) {
+open_bin (appling_resolve_t *req) {
   size_t i = req->bin_candidate;
 
   char path[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){req->path, holepunch_bin_candidates[i], NULL},
+    (const char *[]){req->path, appling_bin_candidates[i], NULL},
     path,
     &path_len,
     path_separator_system
@@ -177,7 +177,7 @@ open_bin (holepunch_resolve_t *req) {
 }
 
 int
-holepunch_resolve (uv_loop_t *loop, holepunch_resolve_t *req, const char *dir, holepunch_resolve_cb cb) {
+appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_resolve_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->bin_candidate = 0;
@@ -200,7 +200,7 @@ holepunch_resolve (uv_loop_t *loop, holepunch_resolve_t *req, const char *dir, h
     size_t path_len = PATH_MAX;
 
     path_join(
-      (const char *[]){homedir, holepunch_dir, NULL},
+      (const char *[]){homedir, appling_platform_dir, NULL},
       req->path,
       &path_len,
       path_separator_system

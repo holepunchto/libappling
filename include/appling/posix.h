@@ -1,0 +1,6 @@
+#ifndef APPLING_POSIX_H
+#define APPLING_POSIX_H
+
+#define APPLING_PATH_SEPARATOR "/"
+
+#endif // APPLING_POSIX_H

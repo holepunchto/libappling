@@ -3,11 +3,11 @@
 #include <path.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 static void
 on_close (fs_close_t *fs_req, int status) {
-  holepunch_lock_t *req = (holepunch_lock_t *) fs_req->data;
+  appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (req->status < 0) status = req->status;
 
@@ -20,7 +20,7 @@ on_close (fs_close_t *fs_req, int status) {
 
 static void
 on_lock (fs_lock_t *fs_req, int status) {
-  holepunch_lock_t *req = (holepunch_lock_t *) fs_req->data;
+  appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
     req->on_lock(req, 0);
@@ -33,7 +33,7 @@ on_lock (fs_lock_t *fs_req, int status) {
 
 static void
 on_open (fs_open_t *fs_req, int status, uv_file file) {
-  holepunch_lock_t *req = (holepunch_lock_t *) fs_req->data;
+  appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
     req->file = file;
@@ -45,7 +45,7 @@ on_open (fs_open_t *fs_req, int status, uv_file file) {
 }
 
 int
-holepunch_lock (uv_loop_t *loop, holepunch_lock_t *req, const char *dir, holepunch_lock_cb cb) {
+appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb) {
   req->loop = loop;
   req->on_lock = cb;
   req->file = -1;
@@ -65,7 +65,7 @@ holepunch_lock (uv_loop_t *loop, holepunch_lock_t *req, const char *dir, holepun
     size_t path_len = PATH_MAX;
 
     path_join(
-      (const char *[]){homedir, holepunch_dir, NULL},
+      (const char *[]){homedir, appling_platform_dir, NULL},
       path,
       &path_len,
       path_separator_system

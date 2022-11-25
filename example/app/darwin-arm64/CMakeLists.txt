@@ -15,13 +15,13 @@ add_executable(
 target_include_directories(
   example_darwin
   PRIVATE
-    $<TARGET_PROPERTY:holepunch,INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:appling,INCLUDE_DIRECTORIES>
 )
 
 target_compile_definitions(
   example_darwin
   PRIVATE
-    EXAMPLE_HOLEPUNCH_DIR="${PROJECT_SOURCE_DIR}/../../holepunch"
+    EXAMPLE_APPLING_PLATFORM_DIR="${PROJECT_SOURCE_DIR}/../../holepunch"
 )
 
 set_target_properties(
@@ -49,5 +49,5 @@ set_source_files_properties(
 target_link_libraries(
   example_darwin
   PRIVATE
-    holepunch_static
+    appling_static
 )

@@ -4,10 +4,10 @@
 #include <string.h>
 #include <uv.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 static inline bool
-should_replace_platform (const holepunch_platform_t *platform, const holepunch_app_t *app) {
+should_replace_platform (const appling_platform_t *platform, const appling_app_t *app) {
   return (
     strcmp(platform->key, app->platform.key) != 0 || // Different platform
     platform->fork < app->platform.fork ||           // Newer platform
@@ -19,11 +19,11 @@ should_replace_platform (const holepunch_platform_t *platform, const holepunch_a
 }
 
 static void
-on_resolve (holepunch_resolve_t *resolve, int status, const holepunch_platform_t *platform) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) resolve->data;
+on_resolve (appling_resolve_t *resolve, int status, const appling_platform_t *platform) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) resolve->data;
 
   if (status >= 0) {
-    memcpy(&req->app.platform, platform, sizeof(holepunch_platform_t));
+    memcpy(&req->app.platform, platform, sizeof(appling_platform_t));
 
     req->cb(req, 0, &req->app);
   } else {
@@ -33,19 +33,19 @@ on_resolve (holepunch_resolve_t *resolve, int status, const holepunch_platform_t
 
 static void
 on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   status = req->status;
 
   if (status >= 0) {
-    holepunch_resolve(req->loop, &req->resolve, req->dir, on_resolve);
+    appling_resolve(req->loop, &req->resolve, req->dir, on_resolve);
   } else {
     req->cb(req, status, NULL);
   }
 }
 
 static void
-discard_tmp (holepunch_bootstrap_t *req) {
+discard_tmp (appling_bootstrap_t *req) {
   char tmp[PATH_MAX];
   size_t path_len = PATH_MAX;
 
@@ -61,7 +61,7 @@ discard_tmp (holepunch_bootstrap_t *req) {
 
 static void
 on_rename (fs_rename_t *fs_req, int status) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
     req->status = 0;
@@ -73,7 +73,7 @@ on_rename (fs_rename_t *fs_req, int status) {
 }
 
 static inline void
-rename_platform (holepunch_bootstrap_t *req) {
+rename_platform (appling_bootstrap_t *req) {
   char to[PATH_MAX];
   size_t path_len = PATH_MAX;
 
@@ -99,7 +99,7 @@ rename_platform (holepunch_bootstrap_t *req) {
 
 static void
 on_swap (fs_swap_t *fs_req, int status) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
     discard_tmp(req);
@@ -111,7 +111,7 @@ on_swap (fs_swap_t *fs_req, int status) {
 }
 
 static inline void
-swap_platform (holepunch_bootstrap_t *req) {
+swap_platform (appling_bootstrap_t *req) {
   char to[PATH_MAX];
   size_t path_len = PATH_MAX;
 
@@ -136,8 +136,8 @@ swap_platform (holepunch_bootstrap_t *req) {
 }
 
 static void
-on_extract (holepunch_extract_t *extract, int status) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) extract->data;
+on_extract (appling_extract_t *extract, int status) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) extract->data;
 
   if (status >= 0) {
     swap_platform(req);
@@ -149,12 +149,12 @@ on_extract (holepunch_extract_t *extract, int status) {
 }
 
 static inline void
-extract_platform (holepunch_bootstrap_t *req) {
+extract_platform (appling_bootstrap_t *req) {
   char archive[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){req->exe_dir, holepunch_platform_bundle, NULL},
+    (const char *[]){req->exe_dir, appling_platform_bundle, NULL},
     archive,
     &path_len,
     path_separator_system
@@ -170,12 +170,12 @@ extract_platform (holepunch_bootstrap_t *req) {
     path_separator_system
   );
 
-  holepunch_extract(req->loop, &req->extract, archive, dest, on_extract);
+  appling_extract(req->loop, &req->extract, archive, dest, on_extract);
 }
 
 static void
 on_close_checkout (fs_close_t *fs_req, int status) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   if (req->status < 0) status = req->status;
 
@@ -183,7 +183,7 @@ on_close_checkout (fs_close_t *fs_req, int status) {
     if (!req->has_platform || should_replace_platform(&req->platform, &req->app)) {
       extract_platform(req);
     } else {
-      memcpy(&req->app.platform, &req->platform, sizeof(holepunch_platform_t));
+      memcpy(&req->app.platform, &req->platform, sizeof(appling_platform_t));
 
       req->cb(req, status, &req->app);
     }
@@ -194,7 +194,7 @@ on_close_checkout (fs_close_t *fs_req, int status) {
 
 static void
 on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
     req->buf.base[req->buf.len - 1] = '\0';
@@ -211,7 +211,7 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
 
 static void
 on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
     size_t len = stat->st_size;
@@ -228,7 +228,7 @@ on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
 
 static void
 on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
-  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   if (status >= 0) {
     req->file = file;
@@ -240,20 +240,16 @@ on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
 }
 
 static void
-open_checkout (holepunch_bootstrap_t *req) {
-  char path[PATH_MAX];
+open_checkout (appling_bootstrap_t *req) {
+  char dir[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){req->exe_dir, holepunch_platform_bundle, NULL},
-    path,
+    (const char *[]){req->exe_dir, appling_platform_bundle, "..", NULL},
+    dir,
     &path_len,
     path_separator_system
   );
-
-  path_dirname(path, &path_len, path_separator_system);
-
-  path[path_len - 1] = '\0';
 
   path_len = PATH_MAX;
 
@@ -261,7 +257,7 @@ open_checkout (holepunch_bootstrap_t *req) {
   path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){path, "checkout", NULL},
+    (const char *[]){dir, "checkout", NULL},
     checkout,
     &path_len,
     path_separator_system
@@ -271,7 +267,7 @@ open_checkout (holepunch_bootstrap_t *req) {
 }
 
 int
-holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *exe, const char *dir, const holepunch_platform_t *platform, holepunch_bootstrap_cb cb) {
+appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->status = 0;
@@ -286,38 +282,42 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
   req->extract.data = (void *) req;
   req->resolve.data = (void *) req;
 
+  size_t path_len;
+
   if (exe) strcpy(req->app.exe, exe);
   else {
-    size_t path_len = PATH_MAX;
-
+    path_len = PATH_MAX;
     uv_exepath(req->app.exe, &path_len);
   }
 
   if (dir) strcpy(req->dir, dir);
   else {
     char homedir[PATH_MAX];
-    size_t homedir_len = PATH_MAX;
+    path_len = PATH_MAX;
 
-    int err = uv_os_homedir(homedir, &homedir_len);
+    int err = uv_os_homedir(homedir, &path_len);
     if (err < 0) return err;
 
-    size_t path_len = PATH_MAX;
+    path_len = PATH_MAX;
 
     path_join(
-      (const char *[]){homedir, holepunch_dir, NULL},
+      (const char *[]){homedir, appling_platform_dir, NULL},
       req->dir,
       &path_len,
       path_separator_system
     );
   }
 
-  size_t dirname = 0;
+  path_len = PATH_MAX;
 
-  path_dirname(req->app.exe, &dirname, path_separator_system);
+  path_join(
+    (const char *[]){req->app.exe, "..", NULL},
+    req->exe_dir,
+    &path_len,
+    path_separator_system
+  );
 
-  strncpy(req->exe_dir, req->app.exe, dirname - 1);
-
-  if (platform) memcpy(&req->platform, platform, sizeof(holepunch_platform_t));
+  if (platform) memcpy(&req->platform, platform, sizeof(appling_platform_t));
 
   open_checkout(req);
 

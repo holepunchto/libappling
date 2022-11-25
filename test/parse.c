@@ -1,13 +1,13 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../include/holepunch.h"
+#include "../include/appling.h"
 
 int
 main () {
-  holepunch_link_t link;
+  appling_link_t link;
 
-  holepunch_parse("punch://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/data", &link);
+  appling_parse("punch://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/data", &link);
   assert(strcmp(link.key, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") == 0);
   assert(strcmp(link.data, "data") == 0);
 

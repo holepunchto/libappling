@@ -11,12 +11,12 @@ list(APPEND tests
 foreach(test IN LISTS tests)
   add_executable(${test} ${test}.c)
 
-  target_link_libraries(${test} holepunch_static)
+  target_link_libraries(${test} appling_static)
 
   target_include_directories(
     ${test}
     PRIVATE
-      $<TARGET_PROPERTY:holepunch,INCLUDE_DIRECTORIES>
+      $<TARGET_PROPERTY:appling,INCLUDE_DIRECTORIES>
   )
 
   add_test(

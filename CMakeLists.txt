@@ -6,7 +6,7 @@ if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
-project(holepunch C)
+project(appling C)
 
 option(ENABLE_ACL OFF)
 option(ENABLE_BZip2 OFF)
@@ -44,25 +44,25 @@ if(NOT TARGET fs)
   add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
 endif()
 
-add_library(holepunch OBJECT)
+add_library(appling OBJECT)
 
 set_target_properties(
-  holepunch
+  appling
   PROPERTIES
   C_STANDARD 99
   POSITION_INDEPENDENT_CODE 1
 )
 
 target_sources(
-  holepunch
+  appling
   INTERFACE
-    include/holepunch.h
-    include/holepunch/arch.h
-    include/holepunch/constants.h
-    include/holepunch/linux.h
-    include/holepunch/mac.h
-    include/holepunch/os.h
-    include/holepunch/win.h
+    include/appling.h
+    include/appling/arch.h
+    include/appling/constants.h
+    include/appling/linux.h
+    include/appling/mac.h
+    include/appling/os.h
+    include/appling/win.h
   PRIVATE
     src/bootstrap.c
     src/extract.c
@@ -74,7 +74,7 @@ target_sources(
 )
 
 target_include_directories(
-  holepunch
+  appling
   PUBLIC
     include
     $<TARGET_PROPERTY:uv,INCLUDE_DIRECTORIES>
@@ -84,16 +84,16 @@ target_include_directories(
     $<TARGET_PROPERTY:path,INCLUDE_DIRECTORIES>
 )
 
-add_library(holepunch_static STATIC $<TARGET_OBJECTS:holepunch>)
+add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
 
 set_target_properties(
-  holepunch_static
+  appling_static
   PROPERTIES
-  OUTPUT_NAME holepunch
+  OUTPUT_NAME appling
 )
 
 target_link_libraries(
-  holepunch_static
+  appling_static
   PUBLIC
     uv
   PRIVATE
@@ -102,10 +102,10 @@ target_link_libraries(
     path_static
 )
 
-install(TARGETS holepunch_static)
+install(TARGETS appling_static)
 
-install(FILES include/holepunch.h DESTINATION include)
-install(DIRECTORY include/holepunch DESTINATION include)
+install(FILES include/appling.h DESTINATION include)
+install(DIRECTORY include/appling DESTINATION include)
 
 if(PROJECT_IS_TOP_LEVEL)
   enable_testing()

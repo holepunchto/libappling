@@ -3,6 +3,8 @@ list(APPEND tests
   bootstrap-no-platform
   bootstrap-older-platform
   extract
+  lock
+  parse
   resolve
 )
 

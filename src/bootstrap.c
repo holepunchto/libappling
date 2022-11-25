@@ -19,13 +19,26 @@ should_replace_platform (const holepunch_platform_t *platform, const holepunch_a
 }
 
 static void
+on_resolve (holepunch_resolve_t *resolve, int status, const holepunch_platform_t *platform) {
+  holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) resolve->data;
+
+  if (status >= 0) {
+    memcpy(&req->app.platform, platform, sizeof(holepunch_platform_t));
+
+    req->cb(req, 0, &req->app);
+  } else {
+    req->cb(req, status, NULL);
+  }
+}
+
+static void
 on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
   holepunch_bootstrap_t *req = (holepunch_bootstrap_t *) fs_req->data;
 
   status = req->status;
 
   if (status >= 0) {
-    req->cb(req, status, &req->app);
+    holepunch_resolve(req->loop, &req->resolve, req->dir, on_resolve);
   } else {
     req->cb(req, status, NULL);
   }
@@ -33,17 +46,17 @@ on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
 
 static void
 discard_tmp (holepunch_bootstrap_t *req) {
-  char path[PATH_MAX];
+  char tmp[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
     (const char *[]){req->dir, "tmp", NULL},
-    path,
+    tmp,
     &path_len,
     path_separator_system
   );
 
-  fs_rmdir(req->loop, &req->rmdir, path, true, on_rmdir_tmp);
+  fs_rmdir(req->loop, &req->rmdir, tmp, true, on_rmdir_tmp);
 }
 
 static void
@@ -61,17 +74,27 @@ on_rename (fs_rename_t *fs_req, int status) {
 
 static inline void
 rename_platform (holepunch_bootstrap_t *req) {
-  char path[PATH_MAX];
+  char to[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
     (const char *[]){req->dir, "platform", NULL},
-    path,
+    to,
     &path_len,
     path_separator_system
   );
 
-  fs_rename(req->loop, &req->rename, req->path, path, on_rename);
+  char from[PATH_MAX];
+  path_len = PATH_MAX;
+
+  path_join(
+    (const char *[]){req->dir, "tmp", req->app.key, "platform", NULL},
+    from,
+    &path_len,
+    path_separator_system
+  );
+
+  fs_rename(req->loop, &req->rename, from, to, on_rename);
 }
 
 static void
@@ -89,17 +112,27 @@ on_swap (fs_swap_t *fs_req, int status) {
 
 static inline void
 swap_platform (holepunch_bootstrap_t *req) {
-  char path[PATH_MAX];
+  char to[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
     (const char *[]){req->dir, "platform", NULL},
-    path,
+    to,
     &path_len,
     path_separator_system
   );
 
-  fs_swap(req->loop, &req->swap, req->path, path, on_swap);
+  char from[PATH_MAX];
+  path_len = PATH_MAX;
+
+  path_join(
+    (const char *[]){req->dir, "tmp", req->app.key, "platform", NULL},
+    from,
+    &path_len,
+    path_separator_system
+  );
+
+  fs_swap(req->loop, &req->swap, from, to, on_swap);
 }
 
 static void
@@ -117,26 +150,27 @@ on_extract (holepunch_extract_t *extract, int status) {
 
 static inline void
 extract_platform (holepunch_bootstrap_t *req) {
-  char path[PATH_MAX];
+  char archive[PATH_MAX];
   size_t path_len = PATH_MAX;
 
   path_join(
     (const char *[]){req->exe_dir, holepunch_platform_bundle, NULL},
-    path,
+    archive,
     &path_len,
     path_separator_system
   );
 
+  char dest[PATH_MAX];
   path_len = PATH_MAX;
 
   path_join(
     (const char *[]){req->dir, "tmp", req->app.key, NULL},
-    req->path,
+    dest,
     &path_len,
     path_separator_system
   );
 
-  holepunch_extract(req->loop, &req->extract, path, req->path, on_extract);
+  holepunch_extract(req->loop, &req->extract, archive, dest, on_extract);
 }
 
 static void
@@ -223,14 +257,17 @@ open_checkout (holepunch_bootstrap_t *req) {
 
   path_len = PATH_MAX;
 
+  char checkout[PATH_MAX];
+  path_len = PATH_MAX;
+
   path_join(
     (const char *[]){path, "checkout", NULL},
-    req->path,
+    checkout,
     &path_len,
     path_separator_system
   );
 
-  fs_open(req->loop, &req->open, req->path, 0, O_RDONLY, on_open_checkout);
+  fs_open(req->loop, &req->open, checkout, 0, O_RDONLY, on_open_checkout);
 }
 
 int
@@ -247,19 +284,16 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
   req->rename.data = (void *) req;
   req->rmdir.data = (void *) req;
   req->extract.data = (void *) req;
+  req->resolve.data = (void *) req;
 
-  strcpy(req->exe, exe);
-  strcpy(req->dir, dir);
+  if (exe) strcpy(req->exe, exe);
+  else {
+    size_t path_len = PATH_MAX;
 
-  size_t dirname = 0;
+    uv_exepath(req->exe, &path_len);
+  }
 
-  path_dirname(req->exe, &dirname, path_separator_system);
-
-  strncpy(req->exe_dir, req->exe, dirname - 1);
-
-  if (platform) memcpy(&req->platform, platform, sizeof(holepunch_platform_t));
-
-  if (dir) strcpy(req->path, dir);
+  if (dir) strcpy(req->dir, dir);
   else {
     char homedir[PATH_MAX];
     size_t homedir_len = PATH_MAX;
@@ -271,11 +305,19 @@ holepunch_bootstrap (uv_loop_t *loop, holepunch_bootstrap_t *req, const char *ex
 
     path_join(
       (const char *[]){homedir, holepunch_dir, NULL},
-      req->path,
+      req->dir,
       &path_len,
       path_separator_system
     );
   }
+
+  size_t dirname = 0;
+
+  path_dirname(req->exe, &dirname, path_separator_system);
+
+  strncpy(req->exe_dir, req->exe, dirname - 1);
+
+  if (platform) memcpy(&req->platform, platform, sizeof(holepunch_platform_t));
 
   open_checkout(req);
 

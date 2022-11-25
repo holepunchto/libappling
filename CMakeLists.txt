@@ -66,6 +66,10 @@ target_sources(
   PRIVATE
     src/bootstrap.c
     src/extract.c
+    src/launch.c
+    src/lock.c
+    src/unlock.c
+    src/parse.c
     src/resolve.c
 )
 

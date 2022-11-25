@@ -27,7 +27,7 @@ target_compile_definitions(
 set_target_properties(
   example_darwin_x64
   PROPERTIES
-  OUTPUT_NAME Example
+  OUTPUT_NAME darwin-x64/Example
   MACOSX_BUNDLE YES
   MACOSX_BUNDLE_INFO_PLIST "${APP}/Contents/Info.plist"
   XCODE_ATTRIBUTE_PRODUCT_NAME "Example"

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(example_darwin_x64 C)
+project(example_darwin C)
 
 set(APP ${PROJECT_SOURCE_DIR}/Example.app)
 
 add_executable(
-  example_darwin_x64
+  example_darwin
   ../main.c
   ${APP}/Contents/Info.plist
   ${APP}/Contents/Resources/app/checkout
@@ -13,19 +13,19 @@ add_executable(
 )
 
 target_include_directories(
-  example_darwin_x64
+  example_darwin
   PRIVATE
     $<TARGET_PROPERTY:holepunch,INCLUDE_DIRECTORIES>
 )
 
 target_compile_definitions(
-  example_darwin_x64
+  example_darwin
   PRIVATE
     EXAMPLE_HOLEPUNCH_DIR="${PROJECT_SOURCE_DIR}/../../holepunch"
 )
 
 set_target_properties(
-  example_darwin_x64
+  example_darwin
   PROPERTIES
   OUTPUT_NAME Example
   MACOSX_BUNDLE YES
@@ -47,7 +47,7 @@ set_source_files_properties(
 )
 
 target_link_libraries(
-  example_darwin_x64
+  example_darwin
   PRIVATE
     holepunch_static
 )

@@ -88,5 +88,5 @@ holepunch_launch (uv_loop_t *loop, holepunch_process_t *process, const holepunch
 
   if (link) free(key);
 
-  return;
+  return err;
 }

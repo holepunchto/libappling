@@ -37,8 +37,15 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
 
   char *key;
 
-  if (link == NULL) key = (char *) app->key;
-  else {
+  if (link == NULL) {
+    key = malloc(8 /* punch:// */ + strlen(app->key) + 1 /* NULL */);
+    key[0] = '\0';
+
+    strcat(key, "punch://");
+    strcat(key, app->key);
+  } else {
+    if (strcmp(link->key, app->key) != 0) return UV_EINVAL;
+
     key = malloc(8 /* punch:// */ + strlen(link->key) + 1 /* / */ + strlen(link->data) + 1 /* NULL */);
     key[0] = '\0';
 
@@ -86,7 +93,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
 
   int err = uv_spawn(loop, &process->process, &options);
 
-  if (link) free(key);
+  free(key);
 
   return err;
 }

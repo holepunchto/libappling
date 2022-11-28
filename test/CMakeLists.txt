@@ -3,6 +3,9 @@ list(APPEND tests
   bootstrap-no-platform
   bootstrap-older-platform
   extract
+  launch
+  launch-link
+  launch-link-different-key
   lock
   lock-non-existing
   parse

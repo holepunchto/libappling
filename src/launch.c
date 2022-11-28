@@ -6,7 +6,7 @@
 #include "../include/appling.h"
 
 static void
-on_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
+on_process_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
   appling_process_t *process = (appling_process_t *) handle;
 
   process->on_exit(process, exit_status, term_signal);
@@ -62,7 +62,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
   get_app_root(app->exe, app_root);
 
   uv_process_options_t options = {
-    .exit_cb = on_exit,
+    .exit_cb = on_process_exit,
     .file = app->platform.exe,
     .args = (char *[]){
       (char *) app->platform.exe,

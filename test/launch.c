@@ -17,7 +17,7 @@ appling_process_t process;
 bool exit_called = false;
 
 static void
-on_exit (appling_process_t *process, int64_t exit_status, int term_signal) {
+on_process_exit (appling_process_t *process, int64_t exit_status, int term_signal) {
   exit_called = true;
 
   assert(exit_status == 0);
@@ -31,7 +31,7 @@ on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platfo
     .key = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   };
 
-  int err = appling_launch(loop, &process, NULL, &app, on_exit);
+  int err = appling_launch(loop, &process, NULL, &app, on_process_exit);
   assert(err == 0);
 }
 

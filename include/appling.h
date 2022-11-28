@@ -61,11 +61,14 @@ struct appling_lock_s {
   appling_lock_cb on_lock;
   appling_unlock_cb on_unlock;
 
-  uv_file file;
-
+  fs_mkdir_t mkdir;
   fs_open_t open;
   fs_lock_t lock;
   fs_close_t close;
+
+  char dir[PATH_MAX];
+
+  uv_file file;
 
   int status;
 

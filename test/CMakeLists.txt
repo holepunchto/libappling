@@ -4,6 +4,7 @@ list(APPEND tests
   bootstrap-older-platform
   extract
   lock
+  lock-non-existing
   parse
   resolve
 )

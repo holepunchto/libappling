@@ -44,17 +44,27 @@ on_open (fs_open_t *fs_req, int status, uv_file file) {
   }
 }
 
+static void
+on_mkdir (fs_mkdir_t *fs_req, int status) {
+  appling_lock_t *req = (appling_lock_t *) fs_req->data;
+
+  if (status >= 0) {
+    fs_open(req->loop, &req->open, req->dir, 0, O_RDONLY, on_open);
+  } else {
+    req->on_lock(req, status);
+  }
+}
+
 int
 appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb) {
   req->loop = loop;
   req->on_lock = cb;
   req->file = -1;
+  req->mkdir.data = (void *) req;
   req->open.data = (void *) req;
   req->lock.data = (void *) req;
 
-  char path[PATH_MAX];
-
-  if (dir) strcpy(path, dir);
+  if (dir) strcpy(req->dir, dir);
   else {
     char homedir[PATH_MAX];
     size_t homedir_len = PATH_MAX;
@@ -66,11 +76,11 @@ appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_loc
 
     path_join(
       (const char *[]){homedir, appling_platform_dir, NULL},
-      path,
+      req->dir,
       &path_len,
       path_separator_system
     );
   }
 
-  return fs_open(req->loop, &req->open, path, 0, O_RDONLY, on_open);
+  return fs_mkdir(req->loop, &req->mkdir, req->dir, 0777, true, on_mkdir);
 }

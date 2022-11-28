@@ -23,7 +23,7 @@ int
 main () {
   loop = uv_default_loop();
 
-  int err = appling_lock(loop, &req, "test/fixtures/lock", on_lock);
+  int err = appling_lock(loop, &req, "test/fixtures/lock/missing/directory", on_lock);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

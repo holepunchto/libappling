@@ -5,6 +5,7 @@ list(APPEND tests
   extract
   launch
   launch-link
+  launch-link-data
   launch-link-different-key
   lock
   lock-non-existing

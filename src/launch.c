@@ -25,7 +25,7 @@ get_app_root (const char *exe, char *result) {
     (const char *[]){exe, "..", "..", "..", NULL},
     result,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 #endif
 }

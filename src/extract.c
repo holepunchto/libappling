@@ -62,7 +62,7 @@ extract (appling_extract_t *req, const char *archive, const char *dest) {
       (const char *[]){dest, archive_entry_pathname(entry), NULL},
       path,
       &path_len,
-      path_separator_system
+      path_behavior_system
     );
 
     archive_entry_set_pathname(entry, path);

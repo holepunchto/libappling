@@ -78,7 +78,7 @@ appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_loc
       (const char *[]){homedir, appling_platform_dir, NULL},
       req->dir,
       &path_len,
-      path_separator_system
+      path_behavior_system
     );
   }
 

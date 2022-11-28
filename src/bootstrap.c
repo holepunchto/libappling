@@ -53,7 +53,7 @@ discard_tmp (appling_bootstrap_t *req) {
     (const char *[]){req->dir, "tmp", NULL},
     tmp,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_rmdir(req->loop, &req->rmdir, tmp, true, on_rmdir_tmp);
@@ -81,7 +81,7 @@ rename_platform (appling_bootstrap_t *req) {
     (const char *[]){req->dir, "platform", NULL},
     to,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   char from[PATH_MAX];
@@ -91,7 +91,7 @@ rename_platform (appling_bootstrap_t *req) {
     (const char *[]){req->dir, "tmp", req->app.key, "platform", NULL},
     from,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_rename(req->loop, &req->rename, from, to, on_rename);
@@ -119,7 +119,7 @@ swap_platform (appling_bootstrap_t *req) {
     (const char *[]){req->dir, "platform", NULL},
     to,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   char from[PATH_MAX];
@@ -129,7 +129,7 @@ swap_platform (appling_bootstrap_t *req) {
     (const char *[]){req->dir, "tmp", req->app.key, "platform", NULL},
     from,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_swap(req->loop, &req->swap, from, to, on_swap);
@@ -157,7 +157,7 @@ extract_platform (appling_bootstrap_t *req) {
     (const char *[]){req->exe_dir, appling_platform_bundle, NULL},
     archive,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   char dest[PATH_MAX];
@@ -167,7 +167,7 @@ extract_platform (appling_bootstrap_t *req) {
     (const char *[]){req->dir, "tmp", req->app.key, NULL},
     dest,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   appling_extract(req->loop, &req->extract, archive, dest, on_extract);
@@ -248,7 +248,7 @@ open_checkout (appling_bootstrap_t *req) {
     (const char *[]){req->exe_dir, appling_platform_bundle, "..", NULL},
     dir,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   path_len = PATH_MAX;
@@ -260,7 +260,7 @@ open_checkout (appling_bootstrap_t *req) {
     (const char *[]){dir, "checkout", NULL},
     checkout,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_open(req->loop, &req->open, checkout, 0, O_RDONLY, on_open_checkout);
@@ -304,7 +304,7 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, c
       (const char *[]){homedir, appling_platform_dir, NULL},
       req->dir,
       &path_len,
-      path_separator_system
+      path_behavior_system
     );
   }
 
@@ -314,7 +314,7 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, c
     (const char *[]){req->app.exe, "..", NULL},
     req->exe_dir,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   if (platform) memcpy(&req->platform, platform, sizeof(appling_platform_t));

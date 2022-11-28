@@ -81,7 +81,7 @@ open_checkout (appling_resolve_t *req) {
   while (dirname > 4 && !is_bin) {
     is_bin = strcmp(APPLING_PATH_SEPARATOR "bin", &bin[dirname - 5]) == 0;
 
-    path_dirname(bin, &dirname, path_separator_system);
+    path_dirname(bin, &dirname, path_behavior_system);
 
     bin[dirname - 1] = '\0';
   }
@@ -92,7 +92,7 @@ open_checkout (appling_resolve_t *req) {
     (const char *[]){bin, "checkout", NULL},
     req->path,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_open(req->loop, &req->open, req->path, 0, O_RDONLY, on_open_checkout);
@@ -129,7 +129,7 @@ realpath_exe (appling_resolve_t *req) {
     (const char *[]){req->path, appling_bin_candidates[i], appling_exe_candidates[j], NULL},
     path,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_realpath(req->loop, &req->realpath, path, on_realpath_exe);
@@ -170,7 +170,7 @@ open_bin (appling_resolve_t *req) {
     (const char *[]){req->path, appling_bin_candidates[i], NULL},
     path,
     &path_len,
-    path_separator_system
+    path_behavior_system
   );
 
   fs_open(req->loop, &req->open, path, 0, O_RDONLY, on_open_bin);
@@ -203,7 +203,7 @@ appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appli
       (const char *[]){homedir, appling_platform_dir, NULL},
       req->path,
       &path_len,
-      path_separator_system
+      path_behavior_system
     );
   }
 

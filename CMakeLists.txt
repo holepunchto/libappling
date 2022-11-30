@@ -95,7 +95,7 @@ set_target_properties(
 target_link_libraries(
   appling_static
   PUBLIC
-    uv
+    uv_a
   PRIVATE
     archive_static
     fs_static
@@ -105,6 +105,7 @@ target_link_libraries(
 install(TARGETS appling_static)
 
 install(FILES include/appling.h DESTINATION include)
+
 install(DIRECTORY include/appling DESTINATION include)
 
 if(PROJECT_IS_TOP_LEVEL)

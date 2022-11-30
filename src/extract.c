@@ -1,10 +1,11 @@
-#include <archive.h>
-#include <archive_entry.h>
-#include <limits.h>
 #include <path.h>
 #include <stdlib.h>
 #include <string.h>
 #include <uv.h>
+
+// Must be included after uv.h
+#include <archive.h>
+#include <archive_entry.h>
 
 #include "../include/appling.h"
 

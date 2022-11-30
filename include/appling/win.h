@@ -1,6 +1,10 @@
 #ifndef APPLING_WIN_H
 #define APPLING_WIN_H
 
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
+
 #define APPLING_PATH_SEPARATOR "\\"
 
 #define APPLING_OS "win32"

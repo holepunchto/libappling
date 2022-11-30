@@ -1,5 +1,4 @@
 #include <fs.h>
-#include <limits.h>
 #include <path.h>
 #include <stdio.h>
 #include <stdlib.h>

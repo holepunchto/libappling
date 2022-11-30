@@ -30,3 +30,5 @@ foreach(test IN LISTS tests)
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   )
 endforeach()
+
+add_subdirectory(fixtures EXCLUDE_FROM_ALL)

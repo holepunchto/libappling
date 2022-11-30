@@ -5,3 +5,7 @@ if(APPLE)
     add_subdirectory(app/darwin-x64 EXCLUDE_FROM_ALL)
   endif()
 endif()
+
+if(WIN32)
+  add_subdirectory(app/win32-x64 EXCLUDE_FROM_ALL)
+endif()

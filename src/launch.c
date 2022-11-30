@@ -74,6 +74,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
       key,
       NULL,
     },
+    .flags = UV_PROCESS_WINDOWS_HIDE,
     .stdio_count = 3,
     .stdio = (uv_stdio_container_t[]){
       {

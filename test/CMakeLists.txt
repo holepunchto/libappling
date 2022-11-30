@@ -16,7 +16,11 @@ list(APPEND tests
 foreach(test IN LISTS tests)
   add_executable(${test} ${test}.c)
 
-  target_link_libraries(${test} appling_static)
+  target_link_libraries(
+    ${test}
+    PRIVATE
+      appling_static
+  )
 
   target_include_directories(
     ${test}

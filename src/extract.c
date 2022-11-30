@@ -3,7 +3,8 @@
 #include <string.h>
 #include <uv.h>
 
-// Must be included after uv.h
+#define LIBARCHIVE_STATIC
+
 #include <archive.h>
 #include <archive_entry.h>
 

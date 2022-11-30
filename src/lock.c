@@ -62,6 +62,7 @@ appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_loc
   req->mkdir.data = (void *) req;
   req->open.data = (void *) req;
   req->lock.data = (void *) req;
+  req->close.data = (void *) req;
 
   if (dir) strcpy(req->dir, dir);
   else {

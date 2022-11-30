@@ -7,13 +7,13 @@
   <key>CFBundleDisplayName</key>
   <string>Example</string>
   <key>CFBundleExecutable</key>
-  <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+  <string>Example</string>
   <key>CFBundleIdentifier</key>
   <string>com.example.Example</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
-  <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+  <string>Example</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleVersion</key>

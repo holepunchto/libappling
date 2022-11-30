@@ -47,8 +47,18 @@ static void
 on_mkdir (fs_mkdir_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
+  char path[PATH_MAX];
+  size_t path_len = PATH_MAX;
+
+  path_join(
+    (const char *[]){req->dir, "lock", NULL},
+    path,
+    &path_len,
+    path_behavior_system
+  );
+
   if (status >= 0) {
-    fs_open(req->loop, &req->open, req->dir, 0, O_RDONLY, on_open);
+    fs_open(req->loop, &req->open, path, UV_FS_O_RDWR | UV_FS_O_CREAT, 0666, on_open);
   } else {
     req->on_lock(req, status);
   }

@@ -34,6 +34,6 @@ install(
 )
 
 install(
-  DIRECTORY resources
+  DIRECTORY Example/resources
   DESTINATION Example
 )

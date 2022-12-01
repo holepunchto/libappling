@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <uv.h>
 
-#ifndef EXAMPLE_APPLING_PLATFORM_DIR
-#define EXAMPLE_APPLING_PLATFORM_DIR "example/holepunch"
+#ifndef PLATFORM_DIR
+#define PLATFORM_DIR "example/holepunch"
 #endif
 
 uv_loop_t *loop;
@@ -37,14 +37,14 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
 
 static void
 on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
-  appling_bootstrap(req->loop, &bootstrap, NULL, EXAMPLE_APPLING_PLATFORM_DIR, platform, on_bootstrap);
+  appling_bootstrap(req->loop, &bootstrap, NULL, PLATFORM_DIR, platform, on_bootstrap);
 }
 
 static void
 on_lock (appling_lock_t *req, int status) {
   assert(status == 0);
 
-  appling_resolve(loop, &resolve, EXAMPLE_APPLING_PLATFORM_DIR, on_resolve);
+  appling_resolve(loop, &resolve, PLATFORM_DIR, on_resolve);
 }
 
 int
@@ -53,7 +53,7 @@ main (int argc, char *argv[]) {
 
   loop = uv_default_loop();
 
-  appling_lock(loop, &lock, EXAMPLE_APPLING_PLATFORM_DIR, on_lock);
+  appling_lock(loop, &lock, PLATFORM_DIR, on_lock);
 
   return uv_run(loop, UV_RUN_DEFAULT);
 }

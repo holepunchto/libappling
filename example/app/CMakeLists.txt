@@ -36,6 +36,10 @@ if(APPLE)
   endif()
 endif()
 
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  add_subdirectory(linux-x64)
+endif()
+
 if(WIN32)
   add_subdirectory(win32-x64)
 endif()

@@ -1,5 +1,6 @@
 #include <fs.h>
 #include <path.h>
+#include <string.h>
 #include <uv.h>
 
 #include "../include/appling.h"

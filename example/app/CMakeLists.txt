@@ -37,7 +37,11 @@ if(APPLE)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  add_subdirectory(linux-x64)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    add_subdirectory(linux-arm64)
+  else()
+    add_subdirectory(linux-x64)
+  endif()
 endif()
 
 if(WIN32)

@@ -13,7 +13,7 @@ target_include_directories(
 target_compile_definitions(
   example
   PRIVATE
-    PLATFORM_DIR="${PROJECT_SOURCE_DIR}/../../holepunch"
+    PLATFORM_DIR="${PROJECT_SOURCE_DIR}/../holepunch"
 )
 
 set_target_properties(

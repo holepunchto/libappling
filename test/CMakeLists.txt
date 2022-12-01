@@ -35,4 +35,4 @@ foreach(test IN LISTS tests)
   )
 endforeach()
 
-add_subdirectory(fixtures EXCLUDE_FROM_ALL)
+add_subdirectory(fixtures)

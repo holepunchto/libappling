@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(example_win32_x64 C)
 
-add_executable(example_win32_x64 ../main.c)
+add_executable(example_win32_x64 WIN32 ../main.c)
 
 target_include_directories(
   example_win32_x64
@@ -20,6 +20,12 @@ set_target_properties(
   example_win32_x64
   PROPERTIES
   OUTPUT_NAME Example
+)
+
+target_link_options(
+  example_win32_x64
+  PRIVATE
+    /entry:mainCRTStartup
 )
 
 target_link_libraries(

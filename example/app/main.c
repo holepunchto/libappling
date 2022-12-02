@@ -1,5 +1,6 @@
 #include <appling.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <uv.h>
 
@@ -8,6 +9,9 @@
 #endif
 
 uv_loop_t *loop;
+
+appling_link_t link;
+bool has_link;
 
 appling_lock_t lock;
 appling_resolve_t resolve;
@@ -30,7 +34,7 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
 
   appling_unlock(req->loop, &lock, on_unlock);
 
-  status = appling_launch(req->loop, &process, NULL, app, on_process_exit);
+  status = appling_launch(req->loop, &process, has_link ? &link : NULL, app, on_process_exit);
 
   assert(status == 0);
 }
@@ -52,6 +56,14 @@ main (int argc, char *argv[]) {
   uv_setup_args(argc, argv);
 
   loop = uv_default_loop();
+
+  has_link = argc > 1;
+
+  if (has_link) {
+    int err = appling_parse(argv[1], &link);
+
+    assert(err == 0);
+  }
 
   appling_lock(loop, &lock, PLATFORM_DIR, on_lock);
 

@@ -10,6 +10,7 @@ list(APPEND tests
   lock
   lock-non-existing
   parse
+  parse-invalid
   resolve
 )
 

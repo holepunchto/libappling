@@ -87,7 +87,7 @@ rename_platform (appling_bootstrap_t *req) {
   path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){req->dir, "tmp", req->app.key, "platform", NULL},
+    (const char *[]){req->dir, "tmp", req->app.key, NULL},
     from,
     &path_len,
     path_behavior_system
@@ -125,7 +125,7 @@ swap_platform (appling_bootstrap_t *req) {
   path_len = PATH_MAX;
 
   path_join(
-    (const char *[]){req->dir, "tmp", req->app.key, "platform", NULL},
+    (const char *[]){req->dir, "tmp", req->app.key, NULL},
     from,
     &path_len,
     path_behavior_system

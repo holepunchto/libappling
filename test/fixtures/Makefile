@@ -2,8 +2,9 @@ platform-%.tar:
 	tar \
 	--create \
 	--file $@ \
-	platform/stable/swap-0/checkout \
-	platform/stable/swap-0/bin/$*
+	--directory platform \
+	stable/swap-0/checkout \
+	stable/swap-0/bin/$*
 
 all: \
 	platform-darwin-arm64.tar \

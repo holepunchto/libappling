@@ -14,9 +14,9 @@ on_close_checkout (fs_close_t *fs_req, int status) {
   if (req->status < 0) status = req->status;
 
   if (status >= 0) {
-    req->cb(req, 0, &req->platform);
+    if (req->cb) req->cb(req, 0, &req->platform);
   } else {
-    req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 
@@ -63,7 +63,7 @@ on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
 
     fs_stat(req->loop, &req->stat, req->file, on_stat_checkout);
   } else {
-    req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 
@@ -112,7 +112,7 @@ on_realpath_exe (fs_realpath_t *fs_req, int status, const char *path) {
     size_t i = ++req->exe_candidate;
 
     if (appling_exe_candidates[i]) realpath_exe(req);
-    else req->cb(req, status, NULL);
+    else if (req->cb) req->cb(req, status, NULL);
   }
 }
 
@@ -154,7 +154,7 @@ on_open_bin (fs_open_t *fs_req, int status, uv_file file) {
     size_t i = ++req->bin_candidate;
 
     if (appling_bin_candidates[i]) open_bin(req);
-    else req->cb(req, status, NULL);
+    else if (req->cb) req->cb(req, status, NULL);
   }
 }
 

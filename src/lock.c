@@ -12,9 +12,9 @@ on_close (fs_close_t *fs_req, int status) {
   if (req->status < 0) status = req->status;
 
   if (status >= 0) {
-    req->on_lock(req, 0);
+    if (req->on_lock) req->on_lock(req, 0);
   } else {
-    req->on_lock(req, status);
+    if (req->on_lock) req->on_lock(req, status);
   }
 }
 
@@ -23,7 +23,7 @@ on_lock (fs_lock_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
-    req->on_lock(req, 0);
+    if (req->on_lock) req->on_lock(req, 0);
   } else {
     req->status = status; // Propagate
 
@@ -40,7 +40,7 @@ on_open (fs_open_t *fs_req, int status, uv_file file) {
 
     fs_lock(req->loop, &req->lock, req->file, 0, 0, false, on_lock);
   } else {
-    req->on_lock(req, status);
+    if (req->on_lock) req->on_lock(req, status);
   }
 }
 
@@ -61,7 +61,7 @@ on_mkdir (fs_mkdir_t *fs_req, int status) {
   if (status >= 0) {
     fs_open(req->loop, &req->open, path, UV_FS_O_RDWR | UV_FS_O_CREAT, 0666, on_open);
   } else {
-    req->on_lock(req, status);
+    if (req->on_lock) req->on_lock(req, status);
   }
 }
 

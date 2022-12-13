@@ -111,7 +111,7 @@ on_after_work (uv_work_t *handle, int status) {
   free(req->archive);
   free(req->dest);
 
-  req->cb(req, status);
+  if (req->cb) req->cb(req, status);
 }
 
 int

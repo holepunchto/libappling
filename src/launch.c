@@ -10,7 +10,7 @@ static void
 on_process_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
   appling_process_t *process = (appling_process_t *) handle;
 
-  process->on_exit(process, exit_status, term_signal);
+  if (process->on_exit) process->on_exit(process, exit_status, term_signal);
 }
 
 static inline void

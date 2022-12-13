@@ -8,9 +8,9 @@ on_close (fs_close_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
-    req->on_unlock(req, 0);
+    if (req->on_unlock) req->on_unlock(req, 0);
   } else {
-    req->on_unlock(req, status);
+    if (req->on_unlock) req->on_unlock(req, status);
   }
 }
 

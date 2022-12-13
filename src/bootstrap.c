@@ -24,9 +24,9 @@ on_resolve (appling_resolve_t *resolve, int status, const appling_platform_t *pl
   if (status >= 0) {
     memcpy(&req->app.platform, platform, sizeof(appling_platform_t));
 
-    req->cb(req, 0, &req->app);
+    if (req->cb) req->cb(req, 0, &req->app);
   } else {
-    req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 
@@ -39,7 +39,7 @@ on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
   if (status >= 0) {
     appling_resolve(req->loop, &req->resolve, req->dir, on_resolve);
   } else {
-    req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 
@@ -184,10 +184,10 @@ on_close_checkout (fs_close_t *fs_req, int status) {
     } else {
       memcpy(&req->app.platform, &req->platform, sizeof(appling_platform_t));
 
-      req->cb(req, status, &req->app);
+      if (req->cb) req->cb(req, status, &req->app);
     }
   } else {
-    req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 
@@ -234,7 +234,7 @@ on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
 
     fs_stat(req->loop, &req->stat, req->file, on_stat_checkout);
   } else {
-    req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 

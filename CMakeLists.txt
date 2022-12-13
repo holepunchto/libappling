@@ -44,6 +44,10 @@ if(NOT TARGET fs)
   add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
 endif()
 
+if(NOT TARGET log)
+  add_subdirectory(vendor/liblog EXCLUDE_FROM_ALL)
+endif()
+
 add_library(appling OBJECT)
 
 set_target_properties(
@@ -82,6 +86,7 @@ target_include_directories(
   PRIVATE
     $<TARGET_PROPERTY:archive,INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:log,INCLUDE_DIRECTORIES>
 )
 
 add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
@@ -100,6 +105,7 @@ target_link_libraries(
     archive_static
     fs_static
     path_static
+    log_static
 )
 
 install(TARGETS appling_static)

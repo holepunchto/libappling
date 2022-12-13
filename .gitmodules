@@ -10,3 +10,6 @@
 [submodule "vendor/libuv"]
 	path = vendor/libuv
 	url = git@github.com:libuv/libuv.git
+[submodule "vendor/liblog"]
+	path = vendor/liblog
+	url = git@github.com:holepunchto/liblog.git

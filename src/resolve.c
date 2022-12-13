@@ -1,4 +1,5 @@
 #include <fs.h>
+#include <log.h>
 #include <path.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -94,6 +95,8 @@ open_checkout (appling_resolve_t *req) {
     path_behavior_system
   );
 
+  log_debug("appling_resolve() opening checkout file at %s", req->path);
+
   fs_open(req->loop, &req->open, req->path, 0, O_RDONLY, on_open_checkout);
 }
 
@@ -171,6 +174,8 @@ open_bin (appling_resolve_t *req) {
     &path_len,
     path_behavior_system
   );
+
+  log_debug("appling_resolve() opening platform binary at %s", path);
 
   fs_open(req->loop, &req->open, path, 0, O_RDONLY, on_open_bin);
 }

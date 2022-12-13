@@ -1,3 +1,4 @@
+#include <log.h>
 #include <path.h>
 #include <stdlib.h>
 #include <string.h>
@@ -93,6 +94,8 @@ rename_platform (appling_bootstrap_t *req) {
     path_behavior_system
   );
 
+  log_debug("appling_bootstrap() renaming platform at %s", to);
+
   fs_rename(req->loop, &req->rename, from, to, on_rename);
 }
 
@@ -130,6 +133,8 @@ swap_platform (appling_bootstrap_t *req) {
     &path_len,
     path_behavior_system
   );
+
+  log_debug("appling_bootstrap() swapping platform at %s", to);
 
   fs_swap(req->loop, &req->swap, from, to, on_swap);
 }
@@ -169,6 +174,8 @@ extract_platform (appling_bootstrap_t *req) {
     path_behavior_system
   );
 
+  log_debug("appling_bootstrap() extracting platform archive to %s", dest);
+
   appling_extract(req->loop, &req->extract, archive, dest, on_extract);
 }
 
@@ -182,6 +189,8 @@ on_close_checkout (fs_close_t *fs_req, int status) {
     if (!req->has_platform || should_replace_platform(&req->platform, &req->app)) {
       extract_platform(req);
     } else {
+      log_debug("appling_bootstrap() using existing platform at %s", req->platform.exe);
+
       memcpy(&req->app.platform, &req->platform, sizeof(appling_platform_t));
 
       if (req->cb) req->cb(req, status, &req->app);
@@ -261,6 +270,8 @@ open_checkout (appling_bootstrap_t *req) {
     &path_len,
     path_behavior_system
   );
+
+  log_debug("appling_bootstrap() opening checkout file at %s", checkout);
 
   fs_open(req->loop, &req->open, checkout, 0, O_RDONLY, on_open_checkout);
 }

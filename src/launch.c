@@ -1,3 +1,4 @@
+#include <log.h>
 #include <path.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -59,8 +60,12 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
     }
   }
 
+  log_debug("appling_launch() launching link %s", key);
+
   char app_root[PATH_MAX];
   get_app_root(app->exe, app_root);
+
+  log_debug("appling_launch() launching application shell %s", app_root);
 
   uv_process_options_t options = {
     .exit_cb = on_process_exit,

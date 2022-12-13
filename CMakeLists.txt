@@ -48,6 +48,14 @@ if(NOT TARGET log)
   add_subdirectory(vendor/liblog EXCLUDE_FROM_ALL)
 endif()
 
+if(NOT TARGET hex)
+  add_subdirectory(vendor/libhex EXCLUDE_FROM_ALL)
+endif()
+
+if(NOT TARGET z32)
+  add_subdirectory(vendor/libz32 EXCLUDE_FROM_ALL)
+endif()
+
 add_library(appling OBJECT)
 
 set_target_properties(
@@ -87,6 +95,8 @@ target_include_directories(
     $<TARGET_PROPERTY:archive,INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:hex,INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:z32,INCLUDE_DIRECTORIES>
 )
 
 add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
@@ -106,6 +116,8 @@ target_link_libraries(
     fs_static
     path_static
     log_static
+    hex_static
+    z32_static
 )
 
 install(TARGETS appling_static)

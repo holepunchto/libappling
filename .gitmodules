@@ -13,3 +13,9 @@
 [submodule "vendor/liblog"]
 	path = vendor/liblog
 	url = git@github.com:holepunchto/liblog.git
+[submodule "vendor/libhex"]
+	path = vendor/libhex
+	url = git@github.com:holepunchto/libhex.git
+[submodule "vendor/libz32"]
+	path = vendor/libz32
+	url = git@github.com:holepunchto/libz32.git

@@ -232,7 +232,7 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
 
     len = APPLING_KEY_LEN;
 
-    req->status = hex_decode(platform_key, strlen(platform_key), req->platform.key, &len);
+    req->status = hex_decode(platform_key, strlen(platform_key), req->app.platform.key, &len);
 
     if (req->status < 0) goto close;
 

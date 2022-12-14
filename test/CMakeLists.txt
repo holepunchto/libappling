@@ -9,8 +9,9 @@ list(APPEND tests
   launch-link-different-key
   lock
   lock-non-existing
-  parse
+  parse-hex
   parse-invalid
+  parse-z32
   resolve
 )
 

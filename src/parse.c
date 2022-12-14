@@ -1,5 +1,7 @@
+#include <hex.h>
 #include <stddef.h>
 #include <string.h>
+#include <z32.h>
 
 #include "../include/appling.h"
 
@@ -15,18 +17,40 @@ appling_parse (const char *link, appling_link_t *result) {
   else if (strncmp(link, "holepunch://", 12) == 0) i += 12;
   else goto err;
 
-  for (size_t j = 0; j < APPLING_KEY_MAX; i++, j++) {
+  char key[APPLING_KEY_LEN * 2 + 1 /* NULL */];
+  size_t key_len = 0;
+
+  for (; key_len < APPLING_KEY_LEN * 2; i++) {
     char c = link[i];
 
     if (c == '\0' || c == '/') {
-      result->key[j] = '\0';
+      key[key_len] = '\0';
       break;
     }
 
-    result->key[j] = c;
+    key[key_len++] = c;
   }
 
-  result->key[APPLING_KEY_MAX] = '\0';
+  size_t len = APPLING_KEY_LEN;
+
+  switch (key_len) {
+  case 64: {
+    int err = hex_decode(key, key_len, result->key, &len);
+
+    if (err < 0 || len != APPLING_KEY_LEN) goto err;
+    break;
+  }
+
+  case 52: {
+    int err = z32_decode(key, key_len, result->key, &len);
+
+    if (err < 0 || len != APPLING_KEY_LEN) goto err;
+    break;
+  }
+
+  default:
+    goto err;
+  }
 
   if (link[i] == '/') i++;
   else if (link[i] != '\0') goto err;

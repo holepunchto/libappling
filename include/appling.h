@@ -15,10 +15,10 @@ extern "C" {
 #include "appling/constants.h"
 #include "appling/os.h"
 
-#define APPLING_KEY_MAX       64
+#define APPLING_KEY_LEN       32
 #define APPLING_LINK_DATA_MAX 4096
 
-typedef char appling_key_t[APPLING_KEY_MAX + 1 /* NULL */];
+typedef uint8_t appling_key_t[APPLING_KEY_LEN];
 
 typedef struct appling_platform_s appling_platform_t;
 typedef struct appling_app_s appling_app_t;

@@ -17,6 +17,15 @@ main () {
   // Empty
   test_parse_invalid("");
 
+  // Empty link
+  test_parse_invalid("punch://");
+  test_parse_invalid("holepunch://");
+  test_parse_invalid("punch:///");
+  test_parse_invalid("holepunch:///");
+
+  // Key shorter than 52 characters
+  test_parse_invalid("punch://aaaa");
+
   // Key longer than 64 characters
   test_parse_invalid("punch://" KEY "aaaa");
 

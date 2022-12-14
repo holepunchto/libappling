@@ -11,8 +11,8 @@
     appling_link_t link; \
     int err = appling_parse(input, &link); \
     assert(err == 0); \
-    uint8_t expected_z32_key[strlen(expected_key)]; \
-    size_t expected_z32_len = strlen(expected_key); \
+    uint8_t expected_z32_key[strlen(expected_key) + 1]; \
+    size_t expected_z32_len = strlen(expected_key) + 1; \
     z32_decode(expected_key, strlen(expected_key), expected_z32_key, &expected_z32_len); \
     assert(memcmp(link.key, expected_z32_key, APPLING_KEY_LEN) == 0); \
     assert(strcmp(link.data, expected_data) == 0); \

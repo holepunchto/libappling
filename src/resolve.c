@@ -1,4 +1,5 @@
 #include <fs.h>
+#include <hex.h>
 #include <log.h>
 #include <path.h>
 #include <stdio.h>
@@ -28,11 +29,23 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
   if (status >= 0) {
     req->buf.base[read - 1] = '\0';
 
-    sscanf(req->buf.base, "%i %i %64s", &req->platform.fork, &req->platform.len, req->platform.key);
+    size_t len;
+
+    char platform_key[65];
+
+    sscanf(req->buf.base, "%i %i %64s", &req->platform.fork, &req->platform.len, platform_key);
+
+    len = APPLING_KEY_LEN;
+
+    req->status = hex_decode(platform_key, strlen(platform_key), req->platform.key, &len);
+
+    if (req->status < 0) goto close;
+
   } else {
     req->status = status; // Propagate
   }
 
+close:
   free(req->buf.base);
 
   fs_close(req->loop, &req->close, req->file, on_close_checkout);

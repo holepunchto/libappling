@@ -1,3 +1,4 @@
+#include <hex.h>
 #include <log.h>
 #include <path.h>
 #include <stdlib.h>
@@ -9,8 +10,8 @@
 static inline bool
 should_replace_platform (const appling_platform_t *platform, const appling_app_t *app) {
   return (
-    strcmp(platform->key, app->platform.key) != 0 || // Different platform
-    platform->fork < app->platform.fork ||           // Newer platform
+    memcmp(platform->key, app->platform.key, APPLING_KEY_LEN) != 0 || // Different platform
+    platform->fork < app->platform.fork ||                            // Newer platform
     (
       platform->fork == app->platform.fork &&
       platform->len < app->platform.len
@@ -87,8 +88,13 @@ rename_platform (appling_bootstrap_t *req) {
   char from[PATH_MAX];
   path_len = PATH_MAX;
 
+  char app_key[65];
+  size_t app_key_len = 65;
+
+  hex_encode(req->app.key, APPLING_KEY_LEN, app_key, &app_key_len);
+
   path_join(
-    (const char *[]){req->dir, "tmp", req->app.key, NULL},
+    (const char *[]){req->dir, "tmp", app_key, NULL},
     from,
     &path_len,
     path_behavior_system
@@ -127,8 +133,13 @@ swap_platform (appling_bootstrap_t *req) {
   char from[PATH_MAX];
   path_len = PATH_MAX;
 
+  char app_key[65];
+  size_t app_key_len = 65;
+
+  hex_encode(req->app.key, APPLING_KEY_LEN, app_key, &app_key_len);
+
   path_join(
-    (const char *[]){req->dir, "tmp", req->app.key, NULL},
+    (const char *[]){req->dir, "tmp", app_key, NULL},
     from,
     &path_len,
     path_behavior_system
@@ -167,8 +178,13 @@ extract_platform (appling_bootstrap_t *req) {
   char dest[PATH_MAX];
   path_len = PATH_MAX;
 
+  char app_key[65];
+  size_t app_key_len = 65;
+
+  hex_encode(req->app.key, APPLING_KEY_LEN, app_key, &app_key_len);
+
   path_join(
-    (const char *[]){req->dir, "tmp", req->app.key, NULL},
+    (const char *[]){req->dir, "tmp", app_key, NULL},
     dest,
     &path_len,
     path_behavior_system
@@ -207,11 +223,29 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
   if (status >= 0) {
     req->buf.base[req->buf.len - 1] = '\0';
 
-    sscanf(req->buf.base, "%i %i %64s %64s", &req->app.platform.fork, &req->app.platform.len, req->app.platform.key, req->app.key);
+    size_t len;
+
+    char platform_key[65];
+    char app_key[65];
+
+    sscanf(req->buf.base, "%i %i %64s %64s", &req->app.platform.fork, &req->app.platform.len, platform_key, app_key);
+
+    len = APPLING_KEY_LEN;
+
+    req->status = hex_decode(platform_key, strlen(platform_key), req->platform.key, &len);
+
+    if (req->status < 0) goto close;
+
+    len = APPLING_KEY_LEN;
+
+    req->status = hex_decode(app_key, strlen(app_key), req->app.key, &len);
+
+    if (req->status < 0) goto close;
   } else {
     req->status = status; // Propagate
   }
 
+close:
   free(req->buf.base);
 
   fs_close(req->loop, &req->close, req->file, on_close_checkout);

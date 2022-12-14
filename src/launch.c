@@ -1,3 +1,4 @@
+#include <hex.h>
 #include <log.h>
 #include <path.h>
 #include <stdint.h>
@@ -37,30 +38,36 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
   process->on_exit = cb;
   process->process.data = (void *) process;
 
-  char *key;
+  char *launch;
 
   if (link == NULL) {
-    key = malloc(8 /* punch:// */ + strlen(app->key) + 1 /* NULL */);
-    key[0] = '\0';
+    launch = malloc(8 /* punch:// */ + APPLING_KEY_LEN * 2 + 1 /* NULL */);
+    launch[0] = '\0';
 
-    strcat(key, "punch://");
-    strcat(key, app->key);
+    strcat(launch, "punch://");
+
+    size_t len = 65;
+
+    hex_encode(app->key, APPLING_KEY_LEN, &launch[8], &len);
   } else {
-    if (strcmp(link->key, app->key) != 0) return UV_EINVAL;
+    if (memcmp(link->key, app->key, APPLING_KEY_LEN) != 0) return UV_EINVAL;
 
-    key = malloc(8 /* punch:// */ + strlen(link->key) + 1 /* / */ + strlen(link->data) + 1 /* NULL */);
-    key[0] = '\0';
+    launch = malloc(8 /* punch:// */ + APPLING_KEY_LEN * 2 + 1 /* / */ + strlen(link->data) + 1 /* NULL */);
+    launch[0] = '\0';
 
-    strcat(key, "punch://");
-    strcat(key, link->key);
+    strcat(launch, "punch://");
+
+    size_t len = 65;
+
+    hex_encode(link->key, APPLING_KEY_LEN, &launch[8], &len);
 
     if (strlen(link->data)) {
-      strcat(key, "/");
-      strcat(key, link->data);
+      strcat(launch, "/");
+      strcat(launch, link->data);
     }
   }
 
-  log_debug("appling_launch() launching link %s", key);
+  log_debug("appling_launch() launching link %s", launch);
 
   char app_root[PATH_MAX];
   get_app_root(app->exe, app_root);
@@ -77,7 +84,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
       "--no-multiapp",
       "--sequester",
       "--launch",
-      key,
+      launch,
       NULL,
     },
     .flags = UV_PROCESS_WINDOWS_HIDE,
@@ -100,7 +107,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
 
   int err = uv_spawn(loop, &process->process, &options);
 
-  free(key);
+  free(launch);
 
   return err;
 }

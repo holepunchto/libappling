@@ -14,7 +14,7 @@ See [`example/`](example).
 
 ## API
 
-See [`includes/appling.h`](include/appling.h) for the public API.
+See [`include/appling.h`](include/appling.h) for the public API.
 
 ## License
 

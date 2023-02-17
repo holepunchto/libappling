@@ -15,6 +15,8 @@ list(APPEND tests
   resolve
 )
 
+add_subdirectory(fixtures)
+
 foreach(test IN LISTS tests)
   add_executable(${test} ${test}.c)
 
@@ -24,17 +26,15 @@ foreach(test IN LISTS tests)
       appling_static
   )
 
-  target_include_directories(
-    ${test}
-    PRIVATE
-      $<TARGET_PROPERTY:appling,INCLUDE_DIRECTORIES>
-  )
-
   add_test(
     NAME ${test}
     COMMAND ${test}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   )
-endforeach()
 
-add_subdirectory(fixtures)
+  set_tests_properties(
+    ${test}
+    PROPERTIES
+    TIMEOUT 30000
+  )
+endforeach()

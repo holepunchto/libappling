@@ -26,6 +26,12 @@ foreach(test IN LISTS tests)
       appling_static
   )
 
+  target_include_directories(
+    ${test}
+    PRIVATE
+      $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
+  )
+
   add_test(
     NAME ${test}
     COMMAND ${test}

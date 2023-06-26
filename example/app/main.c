@@ -1,5 +1,6 @@
 #include <appling.h>
 #include <assert.h>
+#include <log.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <uv.h>
@@ -53,6 +54,8 @@ on_lock (appling_lock_t *req, int status) {
 
 int
 main (int argc, char *argv[]) {
+  log_open("appling", 0);
+
   uv_setup_args(argc, argv);
 
   loop = uv_default_loop();

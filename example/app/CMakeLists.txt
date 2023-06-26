@@ -8,6 +8,7 @@ target_include_directories(
   example
   PRIVATE
     $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_compile_definitions(

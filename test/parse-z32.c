@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include <utf.h>
 #include <z32.h>
 
 #include "../include/appling.h"
@@ -13,7 +14,7 @@
     assert(err == 0); \
     uint8_t expected_z32_key[strlen(expected_key) + 1]; \
     size_t expected_z32_len = strlen(expected_key) + 1; \
-    z32_decode(expected_key, strlen(expected_key), expected_z32_key, &expected_z32_len); \
+    z32_decode((utf8_t *) expected_key, strlen(expected_key), expected_z32_key, &expected_z32_len); \
     assert(memcmp(link.key, expected_z32_key, APPLING_KEY_LEN) == 0); \
     assert(strcmp(link.data, expected_data) == 0); \
   }

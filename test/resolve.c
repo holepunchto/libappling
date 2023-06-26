@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
@@ -26,7 +27,7 @@ on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platfo
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(platform->key, APPLING_KEY_LEN, key, &key_len);
+  hex_encode(platform->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
 
   printf(
     "exe=%s\nfork=%i\nlen=%i\nkey=%s\n",

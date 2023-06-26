@@ -99,6 +99,7 @@ set_target_properties(
   appling_static
   PROPERTIES
   OUTPUT_NAME appling
+  PREFIX lib
 )
 
 target_link_libraries(

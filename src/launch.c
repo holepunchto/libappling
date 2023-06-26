@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
@@ -48,7 +49,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
 
     size_t len = 65;
 
-    hex_encode(app->key, APPLING_KEY_LEN, &launch[8], &len);
+    hex_encode(app->key, APPLING_KEY_LEN, (utf8_t *) &launch[8], &len);
   } else {
     if (memcmp(link->key, app->key, APPLING_KEY_LEN) != 0) return UV_EINVAL;
 
@@ -59,7 +60,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
 
     size_t len = 65;
 
-    hex_encode(link->key, APPLING_KEY_LEN, &launch[8], &len);
+    hex_encode(link->key, APPLING_KEY_LEN, (utf8_t *) &launch[8], &len);
 
     if (strlen(link->data)) {
       strcat(launch, "/");

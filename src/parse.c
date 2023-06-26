@@ -1,6 +1,7 @@
 #include <hex.h>
 #include <stddef.h>
 #include <string.h>
+#include <utf.h>
 #include <z32.h>
 
 #include "../include/appling.h"
@@ -35,14 +36,14 @@ appling_parse (const char *link, appling_link_t *result) {
 
   switch (key_len) {
   case 64: {
-    int err = hex_decode(key, key_len, result->key, &len);
+    int err = hex_decode((utf8_t *) key, key_len, result->key, &len);
 
     if (err < 0 || len != APPLING_KEY_LEN) goto err;
     break;
   }
 
   case 52: {
-    int err = z32_decode(key, key_len, result->key, &len);
+    int err = z32_decode((utf8_t *) key, key_len, result->key, &len);
 
     if (err < 0 || len != APPLING_KEY_LEN) goto err;
     break;

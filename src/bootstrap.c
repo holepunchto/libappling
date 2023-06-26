@@ -3,6 +3,7 @@
 #include <path.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
@@ -91,7 +92,7 @@ rename_platform (appling_bootstrap_t *req) {
   char app_key[65];
   size_t app_key_len = 65;
 
-  hex_encode(req->app.key, APPLING_KEY_LEN, app_key, &app_key_len);
+  hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) app_key, &app_key_len);
 
   path_join(
     (const char *[]){req->dir, "tmp", app_key, NULL},
@@ -136,7 +137,7 @@ swap_platform (appling_bootstrap_t *req) {
   char app_key[65];
   size_t app_key_len = 65;
 
-  hex_encode(req->app.key, APPLING_KEY_LEN, app_key, &app_key_len);
+  hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) app_key, &app_key_len);
 
   path_join(
     (const char *[]){req->dir, "tmp", app_key, NULL},
@@ -181,7 +182,7 @@ extract_platform (appling_bootstrap_t *req) {
   char app_key[65];
   size_t app_key_len = 65;
 
-  hex_encode(req->app.key, APPLING_KEY_LEN, app_key, &app_key_len);
+  hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) app_key, &app_key_len);
 
   path_join(
     (const char *[]){req->dir, "tmp", app_key, NULL},
@@ -232,13 +233,13 @@ on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
 
     len = APPLING_KEY_LEN;
 
-    req->status = hex_decode(platform_key, strlen(platform_key), req->app.platform.key, &len);
+    req->status = hex_decode((utf8_t *) platform_key, strlen(platform_key), req->app.platform.key, &len);
 
     if (req->status < 0) goto close;
 
     len = APPLING_KEY_LEN;
 
-    req->status = hex_decode(app_key, strlen(app_key), req->app.key, &len);
+    req->status = hex_decode((utf8_t *) app_key, strlen(app_key), req->app.key, &len);
 
     if (req->status < 0) goto close;
   } else {

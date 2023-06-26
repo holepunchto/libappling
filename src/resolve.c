@@ -11,110 +11,6 @@
 #include "../include/appling.h"
 
 static void
-on_close_checkout (fs_close_t *fs_req, int status) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
-
-  if (req->status < 0) status = req->status;
-
-  if (status >= 0) {
-    if (req->cb) req->cb(req, 0, &req->platform);
-  } else {
-    if (req->cb) req->cb(req, status, NULL);
-  }
-}
-
-static void
-on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
-
-  if (status >= 0) {
-    req->buf.base[read - 1] = '\0';
-
-    size_t len;
-
-    char platform_key[65];
-
-    sscanf(req->buf.base, "%i %i %64s", &req->platform.fork, &req->platform.len, platform_key);
-
-    len = APPLING_KEY_LEN;
-
-    req->status = hex_decode((utf8_t *) platform_key, strlen(platform_key), req->platform.key, &len);
-
-    if (req->status < 0) goto close;
-
-  } else {
-    req->status = status; // Propagate
-  }
-
-close:
-  free(req->buf.base);
-
-  fs_close(req->loop, &req->close, req->file, on_close_checkout);
-}
-
-static void
-on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
-
-  if (status >= 0) {
-    size_t len = stat->st_size;
-
-    req->buf = uv_buf_init(malloc(len), len);
-
-    fs_read(req->loop, &req->read, req->file, &req->buf, 1, 0, on_read_checkout);
-  } else {
-    req->status = status; // Propagate
-
-    fs_close(req->loop, &req->close, req->file, on_close_checkout);
-  }
-}
-
-static void
-on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
-
-  if (status >= 0) {
-    req->file = file;
-
-    fs_stat(req->loop, &req->stat, req->file, on_stat_checkout);
-  } else {
-    if (req->cb) req->cb(req, status, NULL);
-  }
-}
-
-static inline void
-open_checkout (appling_resolve_t *req) {
-  char bin[PATH_MAX];
-
-  strcpy(bin, req->platform.exe);
-
-  size_t dirname = strlen(bin);
-
-  bool is_bin = false;
-
-  while (dirname > 4 && !is_bin) {
-    is_bin = strcmp(APPLING_PATH_SEPARATOR "bin", &bin[dirname - 5]) == 0;
-
-    path_dirname(bin, &dirname, path_behavior_system);
-
-    bin[dirname - 1] = '\0';
-  }
-
-  size_t path_len = PATH_MAX;
-
-  path_join(
-    (const char *[]){bin, "checkout", NULL},
-    req->path,
-    &path_len,
-    path_behavior_system
-  );
-
-  log_debug("appling_resolve() opening checkout file at %s", req->path);
-
-  fs_open(req->loop, &req->open, req->path, 0, O_RDONLY, on_open_checkout);
-}
-
-static void
 realpath_exe (appling_resolve_t *req);
 
 static void
@@ -124,7 +20,7 @@ on_realpath_exe (fs_realpath_t *fs_req, int status, const char *path) {
   if (status >= 0) {
     strcpy(req->platform.exe, path);
 
-    open_checkout(req);
+    if (req->cb) req->cb(req, 0, &req->platform);
   } else {
     size_t i = ++req->exe_candidate;
 

@@ -8,18 +8,6 @@
 
 #include "../include/appling.h"
 
-static inline bool
-should_replace_platform (const appling_platform_t *platform, const appling_app_t *app) {
-  return (
-    memcmp(platform->key, app->platform.key, APPLING_KEY_LEN) != 0 || // Different platform
-    platform->fork < app->platform.fork ||                            // Newer platform
-    (
-      platform->fork == app->platform.fork &&
-      platform->len < app->platform.len
-    )
-  );
-}
-
 static void
 on_resolve (appling_resolve_t *resolve, int status, const appling_platform_t *platform) {
   appling_bootstrap_t *req = (appling_bootstrap_t *) resolve->data;
@@ -89,13 +77,8 @@ rename_platform (appling_bootstrap_t *req) {
   char from[PATH_MAX];
   path_len = PATH_MAX;
 
-  char app_key[65];
-  size_t app_key_len = 65;
-
-  hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) app_key, &app_key_len);
-
   path_join(
-    (const char *[]){req->dir, "tmp", app_key, NULL},
+    (const char *[]){req->dir, "tmp", NULL},
     from,
     &path_len,
     path_behavior_system
@@ -134,13 +117,8 @@ swap_platform (appling_bootstrap_t *req) {
   char from[PATH_MAX];
   path_len = PATH_MAX;
 
-  char app_key[65];
-  size_t app_key_len = 65;
-
-  hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) app_key, &app_key_len);
-
   path_join(
-    (const char *[]){req->dir, "tmp", app_key, NULL},
+    (const char *[]){req->dir, "tmp", NULL},
     from,
     &path_len,
     path_behavior_system
@@ -179,13 +157,8 @@ extract_platform (appling_bootstrap_t *req) {
   char dest[PATH_MAX];
   path_len = PATH_MAX;
 
-  char app_key[65];
-  size_t app_key_len = 65;
-
-  hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) app_key, &app_key_len);
-
   path_join(
-    (const char *[]){req->dir, "tmp", app_key, NULL},
+    (const char *[]){req->dir, "tmp", NULL},
     dest,
     &path_len,
     path_behavior_system
@@ -196,131 +169,11 @@ extract_platform (appling_bootstrap_t *req) {
   appling_extract(req->loop, &req->extract, archive, dest, on_extract);
 }
 
-static void
-on_close_checkout (fs_close_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (req->status < 0) status = req->status;
-
-  if (status >= 0) {
-    if (!req->has_platform || should_replace_platform(&req->platform, &req->app)) {
-      extract_platform(req);
-    } else {
-      log_debug("appling_bootstrap() using existing platform at %s", req->platform.exe);
-
-      memcpy(&req->app.platform, &req->platform, sizeof(appling_platform_t));
-
-      if (req->cb) req->cb(req, status, &req->app);
-    }
-  } else {
-    if (req->cb) req->cb(req, status, NULL);
-  }
-}
-
-static void
-on_read_checkout (fs_read_t *fs_req, int status, size_t read) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (status >= 0) {
-    req->buf.base[req->buf.len - 1] = '\0';
-
-    size_t len;
-
-    char platform_key[65];
-    char app_key[65];
-
-    sscanf(req->buf.base, "%i %i %64s %64s", &req->app.platform.fork, &req->app.platform.len, platform_key, app_key);
-
-    len = APPLING_KEY_LEN;
-
-    req->status = hex_decode((utf8_t *) platform_key, strlen(platform_key), req->app.platform.key, &len);
-
-    if (req->status < 0) goto close;
-
-    len = APPLING_KEY_LEN;
-
-    req->status = hex_decode((utf8_t *) app_key, strlen(app_key), req->app.key, &len);
-
-    if (req->status < 0) goto close;
-  } else {
-    req->status = status; // Propagate
-  }
-
-close:
-  free(req->buf.base);
-
-  fs_close(req->loop, &req->close, req->file, on_close_checkout);
-}
-
-static void
-on_stat_checkout (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (status >= 0) {
-    size_t len = stat->st_size;
-
-    req->buf = uv_buf_init(malloc(len), len);
-
-    fs_read(req->loop, &req->read, req->file, &req->buf, 1, 0, on_read_checkout);
-  } else {
-    req->status = status; // Propagate
-
-    fs_close(req->loop, &req->close, req->file, on_close_checkout);
-  }
-}
-
-static void
-on_open_checkout (fs_open_t *fs_req, int status, uv_file file) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (status >= 0) {
-    req->file = file;
-
-    fs_stat(req->loop, &req->stat, req->file, on_stat_checkout);
-  } else {
-    if (req->cb) req->cb(req, status, NULL);
-  }
-}
-
-static void
-open_checkout (appling_bootstrap_t *req) {
-  char dir[PATH_MAX];
-  size_t path_len = PATH_MAX;
-
-  path_join(
-    (const char *[]){req->exe_dir, appling_platform_bundle, "..", NULL},
-    dir,
-    &path_len,
-    path_behavior_system
-  );
-
-  path_len = PATH_MAX;
-
-  char checkout[PATH_MAX];
-  path_len = PATH_MAX;
-
-  path_join(
-    (const char *[]){dir, "checkout", NULL},
-    checkout,
-    &path_len,
-    path_behavior_system
-  );
-
-  log_debug("appling_bootstrap() opening checkout file at %s", checkout);
-
-  fs_open(req->loop, &req->open, checkout, 0, O_RDONLY, on_open_checkout);
-}
-
 int
 appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->status = 0;
-  req->has_platform = platform != NULL;
-  req->open.data = (void *) req;
-  req->close.data = (void *) req;
-  req->stat.data = (void *) req;
-  req->read.data = (void *) req;
   req->swap.data = (void *) req;
   req->rename.data = (void *) req;
   req->rmdir.data = (void *) req;
@@ -362,9 +215,11 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, c
     path_behavior_system
   );
 
-  if (platform) memcpy(&req->platform, platform, sizeof(appling_platform_t));
-
-  open_checkout(req);
+  if (platform) {
+    on_resolve(&req->resolve, 0, platform);
+  } else {
+    extract_platform(req);
+  }
 
   return 0;
 }

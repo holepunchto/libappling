@@ -19,8 +19,6 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
   bootstrap_called = true;
 
   assert(status == 0);
-
-  assert(app->platform.len == 1234);
 }
 
 int

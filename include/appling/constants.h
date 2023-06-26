@@ -1,6 +1,8 @@
 #ifndef APPLING_CONSTANTS_H
 #define APPLING_CONSTANTS_H
 
+#include <stddef.h>
+
 #include "arch.h"
 #include "os.h"
 

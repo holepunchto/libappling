@@ -38,15 +38,11 @@ typedef void (*appling_exit_cb)(appling_process_t *process, int64_t exit_status,
 
 struct appling_platform_s {
   char exe[PATH_MAX];
-  appling_key_t key;
-  int fork;
-  int len;
 };
 
 struct appling_app_s {
   appling_platform_t platform;
   char exe[PATH_MAX];
-  appling_key_t key;
 };
 
 struct appling_link_s {
@@ -119,10 +115,6 @@ struct appling_bootstrap_s {
 
   appling_bootstrap_cb cb;
 
-  fs_open_t open;
-  fs_close_t close;
-  fs_stat_t stat;
-  fs_read_t read;
   fs_swap_t swap;
   fs_rename_t rename;
   fs_rmdir_t rmdir;
@@ -130,8 +122,6 @@ struct appling_bootstrap_s {
   appling_extract_t extract;
   appling_resolve_t resolve;
 
-  bool has_platform;
-  appling_platform_t platform;
   appling_app_t app;
 
   char exe_dir[PATH_MAX];

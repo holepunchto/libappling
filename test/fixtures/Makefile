@@ -3,7 +3,6 @@ platform-%.tar:
 	--create \
 	--file $@ \
 	--directory platform \
-	stable/swap-0/checkout \
 	stable/swap-0/bin/$*
 
 all: \

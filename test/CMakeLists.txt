@@ -1,12 +1,10 @@
 list(APPEND tests
-  bootstrap-newer-platform
+  bootstrap-existing-platform
   bootstrap-no-platform
-  bootstrap-older-platform
   extract
   launch
   launch-link
   launch-link-data
-  launch-link-different-key
   lock
   lock-non-existing
   parse-hex

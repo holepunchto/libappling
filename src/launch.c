@@ -39,20 +39,9 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
   process->on_exit = cb;
   process->process.data = (void *) process;
 
-  char *launch;
+  char *launch = NULL;
 
-  if (link == NULL) {
-    launch = malloc(8 /* punch:// */ + APPLING_KEY_LEN * 2 + 1 /* NULL */);
-    launch[0] = '\0';
-
-    strcat(launch, "punch://");
-
-    size_t len = 65;
-
-    hex_encode(app->key, APPLING_KEY_LEN, (utf8_t *) &launch[8], &len);
-  } else {
-    if (memcmp(link->key, app->key, APPLING_KEY_LEN) != 0) return UV_EINVAL;
-
+  if (link != NULL) {
     launch = malloc(8 /* punch:// */ + APPLING_KEY_LEN * 2 + 1 /* / */ + strlen(link->data) + 1 /* NULL */);
     launch[0] = '\0';
 
@@ -68,7 +57,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
     }
   }
 
-  log_debug("appling_launch() launching link %s", launch);
+  if (launch) log_debug("appling_launch() launching link %s", launch);
 
   char app_root[PATH_MAX];
   get_app_root(app->exe, app_root);
@@ -82,9 +71,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
       (char *) app->platform.exe,
       "--appling",
       app_root,
-      "--no-multiapp",
-      "--sequester",
-      "--launch",
+      launch ? "--launch" : NULL,
       launch,
       NULL,
     },

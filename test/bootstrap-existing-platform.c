@@ -10,7 +10,8 @@
 
 uv_loop_t *loop;
 
-appling_bootstrap_t req;
+appling_resolve_t resolve;
+appling_bootstrap_t bootstrap;
 
 bool bootstrap_called = false;
 
@@ -19,8 +20,16 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
   bootstrap_called = true;
 
   assert(status == 0);
+}
 
-  assert(app->platform.len == 1234);
+static void
+on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
+  assert(status == 0);
+
+  printf("exe=%s\n", platform->exe);
+
+  int err = appling_bootstrap(loop, &bootstrap, EXE, "test/fixtures/bootstrap/existing-platform", platform, on_bootstrap);
+  assert(err == 0);
 }
 
 int
@@ -29,12 +38,9 @@ main () {
 
   appling_platform_t platform = {
     .exe = "",
-    .key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa},
-    .fork = 0,
-    .len = 1234 - 1,
   };
 
-  int err = appling_bootstrap(loop, &req, EXE, "test/fixtures/bootstrap/older-platform", &platform, on_bootstrap);
+  int err = appling_resolve(loop, &resolve, "test/fixtures", on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

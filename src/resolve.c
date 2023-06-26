@@ -34,8 +34,8 @@ realpath_exe (appling_resolve_t *req) {
   size_t i = req->bin_candidate;
   size_t j = req->exe_candidate;
 
-  char path[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t path;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->path, appling_bin_candidates[i], appling_exe_candidates[j], NULL},
@@ -75,8 +75,8 @@ static void
 open_bin (appling_resolve_t *req) {
   size_t i = req->bin_candidate;
 
-  char path[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t path;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->path, appling_bin_candidates[i], NULL},
@@ -105,13 +105,13 @@ appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appli
 
   if (dir) strcpy(req->path, dir);
   else {
-    char homedir[PATH_MAX];
-    size_t homedir_len = PATH_MAX;
+    appling_path_t homedir;
+    size_t homedir_len = sizeof(appling_path_t);
 
     int err = uv_os_homedir(homedir, &homedir_len);
     if (err < 0) return err;
 
-    size_t path_len = PATH_MAX;
+    size_t path_len = sizeof(appling_path_t);
 
     path_join(
       (const char *[]){homedir, appling_platform_dir, NULL},

@@ -36,8 +36,8 @@ on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
 
 static void
 discard_tmp (appling_bootstrap_t *req) {
-  char tmp[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t tmp;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "tmp", NULL},
@@ -64,8 +64,8 @@ on_rename (fs_rename_t *fs_req, int status) {
 
 static inline void
 rename_platform (appling_bootstrap_t *req) {
-  char to[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t to;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "platform", NULL},
@@ -74,8 +74,8 @@ rename_platform (appling_bootstrap_t *req) {
     path_behavior_system
   );
 
-  char from[PATH_MAX];
-  path_len = PATH_MAX;
+  appling_path_t from;
+  path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "tmp", NULL},
@@ -104,8 +104,8 @@ on_swap (fs_swap_t *fs_req, int status) {
 
 static inline void
 swap_platform (appling_bootstrap_t *req) {
-  char to[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t to;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "platform", NULL},
@@ -114,8 +114,8 @@ swap_platform (appling_bootstrap_t *req) {
     path_behavior_system
   );
 
-  char from[PATH_MAX];
-  path_len = PATH_MAX;
+  appling_path_t from;
+  path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "tmp", NULL},
@@ -144,8 +144,8 @@ on_extract (appling_extract_t *extract, int status) {
 
 static inline void
 extract_platform (appling_bootstrap_t *req) {
-  char archive[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t archive;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->exe_dir, appling_platform_bundle, NULL},
@@ -154,8 +154,8 @@ extract_platform (appling_bootstrap_t *req) {
     path_behavior_system
   );
 
-  char dest[PATH_MAX];
-  path_len = PATH_MAX;
+  appling_path_t dest;
+  path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "tmp", NULL},
@@ -184,19 +184,19 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, c
 
   if (exe) strcpy(req->app.exe, exe);
   else {
-    path_len = PATH_MAX;
+    path_len = sizeof(appling_path_t);
     uv_exepath(req->app.exe, &path_len);
   }
 
   if (dir) strcpy(req->dir, dir);
   else {
-    char homedir[PATH_MAX];
-    path_len = PATH_MAX;
+    appling_path_t homedir;
+    path_len = sizeof(appling_path_t);
 
     int err = uv_os_homedir(homedir, &path_len);
     if (err < 0) return err;
 
-    path_len = PATH_MAX;
+    path_len = sizeof(appling_path_t);
 
     path_join(
       (const char *[]){homedir, appling_platform_dir, NULL},
@@ -206,7 +206,7 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, c
     );
   }
 
-  path_len = PATH_MAX;
+  path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->app.exe, "..", NULL},

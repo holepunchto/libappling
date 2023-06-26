@@ -24,7 +24,7 @@ get_app_root (const char *exe, char *result) {
 #elif defined(APPLING_OS_WIN32)
   strcpy(result, exe);
 #elif defined(APPLING_OS_DARWIN)
-  size_t path_len = PATH_MAX;
+  size_t path_len = sizeof(appling_path_t);
   path_join(
     (const char *[]){exe, "..", "..", "..", NULL},
     result,
@@ -59,7 +59,7 @@ appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_
 
   if (launch) log_debug("appling_launch() launching link %s", launch);
 
-  char app_root[PATH_MAX];
+  appling_path_t app_root;
   get_app_root(app->exe, app_root);
 
   log_debug("appling_launch() launching application shell %s", app_root);

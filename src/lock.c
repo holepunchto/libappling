@@ -48,8 +48,8 @@ static void
 on_mkdir (fs_mkdir_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
-  char path[PATH_MAX];
-  size_t path_len = PATH_MAX;
+  appling_path_t path;
+  size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]){req->dir, "lock", NULL},
@@ -77,13 +77,13 @@ appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_loc
 
   if (dir) strcpy(req->dir, dir);
   else {
-    char homedir[PATH_MAX];
-    size_t homedir_len = PATH_MAX;
+    appling_path_t homedir;
+    size_t homedir_len = sizeof(appling_path_t);
 
     int err = uv_os_homedir(homedir, &homedir_len);
     if (err < 0) return err;
 
-    size_t path_len = PATH_MAX;
+    size_t path_len = sizeof(appling_path_t);
 
     path_join(
       (const char *[]){homedir, appling_platform_dir, NULL},

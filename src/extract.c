@@ -46,7 +46,7 @@ extract (appling_extract_t *req, const char *archive, const char *dest) {
     goto done;
   }
 
-  char path[PATH_MAX];
+  appling_path_t path;
 
   struct archive_entry *entry;
 
@@ -59,7 +59,7 @@ extract (appling_extract_t *req, const char *archive, const char *dest) {
       goto done;
     }
 
-    size_t path_len = PATH_MAX;
+    size_t path_len = sizeof(appling_path_t);
 
     path_join(
       (const char *[]){dest, archive_entry_pathname(entry), NULL},

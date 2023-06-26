@@ -18,6 +18,8 @@ extern "C" {
 #define APPLING_KEY_LEN       32
 #define APPLING_LINK_DATA_MAX 4096
 
+typedef char appling_path_t[4096 + 1 /* NULL */];
+
 typedef uint8_t appling_key_t[APPLING_KEY_LEN];
 
 typedef struct appling_platform_s appling_platform_t;
@@ -37,12 +39,12 @@ typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status, const
 typedef void (*appling_exit_cb)(appling_process_t *process, int64_t exit_status, int term_signal);
 
 struct appling_platform_s {
-  char exe[PATH_MAX];
+  appling_path_t exe;
 };
 
 struct appling_app_s {
   appling_platform_t platform;
-  char exe[PATH_MAX];
+  appling_path_t exe;
 };
 
 struct appling_link_s {
@@ -61,7 +63,7 @@ struct appling_lock_s {
   fs_lock_t lock;
   fs_close_t close;
 
-  char dir[PATH_MAX];
+  appling_path_t dir;
 
   uv_file file;
 
@@ -81,7 +83,7 @@ struct appling_resolve_s {
   fs_stat_t stat;
   fs_read_t read;
 
-  char path[PATH_MAX];
+  appling_path_t path;
 
   uv_file file;
   uv_buf_t buf;
@@ -124,9 +126,9 @@ struct appling_bootstrap_s {
 
   appling_app_t app;
 
-  char exe_dir[PATH_MAX];
+  appling_path_t exe_dir;
 
-  char dir[PATH_MAX];
+  appling_path_t dir;
 
   uv_file file;
   uv_buf_t buf;

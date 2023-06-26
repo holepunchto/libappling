@@ -5,7 +5,7 @@
 #include <uv.h>
 
 #ifndef PLATFORM_DIR
-#define PLATFORM_DIR "example/holepunch"
+#define PLATFORM_DIR "example/pear"
 #endif
 
 uv_loop_t *loop;

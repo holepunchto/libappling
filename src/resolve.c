@@ -22,23 +22,19 @@ on_realpath_exe (fs_realpath_t *fs_req, int status, const char *path) {
 
     if (req->cb) req->cb(req, 0, &req->platform);
   } else {
-    size_t i = ++req->exe_candidate;
-
-    if (appling_exe_candidates[i]) realpath_exe(req);
-    else if (req->cb) req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL);
   }
 }
 
 static void
 realpath_exe (appling_resolve_t *req) {
   size_t i = req->bin_candidate;
-  size_t j = req->exe_candidate;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->path, appling_bin_candidates[i], appling_exe_candidates[j], NULL},
+    (const char *[]){req->path, appling_bin_candidates[i], appling_platform_exe, NULL},
     path,
     &path_len,
     path_behavior_system
@@ -95,7 +91,6 @@ appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appli
   req->loop = loop;
   req->cb = cb;
   req->bin_candidate = 0;
-  req->exe_candidate = 0;
   req->status = 0;
   req->open.data = (void *) req;
   req->close.data = (void *) req;

@@ -18,4 +18,4 @@ See [`include/appling.h`](include/appling.h) for the public API.
 
 ## License
 
-ISC
+Apache-2.0

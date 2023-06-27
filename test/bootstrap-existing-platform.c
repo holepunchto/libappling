@@ -28,7 +28,9 @@ on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platfo
 
   printf("exe=%s\n", platform->exe);
 
-  int err = appling_bootstrap(loop, &bootstrap, EXE, "test/fixtures/bootstrap/existing-platform", platform, on_bootstrap);
+  appling_key_t key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
+
+  int err = appling_bootstrap(loop, &bootstrap, key, EXE, "test/fixtures/bootstrap/existing-platform", platform, on_bootstrap);
   assert(err == 0);
 }
 
@@ -40,7 +42,7 @@ main () {
     .exe = "",
   };
 
-  int err = appling_resolve(loop, &resolve, "test/fixtures", on_resolve);
+  int err = appling_resolve(loop, &resolve, "test/fixtures/platform", on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

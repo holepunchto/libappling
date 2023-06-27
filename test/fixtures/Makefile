@@ -2,8 +2,8 @@ platform-%.tar:
 	tar \
 	--create \
 	--file $@ \
-	--directory platform \
-	stable/swap-0/bin/$*
+	--directory platform/by-dkey/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/0 \
+	by-arch/$*
 
 all: \
 	platform-darwin-arm64.tar \

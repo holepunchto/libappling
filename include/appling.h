@@ -89,7 +89,6 @@ struct appling_resolve_s {
   uv_buf_t buf;
 
   size_t bin_candidate;
-  size_t exe_candidate;
 
   appling_platform_t platform;
 
@@ -120,10 +119,12 @@ struct appling_bootstrap_s {
   fs_swap_t swap;
   fs_rename_t rename;
   fs_rmdir_t rmdir;
+  fs_symlink_t symlink;
 
   appling_extract_t extract;
   appling_resolve_t resolve;
 
+  appling_key_t key;
   appling_app_t app;
 
   appling_path_t exe_dir;
@@ -160,7 +161,7 @@ int
 appling_extract (uv_loop_t *loop, appling_extract_t *req, const char *archive, const char *dest, appling_extract_cb cb);
 
 int
-appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb);
+appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb);
 
 int
 appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_t *link, const appling_app_t *app, appling_exit_cb cb);

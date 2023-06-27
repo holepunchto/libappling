@@ -1,4 +1,5 @@
 list(APPEND tests
+  bootstrap-dangling-tmp
   bootstrap-existing-platform
   bootstrap-no-platform
   extract

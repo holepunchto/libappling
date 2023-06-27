@@ -19,6 +19,8 @@ appling_resolve_t resolve;
 appling_bootstrap_t bootstrap;
 appling_process_t process;
 
+appling_key_t key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
+
 static void
 on_process_exit (appling_process_t *process, int64_t exit_status, int term_signal) {
   assert(exit_status == 0);
@@ -42,7 +44,7 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
 
 static void
 on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
-  appling_bootstrap(req->loop, &bootstrap, NULL, PLATFORM_DIR, platform, on_bootstrap);
+  appling_bootstrap(req->loop, &bootstrap, key, NULL, PLATFORM_DIR, platform, on_bootstrap);
 }
 
 static void

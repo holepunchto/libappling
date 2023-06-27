@@ -22,10 +22,8 @@ on_resolve (appling_resolve_t *resolve, int status, const appling_platform_t *pl
 }
 
 static void
-on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
+on_symlink (fs_symlink_t *fs_req, int status) {
   appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  status = req->status;
 
   if (status >= 0) {
     appling_resolve(req->loop, &req->resolve, req->dir, on_resolve);
@@ -35,12 +33,62 @@ on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
 }
 
 static void
+symlink_current (appling_bootstrap_t *req) {
+  char key[65];
+  size_t key_len = 65;
+
+  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
+  appling_path_t target;
+  size_t path_len = sizeof(appling_path_t);
+
+  path_join(
+    (const char *[]){"by-dkey", key, "0", NULL},
+    target,
+    &path_len,
+    path_behavior_system
+  );
+
+  appling_path_t link;
+  path_len = sizeof(appling_path_t);
+
+  path_join(
+    (const char *[]){req->dir, "current", NULL},
+    link,
+    &path_len,
+    path_behavior_system
+  );
+
+  log_debug("appling_bootstrap() linking platform at %s", target);
+
+  fs_symlink(req->loop, &req->symlink, target, link, UV_FS_SYMLINK_DIR, on_symlink);
+}
+
+static void
+on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
+
+  status = req->status;
+
+  if (status >= 0) {
+    symlink_current(req);
+  } else {
+    if (req->cb) req->cb(req, status, NULL);
+  }
+}
+
+static void
 discard_tmp (appling_bootstrap_t *req) {
+  char key[65];
+  size_t key_len = 65;
+
+  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
   appling_path_t tmp;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "tmp", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
     tmp,
     &path_len,
     path_behavior_system
@@ -64,11 +112,16 @@ on_rename (fs_rename_t *fs_req, int status) {
 
 static inline void
 rename_platform (appling_bootstrap_t *req) {
+  char key[65];
+  size_t key_len = 65;
+
+  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
   appling_path_t to;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "platform", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "0", NULL},
     to,
     &path_len,
     path_behavior_system
@@ -78,7 +131,7 @@ rename_platform (appling_bootstrap_t *req) {
   path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "tmp", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
     from,
     &path_len,
     path_behavior_system
@@ -104,11 +157,16 @@ on_swap (fs_swap_t *fs_req, int status) {
 
 static inline void
 swap_platform (appling_bootstrap_t *req) {
+  char key[65];
+  size_t key_len = 65;
+
+  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
   appling_path_t to;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "platform", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "0", NULL},
     to,
     &path_len,
     path_behavior_system
@@ -118,7 +176,7 @@ swap_platform (appling_bootstrap_t *req) {
   path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "tmp", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
     from,
     &path_len,
     path_behavior_system
@@ -144,6 +202,11 @@ on_extract (appling_extract_t *extract, int status) {
 
 static inline void
 extract_platform (appling_bootstrap_t *req) {
+  char key[65];
+  size_t key_len = 65;
+
+  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
   appling_path_t archive;
   size_t path_len = sizeof(appling_path_t);
 
@@ -158,7 +221,7 @@ extract_platform (appling_bootstrap_t *req) {
   path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "tmp", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
     dest,
     &path_len,
     path_behavior_system
@@ -169,16 +232,46 @@ extract_platform (appling_bootstrap_t *req) {
   appling_extract(req->loop, &req->extract, archive, dest, on_extract);
 }
 
+static void
+on_rmdir_tmp_maybe (fs_rmdir_t *fs_req, int status) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
+
+  extract_platform(req);
+}
+
+static void
+discard_tmp_maybe (appling_bootstrap_t *req) {
+  char key[65];
+  size_t key_len = 65;
+
+  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
+  appling_path_t tmp;
+  size_t path_len = sizeof(appling_path_t);
+
+  path_join(
+    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
+    tmp,
+    &path_len,
+    path_behavior_system
+  );
+
+  fs_rmdir(req->loop, &req->rmdir, tmp, true, on_rmdir_tmp_maybe);
+}
+
 int
-appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb) {
+appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->status = 0;
   req->swap.data = (void *) req;
   req->rename.data = (void *) req;
   req->rmdir.data = (void *) req;
+  req->symlink.data = (void *) req;
   req->extract.data = (void *) req;
   req->resolve.data = (void *) req;
+
+  memcpy(req->key, key, sizeof(appling_key_t));
 
   size_t path_len;
 
@@ -218,7 +311,7 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const char *exe, c
   if (platform) {
     on_resolve(&req->resolve, 0, platform);
   } else {
-    extract_platform(req);
+    discard_tmp_maybe(req);
   }
 
   return 0;

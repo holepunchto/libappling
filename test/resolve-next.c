@@ -27,7 +27,7 @@ int
 main () {
   loop = uv_default_loop();
 
-  int err = appling_resolve(loop, &req, "test/fixtures/platform", on_resolve);
+  int err = appling_resolve(loop, &req, "test/fixtures/resolve/next", on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

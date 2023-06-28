@@ -11,7 +11,9 @@ list(APPEND tests
   parse-hex
   parse-invalid
   parse-z32
-  resolve
+  resolve-both
+  resolve-current
+  resolve-next
 )
 
 add_subdirectory(fixtures)

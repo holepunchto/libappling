@@ -154,7 +154,7 @@ struct appling_launch_info_s {
   const appling_platform_t *platform;
 
   /**
-   * The application bundle that is currently executing.
+   * The application bundle that is currently executing, if any.
    *
    * @since v0
    */

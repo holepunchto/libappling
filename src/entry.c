@@ -3,20 +3,11 @@
 #include <log.h>
 #include <path.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 #include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
-
-#if defined(APPLING_OS_LINUX)
-#define APPLING_PLATFORM_EXE "holepunch-runtime/holepunch"
-#elif defined(APPLING_OS_WIN32)
-#define APPLING_PLATFORM_EXE "holepunch-runtime\\Holepunch Runtime.exe"
-#elif defined(APPLING_OS_DARWIN)
-#define APPLING_PLATFORM_EXE "Holepunch.app/Contents/MacOS/Holepunch"
-#endif
 
 static void
 on_process_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
@@ -27,62 +18,86 @@ on_process_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
 
 int
 appling_launch_v0 (const appling_launch_info_t *info) {
-  const appling_link_t *link = info->link;
-
-  char *launch = NULL;
-
-  if (link) {
-    launch = malloc(8 /* punch:// */ + APPLING_KEY_LEN * 2 + 1 /* / */ + strlen(link->data) + 1 /* NULL */);
-    launch[0] = '\0';
-
-    strcat(launch, "punch://");
-
-    size_t len = 65;
-
-    hex_encode(link->key, APPLING_KEY_LEN, (utf8_t *) &launch[8], &len);
-
-    if (strlen(link->data)) {
-      strcat(launch, "/");
-      strcat(launch, link->data);
-    }
-  }
-
-  if (launch) log_debug("appling_launch() launching link %s", launch);
-
   const appling_platform_t *platform = info->platform;
 
   appling_path_t file;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){platform->path, "bin", APPLING_PLATFORM_EXE, NULL},
+    (const char *[]) {
+      platform->path,
+        "bin",
+#if defined(APPLING_OS_LINUX)
+        "holepunch-runtime/holepunch",
+#elif defined(APPLING_OS_WIN32)
+        "holepunch-runtime\\Holepunch Runtime.exe",
+#elif defined(APPLING_OS_DARWIN)
+        "Holepunch.app/Contents/MacOS/Holepunch",
+#endif
+        NULL,
+    },
     file,
     &path_len,
     path_behavior_system
   );
 
+  char *args[6] = {file};
+
+  size_t offset = 1;
+
   const appling_app_t *app = info->app;
 
   appling_path_t appling;
 
+  if (app) {
 #if defined(APPLING_OS_LINUX)
-  const char *appimage = getenv("APPIMAGE");
+    const char *appimage = getenv("APPIMAGE");
 
-  strcpy(appling, appimage ? appimage : app->path);
+    strcpy(appling, appimage ? appimage : app->path);
 #elif defined(APPLING_OS_WIN32)
-  strcpy(appling, app->path);
+    strcpy(appling, app->path);
 #elif defined(APPLING_OS_DARWIN)
-  path_len = sizeof(appling_path_t);
+    path_len = sizeof(appling_path_t);
 
-  path_join(
-    (const char *[]){app->path, "..", "..", "..", NULL},
-    appling,
-    &path_len,
-    path_behavior_system
-  );
+    path_join(
+      (const char *[]){app->path, "..", "..", "..", NULL},
+      appling,
+      &path_len,
+      path_behavior_system
+    );
 #endif
 
-  log_debug("appling_launch() launching application shell %s", appling);
+    args[offset++] = "--appling";
+    args[offset++] = appling;
+
+    log_debug("appling_launch() launching application shell %s", appling);
+  }
+
+  const appling_link_t *link = info->link;
+
+  char launch[7 /* pear:// */ + APPLING_KEY_LEN * 2 + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */];
+
+  if (link) {
+    launch[0] = '\0';
+
+    strcat(launch, "pear://");
+
+    size_t len = 65;
+
+    hex_encode(link->key, APPLING_KEY_LEN, (utf8_t *) &launch[7], &len);
+
+    if (strlen(link->data)) {
+      strcat(launch, "/");
+      strcat(launch, link->data);
+    }
+
+    log_debug("appling_launch() launching link %s", launch);
+
+    args[offset++] = "--launch";
+    args[offset++] = launch;
+  }
+
+  args[offset] = NULL;
 
   int err;
 
@@ -99,14 +114,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   uv_process_options_t options = {
     .exit_cb = on_process_exit,
     .file = file,
-    .args = (char *[]){
-      file,
-      "--appling",
-      appling,
-      launch ? "--launch" : NULL,
-      launch,
-      NULL,
-    },
+    .args = args,
     .flags = UV_PROCESS_WINDOWS_HIDE,
     .stdio_count = 3,
     .stdio = (uv_stdio_container_t[]){
@@ -128,8 +136,6 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   err = uv_spawn(&loop, &process, &options);
   if (err < 0) goto err;
 
-  if (launch) free(launch);
-
   uv_run(&loop, UV_RUN_DEFAULT);
 
   err = uv_loop_close(&loop);
@@ -138,8 +144,6 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   return exit_status;
 
 err:
-  if (launch) free(launch);
-
   err = uv_loop_close(&loop);
   assert(err == 0);
 

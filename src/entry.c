@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <hex.h>
 #include <log.h>
 #include <path.h>
@@ -20,6 +21,8 @@
 static void
 on_process_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
   *((int64_t *) handle->data) = exit_status;
+
+  uv_close((uv_handle_t *) handle, NULL);
 }
 
 int
@@ -129,10 +132,16 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   uv_run(&loop, UV_RUN_DEFAULT);
 
+  err = uv_loop_close(&loop);
+  assert(err == 0);
+
   return exit_status;
 
 err:
   if (launch) free(launch);
+
+  err = uv_loop_close(&loop);
+  assert(err == 0);
 
   return err;
 }

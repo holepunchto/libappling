@@ -14,7 +14,8 @@ appling_parse (const char *link, appling_link_t *result) {
 
   size_t i = 0;
 
-  if (strncmp(link, "punch://", 8) == 0) i += 8;
+  if (strncmp(link, "pear://", 7) == 0) i += 7;
+  else if (strncmp(link, "punch://", 8) == 0) i += 8;
   else if (strncmp(link, "holepunch://", 12) == 0) i += 12;
   else goto err;
 

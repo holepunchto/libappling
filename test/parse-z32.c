@@ -21,12 +21,15 @@
 
 int
 main () {
+  test_parse_z32("pear://" KEY, KEY, "");
   test_parse_z32("punch://" KEY, KEY, "");
   test_parse_z32("holepunch://" KEY, KEY, "");
 
+  test_parse_z32("pear://" KEY "/", KEY, "");
   test_parse_z32("punch://" KEY "/", KEY, "");
   test_parse_z32("holepunch://" KEY "/", KEY, "");
 
+  test_parse_z32("pear://" KEY "/data", KEY, "data");
   test_parse_z32("punch://" KEY "/data", KEY, "data");
   test_parse_z32("holepunch://" KEY "/data", KEY, "data");
 

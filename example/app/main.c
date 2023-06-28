@@ -26,12 +26,12 @@ on_unlock (appling_lock_t *req, int status) {
 }
 
 static void
-on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
+on_bootstrap (appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app) {
   assert(status == 0);
 
   appling_unlock(req->loop, &lock, on_unlock);
 
-  status = appling_launch(req->loop, app, has_link ? &link : NULL);
+  status = appling_launch(req->loop, platform, app, has_link ? &link : NULL);
 
   assert(status == 0);
 }

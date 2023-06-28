@@ -28,7 +28,7 @@ on_access (fs_access_t *req, int status) {
 }
 
 static void
-on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
+on_bootstrap (appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app) {
   bootstrap_called = true;
 
   assert(status == 0);

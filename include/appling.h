@@ -36,7 +36,7 @@ typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status, const appling_platform_t *platform);
 typedef void (*appling_extract_cb)(appling_extract_t *req, int status);
-typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status, const appling_app_t *app);
+typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
 struct appling_platform_s {
@@ -44,7 +44,6 @@ struct appling_platform_s {
 };
 
 struct appling_app_s {
-  appling_platform_t platform;
   appling_path_t path;
 };
 
@@ -122,6 +121,7 @@ struct appling_bootstrap_s {
   appling_resolve_t resolve;
 
   appling_key_t key;
+  appling_platform_t platform;
   appling_app_t app;
 
   appling_path_t exe_dir;
@@ -140,16 +140,29 @@ struct appling_launch_info_s {
   int version;
 
   /**
+   * The path to the object library from which the platform was launched.
+   *
    * @since v0
    */
   const char *path;
 
   /**
+   * The platform that was launched.
+   *
+   * @since v0
+   */
+  const appling_platform_t *platform;
+
+  /**
+   * The application bundle that is currently executing.
+   *
    * @since v0
    */
   const appling_app_t *app;
 
   /**
+   * The link to launch, if any.
+   *
    * @since v0
    */
   const appling_link_t *link;
@@ -174,7 +187,7 @@ int
 appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb);
 
 int
-appling_launch (uv_loop_t *loop, const appling_app_t *app, const appling_link_t *link);
+appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
 #ifdef __cplusplus
 }

@@ -9,14 +9,14 @@
 #include "../include/appling.h"
 
 int
-appling_launch (uv_loop_t *loop, const appling_app_t *app, const appling_link_t *link) {
+appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link) {
   int err;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){app->platform.path, "lib", appling_platform_entry, NULL},
+    (const char *[]){platform->path, "lib", appling_platform_entry, NULL},
     path,
     &path_len,
     path_behavior_system
@@ -33,6 +33,7 @@ appling_launch (uv_loop_t *loop, const appling_app_t *app, const appling_link_t 
   appling_launch_info_t info = {
     .version = APPLING_VERSION_MAJOR,
     .path = path,
+    .platform = platform,
     .app = app,
     .link = link,
   };

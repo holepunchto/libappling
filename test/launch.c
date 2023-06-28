@@ -16,11 +16,10 @@ appling_resolve_t req;
 static void
 on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
   appling_app_t app = {
-    .platform = *platform,
     .path = EXE,
   };
 
-  int err = appling_launch(loop, &app, NULL);
+  int err = appling_launch(loop, platform, &app, NULL);
   assert(err == 0);
 }
 

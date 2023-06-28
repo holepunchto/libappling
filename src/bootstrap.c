@@ -13,11 +13,11 @@ on_resolve (appling_resolve_t *resolve, int status, const appling_platform_t *pl
   appling_bootstrap_t *req = (appling_bootstrap_t *) resolve->data;
 
   if (status >= 0) {
-    memcpy(&req->app.platform, platform, sizeof(appling_platform_t));
+    memcpy(&req->platform, platform, sizeof(appling_platform_t));
 
-    if (req->cb) req->cb(req, 0, &req->app);
+    if (req->cb) req->cb(req, 0, &req->platform, &req->app);
   } else {
-    if (req->cb) req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL, NULL);
   }
 }
 
@@ -28,7 +28,7 @@ on_symlink (fs_symlink_t *fs_req, int status) {
   if (status >= 0) {
     appling_resolve(req->loop, &req->resolve, req->dir, on_resolve);
   } else {
-    if (req->cb) req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL, NULL);
   }
 }
 
@@ -73,7 +73,7 @@ on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
   if (status >= 0) {
     symlink_current(req);
   } else {
-    if (req->cb) req->cb(req, status, NULL);
+    if (req->cb) req->cb(req, status, NULL, NULL);
   }
 }
 

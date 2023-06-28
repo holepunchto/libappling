@@ -46,17 +46,19 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   if (launch) log_debug("appling_launch() launching link %s", launch);
 
-  const appling_app_t *app = info->app;
+  const appling_platform_t *platform = info->platform;
 
   appling_path_t file;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){app->platform.path, "bin", APPLING_PLATFORM_EXE, NULL},
+    (const char *[]){platform->path, "bin", APPLING_PLATFORM_EXE, NULL},
     file,
     &path_len,
     path_behavior_system
   );
+
+  const appling_app_t *app = info->app;
 
   appling_path_t appling;
 

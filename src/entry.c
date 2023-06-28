@@ -91,10 +91,10 @@ appling_launch_v0 (const appling_launch_info_t *info) {
       strcat(launch, link->data);
     }
 
-    log_debug("appling_launch() launching link %s", launch);
-
     args[offset++] = "--launch";
     args[offset++] = launch;
+
+    log_debug("appling_launch() launching link %s", launch);
   }
 
   args[offset] = NULL;

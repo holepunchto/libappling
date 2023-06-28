@@ -20,7 +20,7 @@ on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platfo
 
   assert(status == 0);
 
-  printf("exe=%s\n", platform->exe);
+  printf("path=%s\n", platform->path);
 }
 
 int

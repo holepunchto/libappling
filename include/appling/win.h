@@ -10,6 +10,6 @@
 
 #define APPLING_PLATFORM_BUNDLE "resources\\app\\platform.tar"
 
-#define APPLING_PLATFORM_EXE "holepunch-runtime\\Holepunch Runtime.exe"
+#define APPLING_PLATFORM_ENTRY "pear.dll"
 
 #endif // APPLING_WIN_H

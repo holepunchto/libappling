@@ -10,6 +10,6 @@
 
 #define APPLING_PLATFORM_BUNDLE "../../resources/app/platform.tar"
 
-#define APPLING_PLATFORM_EXE "holepunch-runtime/holepunch"
+#define APPLING_PLATFORM_ENTRY "pear.dylib"
 
 #endif // APPLING_LINUX_H

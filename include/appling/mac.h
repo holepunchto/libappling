@@ -10,6 +10,6 @@
 
 #define APPLING_PLATFORM_BUNDLE "../Resources/app/platform.mp3"
 
-#define APPLING_PLATFORM_EXE "Holepunch.app/Contents/MacOS/Holepunch"
+#define APPLING_PLATFORM_ENTRY "pear.dylib"
 
 #endif // APPLING_MAC_H

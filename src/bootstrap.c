@@ -275,10 +275,10 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_
 
   size_t path_len;
 
-  if (exe) strcpy(req->app.exe, exe);
+  if (exe) strcpy(req->app.path, exe);
   else {
     path_len = sizeof(appling_path_t);
-    uv_exepath(req->app.exe, &path_len);
+    uv_exepath(req->app.path, &path_len);
   }
 
   if (dir) strcpy(req->dir, dir);
@@ -302,7 +302,7 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_
   path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->app.exe, "..", NULL},
+    (const char *[]){req->app.path, "..", NULL},
     req->exe_dir,
     &path_len,
     path_behavior_system

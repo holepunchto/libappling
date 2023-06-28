@@ -6,7 +6,7 @@
 #include "../include/appling.h"
 #include "fixtures/app.h"
 
-#define EXE "test/fixtures/app/" APPLING_RUNTIME "/" APPLING_TEST_EXE
+#define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
 
 uv_loop_t *loop;
 
@@ -26,7 +26,7 @@ static void
 on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
   assert(status == 0);
 
-  printf("exe=%s\n", platform->exe);
+  printf("exe=%s\n", platform->path);
 
   appling_key_t key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
 
@@ -39,7 +39,7 @@ main () {
   loop = uv_default_loop();
 
   appling_platform_t platform = {
-    .exe = "",
+    .path = "",
   };
 
   int err = appling_resolve(loop, &resolve, "test/fixtures/platform", on_resolve);

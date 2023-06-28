@@ -8,7 +8,7 @@
 #include "../include/appling.h"
 #include "fixtures/app.h"
 
-#define EXE "test/fixtures/app/" APPLING_RUNTIME "/" APPLING_TEST_EXE
+#define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
 
 #define DANGLING
 

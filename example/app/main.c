@@ -17,14 +17,8 @@ bool has_link;
 appling_lock_t lock;
 appling_resolve_t resolve;
 appling_bootstrap_t bootstrap;
-appling_process_t process;
 
 appling_key_t key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
-
-static void
-on_process_exit (appling_process_t *process, int64_t exit_status, int term_signal) {
-  assert(exit_status == 0);
-}
 
 static void
 on_unlock (appling_lock_t *req, int status) {
@@ -37,7 +31,7 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_app_t *app) {
 
   appling_unlock(req->loop, &lock, on_unlock);
 
-  status = appling_launch(req->loop, &process, has_link ? &link : NULL, app, on_process_exit);
+  status = appling_launch(req->loop, app, has_link ? &link : NULL);
 
   assert(status == 0);
 }
@@ -56,7 +50,7 @@ on_lock (appling_lock_t *req, int status) {
 
 int
 main (int argc, char *argv[]) {
-  log_open("appling", 0);
+  log_open("Appling", 0);
 
   uv_setup_args(argc, argv);
 

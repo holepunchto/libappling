@@ -14,6 +14,7 @@ extern "C" {
 #include "appling/arch.h"
 #include "appling/constants.h"
 #include "appling/os.h"
+#include "appling/version.h"
 
 #define APPLING_KEY_LEN       32
 #define APPLING_LINK_DATA_MAX 4096
@@ -29,22 +30,22 @@ typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
 typedef struct appling_extract_s appling_extract_t;
 typedef struct appling_bootstrap_s appling_bootstrap_t;
-typedef struct appling_process_s appling_process_t;
+typedef struct appling_launch_info_s appling_launch_info_t;
 
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status, const appling_platform_t *platform);
 typedef void (*appling_extract_cb)(appling_extract_t *req, int status);
 typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status, const appling_app_t *app);
-typedef void (*appling_exit_cb)(appling_process_t *process, int64_t exit_status, int term_signal);
+typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
 struct appling_platform_s {
-  appling_path_t exe;
+  appling_path_t path;
 };
 
 struct appling_app_s {
   appling_platform_t platform;
-  appling_path_t exe;
+  appling_path_t path;
 };
 
 struct appling_link_s {
@@ -77,18 +78,14 @@ struct appling_resolve_s {
 
   appling_resolve_cb cb;
 
-  fs_open_t open;
-  fs_close_t close;
   fs_realpath_t realpath;
-  fs_stat_t stat;
-  fs_read_t read;
 
   appling_path_t path;
 
   uv_file file;
   uv_buf_t buf;
 
-  size_t bin_candidate;
+  size_t candidate;
 
   appling_platform_t platform;
 
@@ -139,10 +136,23 @@ struct appling_bootstrap_s {
   void *data;
 };
 
-struct appling_process_s {
-  uv_process_t process;
+struct appling_launch_info_s {
+  int version;
 
-  appling_exit_cb on_exit;
+  /**
+   * @since v0
+   */
+  const char *path;
+
+  /**
+   * @since v0
+   */
+  const appling_app_t *app;
+
+  /**
+   * @since v0
+   */
+  const appling_link_t *link;
 };
 
 int
@@ -164,7 +174,7 @@ int
 appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb);
 
 int
-appling_launch (uv_loop_t *loop, appling_process_t *process, const appling_link_t *link, const appling_app_t *app, appling_exit_cb cb);
+appling_launch (uv_loop_t *loop, const appling_app_t *app, const appling_link_t *link);
 
 #ifdef __cplusplus
 }

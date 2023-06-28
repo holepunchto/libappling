@@ -93,6 +93,31 @@ target_include_directories(
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
+add_library(appling_entry OBJECT)
+
+set_target_properties(
+  appling_entry
+  PROPERTIES
+  C_STANDARD 99
+  POSITION_INDEPENDENT_CODE ON
+)
+
+target_sources(
+  appling_entry
+  PRIVATE
+    src/entry.c
+)
+
+target_include_directories(
+  appling_entry
+  PUBLIC
+    include
+    $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
 add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
 
 set_target_properties(
@@ -113,6 +138,25 @@ target_link_libraries(
     log_static
     hex_static
     z32_static
+)
+
+add_library(appling_entry_shared SHARED $<TARGET_OBJECTS:appling_entry>)
+
+set_target_properties(
+  appling_entry_shared
+  PROPERTIES
+  OUTPUT_NAME pear
+  PREFIX ""
+  WINDOWS_EXPORT_ALL_SYMBOLS ON
+)
+
+target_link_libraries(
+  appling_entry_shared
+  PRIVATE
+    uv
+    path_shared
+    log_shared
+    hex_shared
 )
 
 install(TARGETS appling_static)

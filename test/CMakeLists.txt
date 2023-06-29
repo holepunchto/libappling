@@ -5,10 +5,6 @@ list(APPEND tests
   extract
   launch
   launch-data
-  launch-known-app
-  launch-known-link
-  launch-unknown-app
-  launch-unknown-link
   lock
   lock-non-existing
   parse-hex

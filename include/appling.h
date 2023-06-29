@@ -154,16 +154,14 @@ struct appling_launch_info_s {
   const appling_platform_t *platform;
 
   /**
-   * The application bundle that is currently executing. If not provided, a
-   * link from which the application bundle can be identified MUST be provided.
+   * The application bundle that is currently executing.
    *
    * @since v0
    */
   const appling_app_t *app;
 
   /**
-   * The link to launch. If not provided, an application bundle from which the
-   * link can be identified MUST be provided.
+   * The link to launch.
    *
    * @since v0
    */

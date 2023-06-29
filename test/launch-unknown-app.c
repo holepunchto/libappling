@@ -7,8 +7,6 @@
 #include "../include/appling.h"
 #include "fixtures/app.h"
 
-#define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
-
 uv_loop_t *loop;
 
 appling_resolve_t req;
@@ -16,16 +14,11 @@ appling_resolve_t req;
 static void
 on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
   appling_app_t app = {
-    .path = EXE,
+    .path = "/unknown",
   };
 
-  appling_link_t link = {
-    .key = {0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb},
-    .data = "",
-  };
-
-  int err = appling_launch(loop, platform, &app, &link);
-  assert(err == 0);
+  int err = appling_launch(loop, platform, &app, NULL);
+  assert(err != 0);
 }
 
 int

@@ -4,8 +4,11 @@ list(APPEND tests
   bootstrap-no-platform
   extract
   launch
-  launch-link
-  launch-link-data
+  launch-data
+  launch-known-app
+  launch-known-link
+  launch-unknown-app
+  launch-unknown-link
   lock
   lock-non-existing
   parse-hex

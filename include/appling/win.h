@@ -10,6 +10,6 @@
 
 #define APPLING_PLATFORM_BUNDLE "resources\\app\\platform.tar"
 
-#define APPLING_PLATFORM_ENTRY "pear.dll"
+#define APPLING_PLATFORM_ENTRY "launch.dll"
 
 #endif // APPLING_WIN_H

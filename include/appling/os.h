@@ -6,9 +6,9 @@
 #if defined(__linux__)
 #include "linux.h"
 #elif defined(_WIN32)
-#include "win.h"
+#include "win32.h"
 #elif defined(__APPLE__)
-#include "mac.h"
+#include "darwin.h"
 #else
 #error Unsupported operating system
 #endif

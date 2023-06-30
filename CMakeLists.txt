@@ -65,10 +65,10 @@ target_sources(
     include/appling.h
     include/appling/arch.h
     include/appling/constants.h
+    include/appling/darwin.h
     include/appling/linux.h
-    include/appling/mac.h
     include/appling/os.h
-    include/appling/win.h
+    include/appling/win32.h
   PRIVATE
     src/bootstrap.c
     src/extract.c

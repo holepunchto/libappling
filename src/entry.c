@@ -28,11 +28,11 @@ appling_launch_v0 (const appling_launch_info_t *info) {
       platform->path,
         "bin",
 #if defined(APPLING_OS_LINUX)
-        "holepunch-runtime/holepunch",
+        "holepunch-runtime/holepunch-runtime",
 #elif defined(APPLING_OS_WIN32)
         "holepunch-runtime\\Holepunch Runtime.exe",
 #elif defined(APPLING_OS_DARWIN)
-        "Holepunch.app/Contents/MacOS/Holepunch",
+        "Holepunch Runtime.app/Contents/MacOS/Holepunch Runtime",
 #endif
         NULL,
     },

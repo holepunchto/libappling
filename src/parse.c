@@ -16,7 +16,6 @@ appling_parse (const char *link, appling_link_t *result) {
 
   if (strncmp(link, "pear://", 7) == 0) i += 7;
   else if (strncmp(link, "punch://", 8) == 0) i += 8;
-  else if (strncmp(link, "holepunch://", 12) == 0) i += 12;
   else goto err;
 
   char key[APPLING_KEY_LEN * 2 + 1 /* NULL */];

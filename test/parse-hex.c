@@ -23,15 +23,12 @@ int
 main () {
   test_parse_hex("pear://" KEY, KEY, "");
   test_parse_hex("punch://" KEY, KEY, "");
-  test_parse_hex("holepunch://" KEY, KEY, "");
 
   test_parse_hex("pear://" KEY "/", KEY, "");
   test_parse_hex("punch://" KEY "/", KEY, "");
-  test_parse_hex("holepunch://" KEY "/", KEY, "");
 
   test_parse_hex("pear://" KEY "/data", KEY, "data");
   test_parse_hex("punch://" KEY "/data", KEY, "data");
-  test_parse_hex("holepunch://" KEY "/data", KEY, "data");
 
   return 0;
 }

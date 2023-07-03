@@ -50,6 +50,10 @@ if(NOT TARGET z32)
   add_subdirectory(vendor/libz32 EXCLUDE_FROM_ALL)
 endif()
 
+if(NOT TARGET compact)
+  add_subdirectory(vendor/libcompact EXCLUDE_FROM_ALL)
+endif()
+
 add_library(appling OBJECT)
 
 set_target_properties(
@@ -76,6 +80,7 @@ target_sources(
     src/lock.c
     src/unlock.c
     src/parse.c
+    src/paths.c
     src/resolve.c
 )
 
@@ -91,6 +96,7 @@ target_include_directories(
     $<TARGET_PROPERTY:archive,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 add_library(appling_launch OBJECT)
@@ -138,6 +144,7 @@ target_link_libraries(
     log_static
     hex_static
     z32_static
+    compact_static
 )
 
 add_library(appling_launch_shared SHARED $<TARGET_OBJECTS:appling_launch>)

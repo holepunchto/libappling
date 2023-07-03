@@ -1,0 +1,94 @@
+#ifndef APPLING_TEST_FIXTURES_APPLINGS_H
+#define APPLING_TEST_FIXTURES_APPLINGS_H
+
+#include <assert.h>
+#include <compact.h>
+#include <stdlib.h>
+#include <utf.h>
+#include <uv.h>
+
+#include "../../include/appling.h"
+#include "app.h"
+
+#define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
+
+static int
+on_preencode (compact_state_t *state, void *array, size_t i, void *data) {
+  int err;
+
+  appling_app_t *apps = (appling_app_t *) array;
+
+  err = compact_preencode_utf8(state, (utf8_t *) apps[i].path, -1);
+  assert(err == 0);
+
+  err = compact_preencode_fixed32(state, apps[i].key);
+  assert(err == 0);
+
+  return 0;
+}
+
+static int
+on_encode (compact_state_t *state, void *array, size_t i, void *data) {
+  int err;
+
+  appling_app_t *apps = (appling_app_t *) array;
+
+  err = compact_encode_utf8(state, (utf8_t *) apps[i].path, -1);
+  assert(err == 0);
+
+  err = compact_encode_fixed32(state, apps[i].key);
+  assert(err == 0);
+
+  return 0;
+}
+
+static inline void
+appling_generate_paths (uv_loop_t *loop) {
+  int err;
+
+  appling_app_t apps[] = {
+    {
+      .path = EXE,
+      .key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa},
+    },
+  };
+
+  compact_state_t state = {0, 0};
+
+  err = compact_preencode_uint(&state, 0);
+  assert(err == 0);
+
+  err = compact_preencode_array(&state, apps, 1, NULL, on_preencode);
+  assert(err == 0);
+
+  state.buffer = malloc(state.end);
+
+  err = compact_encode_uint(&state, 0);
+  assert(err == 0);
+
+  err = compact_encode_array(&state, apps, 1, NULL, on_encode);
+  assert(err == 0);
+
+  uv_fs_t req;
+
+  err = uv_fs_open(loop, &req, "test/fixtures/platform/applings", O_WRONLY | O_CREAT | O_TRUNC, 0666, NULL);
+  assert(err > 0);
+
+  int fd = err;
+
+  uv_fs_req_cleanup(&req);
+
+  uv_buf_t buf = uv_buf_init((char *) state.buffer, state.end);
+
+  err = uv_fs_write(loop, &req, fd, &buf, 1, 0, NULL);
+  assert(err > 0);
+
+  uv_fs_req_cleanup(&req);
+
+  err = uv_fs_close(loop, &req, fd, NULL);
+  assert(err == 0);
+
+  uv_fs_req_cleanup(&req);
+}
+
+#endif // APPLING_TEST_FIXTURES_APPLINGS_H

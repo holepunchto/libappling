@@ -30,6 +30,7 @@ typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
 typedef struct appling_extract_s appling_extract_t;
 typedef struct appling_bootstrap_s appling_bootstrap_t;
+typedef struct appling_paths_s appling_paths_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
 
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
@@ -37,6 +38,7 @@ typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status, const appling_platform_t *platform);
 typedef void (*appling_extract_cb)(appling_extract_t *req, int status);
 typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app);
+typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
 struct appling_platform_s {
@@ -45,6 +47,7 @@ struct appling_platform_s {
 
 struct appling_app_s {
   appling_path_t path;
+  appling_key_t key;
 };
 
 struct appling_link_s {
@@ -120,13 +123,32 @@ struct appling_bootstrap_s {
   appling_extract_t extract;
   appling_resolve_t resolve;
 
-  appling_key_t key;
   appling_platform_t platform;
   appling_app_t app;
 
   appling_path_t exe_dir;
 
   appling_path_t dir;
+
+  int status;
+
+  void *data;
+};
+
+struct appling_paths_s {
+  uv_loop_t *loop;
+
+  appling_paths_cb cb;
+
+  fs_open_t open;
+  fs_close_t close;
+  fs_stat_t stat;
+  fs_read_t read;
+
+  appling_path_t path;
+
+  appling_app_t *apps;
+  size_t apps_len;
 
   uv_file file;
   uv_buf_t buf;
@@ -185,6 +207,9 @@ appling_extract (uv_loop_t *loop, appling_extract_t *req, const char *archive, c
 
 int
 appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb);
+
+int
+appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
 appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);

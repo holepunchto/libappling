@@ -10,6 +10,7 @@ list(APPEND tests
   parse-hex
   parse-invalid
   parse-z32
+  paths
   resolve-both
   resolve-current
   resolve-next
@@ -18,7 +19,10 @@ list(APPEND tests
 add_subdirectory(fixtures)
 
 foreach(test IN LISTS tests)
-  add_executable(${test} ${test}.c)
+  add_executable(${test} ${test}.c
+    fixtures/app.h
+    fixtures/applings.h
+  )
 
   target_link_libraries(
     ${test}
@@ -30,6 +34,7 @@ foreach(test IN LISTS tests)
     ${test}
     PRIVATE
       $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
+      $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
   )
 
   add_test(

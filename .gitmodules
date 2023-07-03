@@ -1,21 +1,24 @@
 [submodule "vendor/libarchive"]
 	path = vendor/libarchive
-	url = git@github.com:libarchive/libarchive.git
+	url = ../../libarchive/libarchive.git
 [submodule "vendor/libfs"]
 	path = vendor/libfs
-	url = git@github.com:holepunchto/libfs.git
+	url = ../../holepunchto/libfs.git
 [submodule "vendor/libpath"]
 	path = vendor/libpath
-	url = git@github.com:holepunchto/libpath.git
+	url = ../../holepunchto/libpath.git
 [submodule "vendor/libuv"]
 	path = vendor/libuv
-	url = git@github.com:libuv/libuv.git
+	url = ../../libuv/libuv.git
 [submodule "vendor/liblog"]
 	path = vendor/liblog
-	url = git@github.com:holepunchto/liblog.git
+	url = ../../holepunchto/liblog.git
 [submodule "vendor/libhex"]
 	path = vendor/libhex
-	url = git@github.com:holepunchto/libhex.git
+	url = ../../holepunchto/libhex.git
 [submodule "vendor/libz32"]
 	path = vendor/libz32
-	url = git@github.com:holepunchto/libz32.git
+	url = ../../holepunchto/libz32.git
+[submodule "vendor/libcompact"]
+	path = vendor/libcompact
+	url = ../../holepunchto/libcompact.git

@@ -3,7 +3,8 @@ platform-%.tar:
 	--create \
 	--file $@ \
 	--directory platform/by-dkey/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/0 \
-	by-arch/$*
+	by-arch/$*/ \
+	corestore/
 
 all: \
 	platform-darwin-arm64.tar \

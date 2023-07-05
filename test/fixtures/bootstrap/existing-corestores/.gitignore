@@ -1,0 +1,17 @@
+*
+!.gitignore
+
+!corestores
+!corestores/platform
+!corestores/platform/cores
+!corestores/platform/cores/aa
+!corestores/platform/cores/aa/aa
+!corestores/platform/cores/aa/aa/aaaabb*/
+!corestores/platform/cores/aa/aa/aaaabb*/.gitkeep
+!corestores/platform/cores/aa/bb
+!corestores/platform/cores/aa/bb/*/
+!corestores/platform/cores/aa/bb/*/.gitkeep
+!corestores/platform/cores/cc
+!corestores/platform/cores/cc/cc
+!corestores/platform/cores/cc/cc/*/
+!corestores/platform/cores/cc/cc/*/.gitkeep

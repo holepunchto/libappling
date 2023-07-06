@@ -28,7 +28,7 @@ on_access (fs_access_t *req, int status) {
 }
 
 static void
-on_bootstrap (appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app) {
+on_bootstrap (appling_bootstrap_t *req, int status) {
   bootstrap_called = true;
 
   assert(status == 0);
@@ -39,10 +39,11 @@ on_bootstrap (appling_bootstrap_t *req, int status, const appling_platform_t *pl
 static void
 on_mkdir (fs_mkdir_t *req, int status) {
   assert(status == 0);
+
   appling_key_t key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
 
-  int err = appling_bootstrap(loop, &bootstrap_req, key, EXE, "test/fixtures/bootstrap/dangling-tmp", NULL, on_bootstrap);
-  assert(err == 0);
+  status = appling_bootstrap(loop, &bootstrap_req, key, EXE, "test/fixtures/bootstrap/dangling-tmp", on_bootstrap);
+  assert(status == 0);
 }
 
 static void

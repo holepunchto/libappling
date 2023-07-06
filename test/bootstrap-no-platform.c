@@ -18,7 +18,7 @@ appling_bootstrap_t bootstrap_req;
 bool bootstrap_called = false;
 
 static void
-on_bootstrap (appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app) {
+on_bootstrap (appling_bootstrap_t *req, int status) {
   bootstrap_called = true;
 
   assert(status == 0);
@@ -28,8 +28,8 @@ static void
 on_unlink (fs_unlink_t *req, int status) {
   appling_key_t key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
 
-  int err = appling_bootstrap(loop, &bootstrap_req, key, EXE, "test/fixtures/bootstrap/no-platform", NULL, on_bootstrap);
-  assert(err == 0);
+  status = appling_bootstrap(loop, &bootstrap_req, key, EXE, "test/fixtures/bootstrap/no-platform", on_bootstrap);
+  assert(status == 0);
 }
 
 int

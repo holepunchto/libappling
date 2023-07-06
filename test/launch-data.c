@@ -11,10 +11,12 @@
 
 uv_loop_t *loop;
 
+appling_platform_t platform;
+
 appling_resolve_t req;
 
 static void
-on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
+on_resolve (appling_resolve_t *req, int status) {
   appling_app_t app = {
     .path = EXE,
   };
@@ -24,15 +26,17 @@ on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platfo
     .data = "this-is-some-data",
   };
 
-  int err = appling_launch(loop, platform, &app, &link);
-  assert(err == 0);
+  status = appling_launch(loop, &platform, &app, &link);
+  assert(status == 0);
 }
 
 int
 main () {
+  int err;
+
   loop = uv_default_loop();
 
-  int err = appling_resolve(loop, &req, "test/fixtures/platform", on_resolve);
+  err = appling_resolve(loop, &req, "test/fixtures/platform", &platform, on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

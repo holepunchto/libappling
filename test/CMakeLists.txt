@@ -1,7 +1,6 @@
 list(APPEND tests
   bootstrap-dangling-tmp
   bootstrap-existing-corestores
-  bootstrap-existing-platform
   bootstrap-no-platform
   extract
   launch

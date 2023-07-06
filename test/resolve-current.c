@@ -10,24 +10,28 @@
 
 uv_loop_t *loop;
 
+appling_platform_t platform;
+
 appling_resolve_t req;
 
 bool resolve_called = false;
 
 static void
-on_resolve (appling_resolve_t *req, int status, const appling_platform_t *platform) {
+on_resolve (appling_resolve_t *req, int status) {
   resolve_called = true;
 
   assert(status == 0);
 
-  printf("path=%s\n", platform->path);
+  printf("path=%s\n", platform.path);
 }
 
 int
 main () {
+  int err;
+
   loop = uv_default_loop();
 
-  int err = appling_resolve(loop, &req, "test/fixtures/resolve/current", on_resolve);
+  err = appling_resolve(loop, &req, "test/fixtures/resolve/current", &platform, on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

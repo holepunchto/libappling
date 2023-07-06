@@ -18,14 +18,14 @@ on_realpath_platform (fs_realpath_t *fs_req, int status, const char *path) {
   appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
-    strcpy(req->platform.path, path);
+    strcpy(req->platform->path, path);
 
-    if (req->cb) req->cb(req, 0, &req->platform);
+    if (req->cb) req->cb(req, 0);
   } else {
     size_t i = ++req->candidate;
 
     if (appling_platform_candidates[i]) realpath_platform(req);
-    else if (req->cb) req->cb(req, status, NULL);
+    else if (req->cb) req->cb(req, status);
   }
 }
 
@@ -49,9 +49,10 @@ realpath_platform (appling_resolve_t *req) {
 }
 
 int
-appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_resolve_cb cb) {
+appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb) {
   req->loop = loop;
   req->cb = cb;
+  req->platform = platform;
   req->candidate = 0;
   req->status = 0;
   req->realpath.data = (void *) req;

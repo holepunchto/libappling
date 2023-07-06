@@ -35,14 +35,15 @@ typedef struct appling_launch_info_s appling_launch_info_t;
 
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
-typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status, const appling_platform_t *platform);
+typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
 typedef void (*appling_extract_cb)(appling_extract_t *req, int status);
-typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status, const appling_platform_t *platform, const appling_app_t *app);
+typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
 struct appling_platform_s {
   appling_path_t path;
+  appling_key_t key;
 };
 
 struct appling_app_s {
@@ -89,7 +90,7 @@ struct appling_resolve_s {
 
   size_t candidate;
 
-  appling_platform_t platform;
+  appling_platform_t *platform;
 
   int status;
 
@@ -125,8 +126,7 @@ struct appling_bootstrap_s {
   appling_extract_t extract;
   appling_resolve_t resolve;
 
-  appling_platform_t platform;
-  appling_app_t app;
+  appling_key_t key;
 
   appling_path_t exe_dir;
 
@@ -202,13 +202,13 @@ int
 appling_unlock (uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
 
 int
-appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_resolve_cb cb);
+appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb);
 
 int
 appling_extract (uv_loop_t *loop, appling_extract_t *req, const char *archive, const char *dest, appling_extract_cb cb);
 
 int
-appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, const appling_platform_t *platform, appling_bootstrap_cb cb);
+appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, appling_bootstrap_cb cb);
 
 int
 appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);

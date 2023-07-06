@@ -11,9 +11,6 @@
 
 uv_loop_t *loop;
 
-appling_link_t link;
-bool has_link;
-
 appling_lock_t lock;
 appling_resolve_t resolve;
 appling_bootstrap_t bootstrap;
@@ -25,6 +22,8 @@ appling_platform_t platform = {
 appling_app_t app = {
   .key = {0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb},
 };
+
+appling_link_t link;
 
 static void
 on_resolve (appling_resolve_t *req, int status);
@@ -48,7 +47,7 @@ on_resolve (appling_resolve_t *req, int status) {
     status = appling_unlock(req->loop, &lock, on_unlock);
     assert(status == 0);
 
-    status = appling_launch(req->loop, &platform, &app, has_link ? &link : NULL);
+    status = appling_launch(req->loop, &platform, &app, &link);
     assert(status == 0);
   } else {
     status = appling_bootstrap(req->loop, &bootstrap, platform.key, app.path, PLATFORM_DIR, on_bootstrap);
@@ -80,11 +79,11 @@ main (int argc, char *argv[]) {
 
   loop = uv_default_loop();
 
-  has_link = argc > 1;
-
-  if (has_link) {
+  if (argc > 1) {
     err = appling_parse(argv[1], &link);
     assert(err == 0);
+  } else {
+    memcpy(link.key, app.key, sizeof(appling_link_t));
   }
 
   err = appling_lock(loop, &lock, PLATFORM_DIR, on_lock);

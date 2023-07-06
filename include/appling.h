@@ -118,6 +118,8 @@ struct appling_bootstrap_s {
   fs_swap_t swap;
   fs_rename_t rename;
   fs_rmdir_t rmdir;
+  fs_mkdir_t mkdir;
+  fs_merge_t merge;
   fs_symlink_t symlink;
 
   appling_extract_t extract;

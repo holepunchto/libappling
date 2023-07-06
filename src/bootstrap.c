@@ -65,13 +65,72 @@ symlink_current (appling_bootstrap_t *req) {
 }
 
 static void
+on_merge (fs_merge_t *fs_req, int status) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
+
+  if (status >= 0) {
+    symlink_current(req);
+  } else {
+    if (req->cb) req->cb(req, status, NULL, NULL);
+  }
+}
+
+static void
+on_mkdir (fs_mkdir_t *fs_req, int status) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
+
+  if (status >= 0) {
+    char key[65];
+    size_t key_len = 65;
+
+    hex_encode(req->app.key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+
+    appling_path_t base;
+    size_t path_len = sizeof(appling_path_t);
+
+    path_join(
+      (const char *[]){req->dir, "by-dkey", key, "0", "corestore", NULL},
+      base,
+      &path_len,
+      path_behavior_system
+    );
+
+    appling_path_t onto;
+    path_len = sizeof(appling_path_t);
+
+    path_join(
+      (const char *[]){req->dir, "corestores", "platform", NULL},
+      onto,
+      &path_len,
+      path_behavior_system
+    );
+
+    log_debug("appling_bootstrap() merging corestores at %s", onto);
+
+    fs_merge(req->loop, &req->merge, base, onto, true, on_merge);
+  } else {
+    if (req->cb) req->cb(req, status, NULL, NULL);
+  }
+}
+
+static void
 on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
   appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
 
   status = req->status;
 
   if (status >= 0) {
-    symlink_current(req);
+    appling_path_t path;
+    size_t path_len = sizeof(appling_path_t);
+
+    path_join(
+      (const char *[]){req->dir, "corestores", NULL},
+      path,
+      &path_len,
+      path_behavior_system
+    );
+
+    fs_mkdir(req->loop, &req->mkdir, path, 0777, true, on_mkdir);
   } else {
     if (req->cb) req->cb(req, status, NULL, NULL);
   }
@@ -267,6 +326,8 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_
   req->swap.data = (void *) req;
   req->rename.data = (void *) req;
   req->rmdir.data = (void *) req;
+  req->mkdir.data = (void *) req;
+  req->merge.data = (void *) req;
   req->symlink.data = (void *) req;
   req->extract.data = (void *) req;
   req->resolve.data = (void *) req;

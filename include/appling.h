@@ -128,7 +128,7 @@ struct appling_bootstrap_s {
 
   appling_key_t key;
 
-  appling_path_t exe_dir;
+  appling_path_t exe;
 
   appling_path_t dir;
 

@@ -257,7 +257,7 @@ extract_platform (appling_bootstrap_t *req) {
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->exe_dir, appling_platform_bundle, NULL},
+    (const char *[]){req->exe, "..", appling_platform_bundle, NULL},
     archive,
     &path_len,
     path_behavior_system
@@ -321,19 +321,12 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_
 
   memcpy(req->key, key, sizeof(appling_key_t));
 
-  size_t path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){exe, "..", NULL},
-    req->exe_dir,
-    &path_len,
-    path_behavior_system
-  );
+  strcpy(req->exe, exe);
 
   if (dir) strcpy(req->dir, dir);
   else {
     appling_path_t homedir;
-    path_len = sizeof(appling_path_t);
+    size_t path_len = sizeof(appling_path_t);
 
     int err = uv_os_homedir(homedir, &path_len);
     if (err < 0) return err;

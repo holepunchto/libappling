@@ -1,1 +1,4 @@
 platform-*.tar
+
+# Items that should not be included in tarballs
+.DS_Store

@@ -1,6 +1,7 @@
 platform-%.tar:
 	tar \
 	--create \
+	--exclude-from .gitignore \
 	--file $@ \
 	--directory platform/by-dkey/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/0 \
 	by-arch/$*/ \

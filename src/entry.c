@@ -49,17 +49,8 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   const char *appimage = getenv("APPIMAGE");
 
   strcpy(appling, appimage ? appimage : app->path);
-#elif defined(APPLING_OS_WIN32)
+#else
   strcpy(appling, app->path);
-#elif defined(APPLING_OS_DARWIN)
-  path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){app->path, "..", "..", "..", NULL},
-    appling,
-    &path_len,
-    path_behavior_system
-  );
 #endif
 
   log_debug("appling_launch() launching application shell %s", appling);

@@ -18,6 +18,8 @@ on_process_exit (uv_process_t *handle, int64_t exit_status, int term_signal) {
 
 int
 appling_launch_v0 (const appling_launch_info_t *info) {
+  int err;
+
   const appling_platform_t *platform = info->platform;
 
   appling_path_t file;
@@ -46,9 +48,12 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   appling_path_t appling;
 
 #if defined(APPLING_OS_LINUX)
-  const char *appimage = getenv("APPIMAGE");
+  appling_path_t appimage;
+  path_len = sizeof(appling_path_t);
 
-  strcpy(appling, appimage ? appimage : app->path);
+  err = uv_os_getenv("APPIMAGE", appimage, &path_len);
+
+  strcpy(appling, err == 0 ? appimage : app->path);
 #else
   strcpy(appling, app->path);
 #endif
@@ -73,8 +78,6 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   log_debug("appling_launch() launching link %s", launch);
 
   char *args[] = {file, "--appling", appling, "--launch", launch, NULL};
-
-  int err;
 
   uv_loop_t loop;
   err = uv_loop_init(&loop);

@@ -3,6 +3,7 @@
 #include <log.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 #include <uv.h>
 
 #ifndef PLATFORM_DIR
@@ -83,7 +84,7 @@ main (int argc, char *argv[]) {
     err = appling_parse(argv[1], &link);
     assert(err == 0);
   } else {
-    memcpy(link.key, app.key, sizeof(appling_link_t));
+    memcpy(link.key, app.key, sizeof(appling_key_t));
   }
 
   err = appling_lock(loop, &lock, PLATFORM_DIR, on_lock);

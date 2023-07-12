@@ -216,6 +216,9 @@ appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_p
 int
 appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
+int
+appling_main (int argc, char *argv[], const char *dir, appling_platform_t *platform, appling_app_t *app);
+
 #ifdef __cplusplus
 }
 #endif

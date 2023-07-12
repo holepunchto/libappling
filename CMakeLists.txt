@@ -78,6 +78,7 @@ target_sources(
     src/extract.c
     src/launch.c
     src/lock.c
+    src/main.c
     src/unlock.c
     src/parse.c
     src/paths.c

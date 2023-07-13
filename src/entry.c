@@ -77,7 +77,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *args[] = {file, "--appling", appling, "--launch", launch, NULL};
+  char *args[] = {file, "-", "--appling", appling, "--launch", launch, NULL};
 
   uv_loop_t loop;
   err = uv_loop_init(&loop);

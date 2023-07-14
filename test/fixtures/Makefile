@@ -12,4 +12,5 @@ all: \
 	platform-darwin-x64.tar \
 	platform-linux-arm64.tar \
 	platform-linux-x64.tar \
+	platform-win32-arm64.tar \
 	platform-win32-x64.tar

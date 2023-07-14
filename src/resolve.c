@@ -57,15 +57,30 @@ appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appli
   req->status = 0;
   req->realpath.data = (void *) req;
 
-  if (dir) strcpy(req->path, dir);
-  else {
-    appling_path_t homedir;
-    size_t homedir_len = sizeof(appling_path_t);
+  if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->path, dir);
+  else if (dir) {
+    appling_path_t cwd;
+    size_t path_len = sizeof(appling_path_t);
 
-    int err = uv_os_homedir(homedir, &homedir_len);
+    int err = uv_cwd(cwd, &path_len);
     if (err < 0) return err;
 
+    path_len = sizeof(appling_path_t);
+
+    path_join(
+      (const char *[]){cwd, dir, NULL},
+      req->path,
+      &path_len,
+      path_behavior_system
+    );
+  } else {
+    appling_path_t homedir;
     size_t path_len = sizeof(appling_path_t);
+
+    int err = uv_os_homedir(homedir, &path_len);
+    if (err < 0) return err;
+
+    path_len = sizeof(appling_path_t);
 
     path_join(
       (const char *[]){homedir, appling_platform_dir, NULL},

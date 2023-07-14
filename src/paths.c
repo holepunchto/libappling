@@ -128,8 +128,23 @@ appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_p
   appling_path_t base;
   size_t path_len = sizeof(appling_path_t);
 
-  if (dir) strcpy(base, dir);
-  else {
+  if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(base, dir);
+  else if (dir) {
+    appling_path_t cwd;
+    size_t path_len = sizeof(appling_path_t);
+
+    int err = uv_cwd(cwd, &path_len);
+    if (err < 0) return err;
+
+    path_len = sizeof(appling_path_t);
+
+    path_join(
+      (const char *[]){cwd, dir, NULL},
+      base,
+      &path_len,
+      path_behavior_system
+    );
+  } else {
     appling_path_t homedir;
     size_t homedir_len = sizeof(appling_path_t);
 

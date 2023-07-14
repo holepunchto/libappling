@@ -30,7 +30,7 @@ symlink_current (appling_bootstrap_t *req) {
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){"by-dkey", key, "0", NULL},
+    (const char *[]){req->dir, "by-dkey", key, "0", NULL},
     target,
     &path_len,
     path_behavior_system
@@ -48,7 +48,7 @@ symlink_current (appling_bootstrap_t *req) {
 
   log_debug("appling_bootstrap() linking platform at %s", target);
 
-  fs_symlink(req->loop, &req->symlink, target, link, UV_FS_SYMLINK_DIR, on_symlink);
+  fs_symlink(req->loop, &req->symlink, target, link, UV_FS_SYMLINK_JUNCTION, on_symlink);
 }
 
 static void
@@ -323,8 +323,23 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_
 
   strcpy(req->exe, exe);
 
-  if (dir) strcpy(req->dir, dir);
-  else {
+  if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
+  else if (dir) {
+    appling_path_t cwd;
+    size_t path_len = sizeof(appling_path_t);
+
+    int err = uv_cwd(cwd, &path_len);
+    if (err < 0) return err;
+
+    path_len = sizeof(appling_path_t);
+
+    path_join(
+      (const char *[]){cwd, dir, NULL},
+      req->dir,
+      &path_len,
+      path_behavior_system
+    );
+  } else {
     appling_path_t homedir;
     size_t path_len = sizeof(appling_path_t);
 

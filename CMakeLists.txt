@@ -161,10 +161,10 @@ set_target_properties(
 target_link_libraries(
   appling_launch_shared
   PRIVATE
-    uv
-    path_shared
-    log_shared
-    hex_shared
+    uv_a
+    path_static
+    log_static
+    hex_static
 )
 
 install(TARGETS appling_static)

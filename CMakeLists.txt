@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.22)
 
 project(appling C)
 
+# Force position independent code for all compilation units to allow linking
+# the static libuv archive to the dynamic platform entry point.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 option(ENABLE_ACL OFF)
 option(ENABLE_BZip2 OFF)
 option(ENABLE_CAT OFF)

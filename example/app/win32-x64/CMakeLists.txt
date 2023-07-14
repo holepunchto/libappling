@@ -1,3 +1,9 @@
+set_target_properties(
+  example
+  PROPERTIES
+  OUTPUT_NAME Example
+)
+
 target_link_options(
   example
   PRIVATE

@@ -17,12 +17,6 @@ target_compile_definitions(
     PLATFORM_DIR="${PROJECT_SOURCE_DIR}/../pear"
 )
 
-set_target_properties(
-  example
-  PROPERTIES
-  OUTPUT_NAME Example
-)
-
 target_link_libraries(
   example
   PRIVATE

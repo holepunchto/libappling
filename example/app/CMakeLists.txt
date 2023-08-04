@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.25)
 
 project(example C)
 
@@ -31,7 +31,7 @@ if(APPLE)
   endif()
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+if(LINUX)
   if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     add_subdirectory(linux-arm64)
   else()

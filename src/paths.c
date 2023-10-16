@@ -21,20 +21,25 @@ on_decode (compact_state_t *state, void *array, size_t i, void *data) {
   appling_app_t *apps = (appling_app_t *) array;
 
   utf8_t *path = NULL;
+  utf8_t *key = NULL;
+
   err = compact_decode_utf8(state, &path, NULL);
   if (err < 0) goto err;
 
-  err = compact_decode_fixed32(state, apps[i].key);
+  err = compact_decode_utf8(state, &key, NULL);
   if (err < 0) goto err;
 
   strcpy(apps[i].path, (char *) path);
+  strcpy(apps[i].key, (char *) key);
 
   free(path);
+  free(key);
 
   return 0;
 
 err:
-  free(path);
+  if (path) free(path);
+  if (key) free(key);
 
   return err;
 }

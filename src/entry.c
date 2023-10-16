@@ -62,13 +62,10 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   const appling_link_t *link = info->link;
 
-  char launch[7 /* pear:// */ + APPLING_KEY_LEN * 2 + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
+  char launch[7 /* pear:// */ + APPLING_KEY_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
 
   strcat(launch, "pear://");
-
-  size_t len = 65;
-
-  hex_encode(link->key, APPLING_KEY_LEN, (utf8_t *) &launch[7], &len);
+  strcat(launch, link->key);
 
   if (strlen(link->data)) {
     strcat(launch, "/");

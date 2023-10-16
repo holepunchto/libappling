@@ -24,7 +24,7 @@ symlink_current (appling_bootstrap_t *req) {
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
   appling_path_t target;
   size_t path_len = sizeof(appling_path_t);
@@ -70,7 +70,7 @@ on_mkdir (fs_mkdir_t *fs_req, int status) {
     char key[65];
     size_t key_len = 65;
 
-    hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+    hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
     appling_path_t base;
     size_t path_len = sizeof(appling_path_t);
@@ -128,7 +128,7 @@ discard_tmp (appling_bootstrap_t *req) {
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
   appling_path_t tmp;
   size_t path_len = sizeof(appling_path_t);
@@ -161,7 +161,7 @@ rename_platform (appling_bootstrap_t *req) {
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
   appling_path_t to;
   size_t path_len = sizeof(appling_path_t);
@@ -206,7 +206,7 @@ swap_platform (appling_bootstrap_t *req) {
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
   appling_path_t to;
   size_t path_len = sizeof(appling_path_t);
@@ -251,7 +251,7 @@ extract_platform (appling_bootstrap_t *req) {
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
   appling_path_t archive;
   size_t path_len = sizeof(appling_path_t);
@@ -290,7 +290,7 @@ discard_tmp_maybe (appling_bootstrap_t *req) {
   char key[65];
   size_t key_len = 65;
 
-  hex_encode(req->key, APPLING_KEY_LEN, (utf8_t *) key, &key_len);
+  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
 
   appling_path_t tmp;
   size_t path_len = sizeof(appling_path_t);
@@ -306,7 +306,7 @@ discard_tmp_maybe (appling_bootstrap_t *req) {
 }
 
 int
-appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_t key, const char *exe, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *exe, const char *dir, appling_bootstrap_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->status = 0;
@@ -319,7 +319,7 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_key_
   req->extract.data = (void *) req;
   req->resolve.data = (void *) req;
 
-  memcpy(req->key, key, sizeof(appling_key_t));
+  memcpy(req->dkey, dkey, sizeof(appling_dkey_t));
 
   strcpy(req->exe, exe);
 

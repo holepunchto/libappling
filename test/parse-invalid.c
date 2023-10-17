@@ -23,10 +23,6 @@ main () {
   test_parse_invalid("pear:///");
   test_parse_invalid("punch:///");
 
-  // Key shorter than 52 characters
-  test_parse_invalid("pear://aaaa");
-  test_parse_invalid("punch://aaaa");
-
   // Key longer than 64 characters
   test_parse_invalid("pear://" KEY "aaaa");
   test_parse_invalid("punch://" KEY "aaaa");

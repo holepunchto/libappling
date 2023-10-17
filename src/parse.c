@@ -18,40 +18,20 @@ appling_parse (const char *link, appling_link_t *result) {
   else if (strncmp(link, "punch://", 8) == 0) i += 8;
   else goto err;
 
-  char key[APPLING_KEY_LEN * 2 + 1 /* NULL */];
-  size_t key_len = 0;
-
-  for (; key_len < APPLING_KEY_LEN * 2; i++) {
+  for (size_t j = 0; j < APPLING_KEY_MAX; i++, j++) {
     char c = link[i];
 
     if (c == '\0' || c == '/') {
-      key[key_len] = '\0';
+      result->key[j] = '\0';
       break;
     }
 
-    key[key_len++] = c;
+    result->key[j] = c;
   }
 
-  size_t len = APPLING_KEY_LEN;
+  if (strlen(result->key) == 0) goto err;
 
-  switch (key_len) {
-  case 64: {
-    int err = hex_decode((utf8_t *) key, key_len, result->key, &len);
-
-    if (err < 0 || len != APPLING_KEY_LEN) goto err;
-    break;
-  }
-
-  case 52: {
-    int err = z32_decode((utf8_t *) key, key_len, result->key, &len);
-
-    if (err < 0 || len != APPLING_KEY_LEN) goto err;
-    break;
-  }
-
-  default:
-    goto err;
-  }
+  result->key[APPLING_KEY_MAX] = '\0';
 
   if (link[i] == '/') i++;
   else if (link[i] != '\0') goto err;

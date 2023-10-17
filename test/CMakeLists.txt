@@ -9,6 +9,7 @@ list(APPEND tests
   lock-non-existing
   parse-hex
   parse-invalid
+  parse-named
   parse-z32
   paths
   resolve-both

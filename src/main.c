@@ -47,7 +47,7 @@ on_resolve (appling_resolve_t *req, int status) {
     status = appling_launch(req->loop, main->platform, main->app, &main->link);
     assert(status == 0);
   } else {
-    status = appling_bootstrap(req->loop, &main->bootstrap, main->platform->key, main->app->path, main->dir, on_bootstrap);
+    status = appling_bootstrap(req->loop, &main->bootstrap, main->platform->dkey, main->app->path, main->dir, on_bootstrap);
     assert(status == 0);
   }
 }

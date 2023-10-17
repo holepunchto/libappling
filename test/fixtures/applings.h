@@ -11,6 +11,7 @@
 #include "app.h"
 
 #define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
+#define KEY "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 static int
 on_preencode (compact_state_t *state, void *array, size_t i, void *data) {
@@ -21,7 +22,7 @@ on_preencode (compact_state_t *state, void *array, size_t i, void *data) {
   err = compact_preencode_utf8(state, (utf8_t *) apps[i].path, -1);
   assert(err == 0);
 
-  err = compact_preencode_fixed32(state, apps[i].key);
+  err = compact_preencode_utf8(state, (utf8_t *) apps[i].key, -1);
   assert(err == 0);
 
   return 0;
@@ -36,7 +37,7 @@ on_encode (compact_state_t *state, void *array, size_t i, void *data) {
   err = compact_encode_utf8(state, (utf8_t *) apps[i].path, -1);
   assert(err == 0);
 
-  err = compact_encode_fixed32(state, apps[i].key);
+  err = compact_encode_utf8(state, (utf8_t *) apps[i].key, -1);
   assert(err == 0);
 
   return 0;
@@ -49,7 +50,7 @@ appling_generate_paths (uv_loop_t *loop) {
   appling_app_t apps[] = {
     {
       .path = EXE,
-      .key = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa},
+      .key = KEY,
     },
   };
 

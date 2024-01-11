@@ -29,7 +29,6 @@ typedef struct appling_app_s appling_app_t;
 typedef struct appling_link_s appling_link_t;
 typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
-typedef struct appling_extract_s appling_extract_t;
 typedef struct appling_bootstrap_s appling_bootstrap_t;
 typedef struct appling_paths_s appling_paths_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
@@ -37,7 +36,6 @@ typedef struct appling_launch_info_s appling_launch_info_t;
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
-typedef void (*appling_extract_cb)(appling_extract_t *req, int status);
 typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
@@ -98,34 +96,10 @@ struct appling_resolve_s {
   void *data;
 };
 
-struct appling_extract_s {
-  uv_loop_t *loop;
-  uv_work_t req;
-
-  char *archive;
-  char *dest;
-
-  appling_extract_cb cb;
-
-  int status;
-
-  void *data;
-};
-
 struct appling_bootstrap_s {
   uv_loop_t *loop;
 
   appling_bootstrap_cb cb;
-
-  fs_swap_t swap;
-  fs_rename_t rename;
-  fs_rmdir_t rmdir;
-  fs_mkdir_t mkdir;
-  fs_merge_t merge;
-  fs_symlink_t symlink;
-
-  appling_extract_t extract;
-  appling_resolve_t resolve;
 
   appling_dkey_t dkey;
 
@@ -204,9 +178,6 @@ appling_unlock (uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
 
 int
 appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb);
-
-int
-appling_extract (uv_loop_t *loop, appling_extract_t *req, const char *archive, const char *dest, appling_extract_cb cb);
 
 int
 appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *exe, const char *dir, appling_bootstrap_cb cb);

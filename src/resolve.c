@@ -1,5 +1,4 @@
 #include <fs.h>
-#include <hex.h>
 #include <log.h>
 #include <path.h>
 #include <stdio.h>

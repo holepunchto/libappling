@@ -1,6 +1,8 @@
 #ifndef APPLING_OS_H
 #define APPLING_OS_H
 
+#include <stddef.h>
+
 #include "arch.h"
 
 #if defined(__linux__)

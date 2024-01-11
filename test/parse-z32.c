@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <string.h>
 #include <utf.h>
-#include <z32.h>
 
 #include "../include/appling.h"
 

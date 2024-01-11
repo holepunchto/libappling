@@ -6,32 +6,8 @@ project(appling C)
 # the static libuv archive to the dynamic platform entry point.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-option(ENABLE_ACL OFF)
-option(ENABLE_BZip2 OFF)
-option(ENABLE_CAT OFF)
-option(ENABLE_CNG OFF)
-option(ENABLE_CPIO OFF)
-option(ENABLE_EXPAT OFF)
-option(ENABLE_ICONV OFF)
-option(ENABLE_LIBB2 OFF)
-option(ENABLE_LibGCC OFF)
-option(ENABLE_LIBXML2 OFF)
-option(ENABLE_LZ4 OFF)
-option(ENABLE_LZMA OFF)
-option(ENABLE_LZO OFF)
-option(ENABLE_OPENSSL OFF)
-option(ENABLE_PCREPOSIX OFF)
-option(ENABLE_TEST OFF)
-option(ENABLE_XATTR OFF)
-option(ENABLE_ZLIB OFF)
-option(ENABLE_ZSTD OFF)
-
 if(NOT TARGET uv)
   add_subdirectory(vendor/libuv EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET archive)
-  add_subdirectory(vendor/libarchive EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET path)
@@ -52,10 +28,6 @@ endif()
 
 if(NOT TARGET hex)
   add_subdirectory(vendor/libhex EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET z32)
-  add_subdirectory(vendor/libz32 EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET compact)
@@ -83,7 +55,6 @@ target_sources(
     include/appling/win32.h
   PRIVATE
     src/bootstrap.c
-    src/extract.c
     src/launch.c
     src/lock.c
     src/main.c
@@ -99,10 +70,8 @@ target_include_directories(
     include
     $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:fs,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:z32,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
-    $<TARGET_PROPERTY:archive,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
@@ -130,6 +99,7 @@ target_include_directories(
     include
     $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
+    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
 )
@@ -148,13 +118,11 @@ target_link_libraries(
   PUBLIC
     uv_a
   PRIVATE
-    archive_static
     fs_static
     fx_static
     path_static
     log_static
     hex_static
-    z32_static
     compact_static
 )
 

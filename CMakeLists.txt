@@ -18,10 +18,6 @@ if(NOT TARGET fs)
   add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
 endif()
 
-if(NOT TARGET fx)
-  add_subdirectory(vendor/libfx EXCLUDE_FROM_ALL)
-endif()
-
 if(NOT TARGET log)
   add_subdirectory(vendor/liblog EXCLUDE_FROM_ALL)
 endif()
@@ -75,7 +71,6 @@ target_include_directories(
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:fx,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 add_library(appling_launch OBJECT)
@@ -119,7 +114,6 @@ target_link_libraries(
     uv_a
   PRIVATE
     fs_static
-    fx_static
     path_static
     log_static
     hex_static

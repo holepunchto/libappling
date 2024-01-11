@@ -22,3 +22,6 @@
 [submodule "vendor/libcompact"]
 	path = vendor/libcompact
 	url = ../../holepunchto/libcompact.git
+[submodule "vendor/libfx"]
+	path = vendor/libfx
+	url = ../../holepunchto/libfx.git

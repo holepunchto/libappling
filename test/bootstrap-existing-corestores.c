@@ -5,9 +5,6 @@
 #include <uv.h>
 
 #include "../include/appling.h"
-#include "fixtures/app.h"
-
-#define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
 
 uv_loop_t *loop;
 
@@ -39,7 +36,7 @@ on_unlink (fs_unlink_t *req, int status) {
 
   appling_dkey_t dkey = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
 
-  e = appling_bootstrap(loop, js, &bootstrap_req, dkey, EXE, "test/fixtures/bootstrap/existing-corestores", on_bootstrap);
+  e = appling_bootstrap(loop, js, &bootstrap_req, dkey, "test/fixtures/bootstrap/existing-corestores", on_bootstrap);
   assert(e == 0);
 }
 

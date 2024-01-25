@@ -14,13 +14,24 @@
     "url": "https://github.com/holepunchto/libappling/issues"
   },
   "homepage": "https://github.com/holepunchto/libappling#readme",
-  "devDependencies": {
-    "standard": "^17.0.0"
+  "imports": {
+    "fs": "bare-fs",
+    "fs/promises": "bare-fs/promises",
+    "module": "bare-module",
+    "path": "bare-path",
+    "process": "bare-process"
   },
   "dependencies": {
-    "@holepunchto/pear-updater": "^1.3.1",
+    "@holepunchto/pear-updater": "^2.0.0",
+    "bare-fs": "^2.1.0",
+    "bare-module": "^2.8.2",
+    "bare-path": "^2.1.0",
+    "bare-process": "^1.2.1",
     "corestore": "^6.15.13",
     "hyperdrive": "^11.6.3",
     "hyperswarm": "^4.7.13"
+  },
+  "devDependencies": {
+    "standard": "^17.0.0"
   }
 }

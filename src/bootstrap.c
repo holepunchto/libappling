@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <bare.h>
+#include <hex.h>
 #include <js.h>
 #include <path.h>
 #include <string.h>
@@ -18,10 +19,16 @@ on_thread (void *data) {
   err = uv_loop_init(&loop);
   assert(err == 0);
 
-  js_env_t *env;
+  char dkey[65];
+  size_t dkey_len = 65;
+
+  err = hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) dkey, &dkey_len);
+  assert(err == 0);
+
+  char *argv[2] = {dkey, req->dir};
 
   bare_t *bare;
-  err = bare_setup(&loop, req->js, &env, 0, NULL, NULL, &bare);
+  err = bare_setup(&loop, req->js, NULL, 2, argv, NULL, &bare);
   assert(err == 0);
 
   uv_buf_t source = uv_buf_init((char *) bundle, bundle_len);
@@ -52,7 +59,7 @@ on_signal (uv_async_t *handle) {
 }
 
 int
-appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *exe, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb) {
   int err;
 
   req->loop = loop;
@@ -65,8 +72,6 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
   if (err < 0) return err;
 
   memcpy(req->dkey, dkey, sizeof(appling_dkey_t));
-
-  strcpy(req->exe, exe);
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {

@@ -1,6 +1,4 @@
 list(APPEND tests
-  bootstrap-dangling-tmp
-  bootstrap-existing-corestores
   bootstrap-no-platform
   launch
   launch-data

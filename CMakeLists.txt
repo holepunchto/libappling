@@ -46,6 +46,7 @@ set_target_properties(
 add_bare_bundle(
   ENTRY src/bootstrap.js
   OUT src/bootstrap.bundle.h
+  IMPORT_MAP package.json
   TARGET c
 )
 
@@ -130,6 +131,20 @@ target_link_libraries(
     hex_static
     compact_static
 )
+
+link_bare_module(appling_static bare_fs bare-fs)
+
+link_bare_module(appling_static sodium_native sodium-native)
+
+link_bare_module(appling_static udx_native udx-native)
+
+link_bare_module(appling_static crc_native crc-native)
+
+link_bare_module(appling_static quickbit_native quickbit-native)
+
+link_bare_module(appling_static simdle_native simdle-native)
+
+link_bare_module(appling_static fs_native_extensions fs-native-extensions)
 
 add_library(appling_launch_shared SHARED $<TARGET_OBJECTS:appling_launch>)
 

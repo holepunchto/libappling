@@ -137,7 +137,6 @@ struct appling_paths_s {
   void *data;
 };
 
-/** @version 1 */
 struct appling_launch_info_s {
   int version;
 

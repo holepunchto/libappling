@@ -37,6 +37,7 @@ appling_launch (uv_loop_t *loop, js_platform_t *js, const appling_platform_t *pl
     .platform = platform,
     .app = app,
     .link = link,
+    .js = js,
   };
 
   return launch(&info);

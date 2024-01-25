@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 #include <uv.h>
 
 #include "../include/appling.h"

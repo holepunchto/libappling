@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <js.h>
 #include <string.h>
 #include <uv.h>
 
@@ -7,6 +8,8 @@
 typedef struct appling_main_s appling_main_t;
 
 struct appling_main_s {
+  js_platform_t *js;
+
   const char *dir;
   appling_platform_t *platform;
   appling_app_t *app;
@@ -44,10 +47,10 @@ on_resolve (appling_resolve_t *req, int status) {
     status = appling_unlock(req->loop, &main->lock, on_unlock);
     assert(status == 0);
 
-    status = appling_launch(req->loop, main->platform, main->app, &main->link);
+    status = appling_launch(req->loop, main->js, main->platform, main->app, &main->link);
     assert(status == 0);
   } else {
-    status = appling_bootstrap(req->loop, &main->bootstrap, main->platform->dkey, main->app->path, main->dir, on_bootstrap);
+    status = appling_bootstrap(req->loop, main->js, &main->bootstrap, main->platform->dkey, main->app->path, main->dir, on_bootstrap);
     assert(status == 0);
   }
 }
@@ -94,7 +97,16 @@ appling_main (int argc, char *argv[], const char *dir, appling_platform_t *platf
     memcpy(&main.link.key, app->key, sizeof(appling_key_t));
   }
 
+  err = js_create_platform(&loop, NULL, &main.js);
+  assert(err == 0);
+
   err = appling_lock(&loop, &main.lock, main.dir, on_lock);
+  assert(err == 0);
+
+  err = uv_run(&loop, UV_RUN_DEFAULT);
+  assert(err == 0);
+
+  err = js_destroy_platform(main.js);
   assert(err == 0);
 
   err = uv_run(&loop, UV_RUN_DEFAULT);

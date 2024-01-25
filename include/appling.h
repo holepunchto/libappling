@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <fs.h>
+#include <js.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -29,15 +30,15 @@ typedef struct appling_app_s appling_app_t;
 typedef struct appling_link_s appling_link_t;
 typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
-typedef struct appling_bootstrap_s appling_bootstrap_t;
 typedef struct appling_paths_s appling_paths_t;
+typedef struct appling_bootstrap_s appling_bootstrap_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
 
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
-typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
+typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
 struct appling_platform_s {
@@ -102,10 +103,13 @@ struct appling_bootstrap_s {
   appling_bootstrap_cb cb;
 
   appling_dkey_t dkey;
-
   appling_path_t exe;
-
   appling_path_t dir;
+
+  js_platform_t *js;
+
+  uv_thread_t thread;
+  uv_async_t signal;
 
   int status;
 
@@ -123,7 +127,6 @@ struct appling_paths_s {
   fs_read_t read;
 
   appling_path_t path;
-
   appling_app_t *apps;
   size_t apps_len;
 
@@ -135,6 +138,7 @@ struct appling_paths_s {
   void *data;
 };
 
+/** @version 1 */
 struct appling_launch_info_s {
   int version;
 
@@ -165,6 +169,13 @@ struct appling_launch_info_s {
    * @since v0
    */
   const appling_link_t *link;
+
+  /**
+   * The JavaScript platform instance.
+   *
+   * @since v1
+   */
+  js_platform_t *js;
 };
 
 int
@@ -180,13 +191,13 @@ int
 appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb);
 
 int
-appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *exe, const char *dir, appling_bootstrap_cb cb);
-
-int
 appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
+appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *exe, const char *dir, appling_bootstrap_cb cb);
+
+int
+appling_launch (uv_loop_t *loop, js_platform_t *js, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
 int
 appling_main (int argc, char *argv[], const char *dir, appling_platform_t *platform, appling_app_t *app);

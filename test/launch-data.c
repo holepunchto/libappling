@@ -26,7 +26,7 @@ on_resolve (appling_resolve_t *req, int status) {
     .data = "this-is-some-data",
   };
 
-  status = appling_launch(loop, &platform, &app, &link);
+  status = appling_launch(loop, NULL, &platform, &app, &link);
   assert(status == 0);
 }
 

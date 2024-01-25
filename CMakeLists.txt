@@ -30,6 +30,10 @@ if(NOT TARGET compact)
   add_subdirectory(vendor/libcompact EXCLUDE_FROM_ALL)
 endif()
 
+if(NOT TARGET bare)
+  add_subdirectory(vendor/bare EXCLUDE_FROM_ALL)
+endif()
+
 add_library(appling OBJECT)
 
 set_target_properties(
@@ -37,6 +41,12 @@ set_target_properties(
   PROPERTIES
   C_STANDARD 99
   POSITION_INDEPENDENT_CODE ON
+)
+
+add_bare_bundle(
+  ENTRY src/bootstrap.js
+  OUT src/bootstrap.bundle.h
+  TARGET c
 )
 
 target_sources(
@@ -51,6 +61,7 @@ target_sources(
     include/appling/win32.h
   PRIVATE
     src/bootstrap.c
+    src/bootstrap.bundle.h
     src/launch.c
     src/lock.c
     src/main.c
@@ -66,6 +77,7 @@ target_include_directories(
     include
     $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:fs,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
     $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
@@ -110,9 +122,8 @@ set_target_properties(
 
 target_link_libraries(
   appling_static
-  PUBLIC
-    uv_a
   PRIVATE
+    $<LINK_LIBRARY:WHOLE_ARCHIVE,bare_static>
     fs_static
     path_static
     log_static

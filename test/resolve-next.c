@@ -2,7 +2,6 @@
 #include <hex.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <utf.h>
 #include <uv.h>
 

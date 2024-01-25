@@ -32,7 +32,7 @@ appling_launch (uv_loop_t *loop, js_platform_t *js, const appling_platform_t *pl
   if (err < 0) return err;
 
   appling_launch_info_t info = {
-    .version = APPLING_VERSION_MAJOR,
+    .version = 1,
     .path = path,
     .platform = platform,
     .app = app,

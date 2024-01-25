@@ -137,41 +137,42 @@ struct appling_paths_s {
   void *data;
 };
 
+/** @version 0 */
 struct appling_launch_info_s {
   int version;
 
   /**
    * The path to the object library from which the platform was launched.
    *
-   * @since v0
+   * @since 0
    */
   const char *path;
 
   /**
    * The platform that was launched.
    *
-   * @since v0
+   * @since 0
    */
   const appling_platform_t *platform;
 
   /**
    * The application bundle that is currently executing.
    *
-   * @since v0
+   * @since 0
    */
   const appling_app_t *app;
 
   /**
    * The link to launch.
    *
-   * @since v0
+   * @since 0
    */
   const appling_link_t *link;
 
   /**
    * The JavaScript platform instance.
    *
-   * @since v1
+   * @since 1
    */
   js_platform_t *js;
 };

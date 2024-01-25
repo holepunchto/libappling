@@ -1,5 +1,7 @@
 build/
 install/
 sandbox/
+node_modules/
+package-lock.json
 *.bundle.h
 *.bundle.h.d

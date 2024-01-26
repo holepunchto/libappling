@@ -86,32 +86,6 @@ target_include_directories(
     $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-add_library(appling_launch OBJECT)
-
-set_target_properties(
-  appling_launch
-  PROPERTIES
-  C_STANDARD 99
-  POSITION_INDEPENDENT_CODE ON
-)
-
-target_sources(
-  appling_launch
-  PRIVATE
-    src/entry.c
-)
-
-target_include_directories(
-  appling_launch
-  PUBLIC
-    include
-    $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
-  PRIVATE
-    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
-)
-
 add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
 
 set_target_properties(
@@ -146,6 +120,31 @@ link_bare_module(appling_static simdle_native simdle-native)
 
 link_bare_module(appling_static fs_native_extensions fs-native-extensions)
 
+add_library(appling_launch OBJECT)
+
+set_target_properties(
+  appling_launch
+  PROPERTIES
+  C_STANDARD 99
+  POSITION_INDEPENDENT_CODE ON
+)
+
+target_sources(
+  appling_launch
+  PRIVATE
+    src/entry.c
+)
+
+target_include_directories(
+  appling_launch
+  PUBLIC
+    include
+    $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
 add_library(appling_launch_shared SHARED $<TARGET_OBJECTS:appling_launch>)
 
 set_target_properties(
@@ -159,10 +158,8 @@ set_target_properties(
 target_link_libraries(
   appling_launch_shared
   PRIVATE
-    uv_a
     path_static
     log_static
-    hex_static
 )
 
 install(TARGETS appling_static)

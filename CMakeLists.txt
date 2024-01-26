@@ -2,9 +2,13 @@ cmake_minimum_required(VERSION 3.25)
 
 project(appling C)
 
+include(bare)
+
 # Force position independent code for all compilation units to allow linking
 # the static libuv archive to the dynamic platform entry point.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+install_node_modules()
 
 if(NOT TARGET uv)
   add_subdirectory(vendor/libuv EXCLUDE_FROM_ALL)

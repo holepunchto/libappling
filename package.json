@@ -24,7 +24,7 @@
   "dependencies": {
     "@holepunchto/pear-updater": "^2.0.0",
     "bare-fs": "^2.1.0",
-    "bare-module": "^2.8.2",
+    "bare-module": "^3.0.2",
     "bare-path": "^2.1.0",
     "bare-process": "^1.2.1",
     "corestore": "^6.15.13",

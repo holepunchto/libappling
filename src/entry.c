@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../include/appling.h"
+
 #if defined(APPLING_OS_WIN32)
 #include <process.h>
 #else
 #include <unistd.h>
 #endif
-
-#include "../include/appling.h"
 
 int
 appling_launch_v0 (const appling_launch_info_t *info) {

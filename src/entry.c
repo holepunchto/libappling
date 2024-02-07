@@ -28,6 +28,8 @@ appling_launch_v0 (const appling_launch_info_t *info) {
         "pear-runtime",
 #elif defined(APPLING_OS_WIN32)
         "pear-runtime.exe",
+#else
+#error Unsupported operating system
 #endif
         NULL,
     },

@@ -11,15 +11,15 @@ Bare
   .on('uncaughtException', onerror)
   .on('unhandledRejection', onerror)
 
-const process = require('process')
-const path = require('path')
+const process = require('bare-process')
+const path = require('bare-path')
 
 global.process = process
 
-const Updater = require('@holepunchto/pear-updater')
+const Updater = require('pear-updater')
 const Hyperdrive = require('hyperdrive')
-const Corestore = require('corestore')
 const Hyperswarm = require('hyperswarm')
+const Corestore = require('corestore')
 
 const swarm = new Hyperswarm()
 

@@ -1,9 +1,6 @@
 {
   "private": true,
   "name": "libapping",
-  "workspaces": [
-    "vendor/*"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/holepunchto/libappling.git"
@@ -14,22 +11,15 @@
     "url": "https://github.com/holepunchto/libappling/issues"
   },
   "homepage": "https://github.com/holepunchto/libappling#readme",
-  "imports": {
-    "fs": "bare-fs",
-    "fs/promises": "bare-fs/promises",
-    "module": "bare-module",
-    "path": "bare-path",
-    "process": "bare-process"
-  },
   "dependencies": {
-    "@holepunchto/pear-updater": "^2.0.0",
     "bare-fs": "^2.1.0",
     "bare-module": "^3.0.2",
     "bare-path": "^2.1.0",
     "bare-process": "^1.2.1",
     "corestore": "^6.15.13",
     "hyperdrive": "^11.6.3",
-    "hyperswarm": "^4.7.13"
+    "hyperswarm": "^4.7.13",
+    "pear-updater": "^2.0.0"
   },
   "devDependencies": {
     "standard": "^17.0.0"

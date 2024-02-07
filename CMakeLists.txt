@@ -8,7 +8,7 @@ include(bare)
 # the static libuv archive to the dynamic platform entry point.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-install_node_modules()
+install_node_modules(LOCKFILE)
 
 if(NOT TARGET uv)
   add_subdirectory(vendor/libuv EXCLUDE_FROM_ALL)
@@ -50,7 +50,6 @@ set_target_properties(
 add_bare_bundle(
   ENTRY src/bootstrap.js
   OUT src/bootstrap.bundle.h
-  IMPORT_MAP package.json
   TARGET c
 )
 
@@ -110,19 +109,7 @@ target_link_libraries(
     compact_static
 )
 
-link_bare_module(appling_static bare_fs bare-fs)
-
-link_bare_module(appling_static sodium_native sodium-native)
-
-link_bare_module(appling_static udx_native udx-native)
-
-link_bare_module(appling_static crc_native crc-native)
-
-link_bare_module(appling_static quickbit_native quickbit-native)
-
-link_bare_module(appling_static simdle_native simdle-native)
-
-link_bare_module(appling_static fs_native_extensions fs-native-extensions)
+link_bare_modules(appling_static)
 
 add_library(appling_launch OBJECT)
 

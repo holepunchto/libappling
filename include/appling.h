@@ -168,13 +168,6 @@ struct appling_launch_info_s {
    * @since 0
    */
   const appling_link_t *link;
-
-  /**
-   * The JavaScript platform instance.
-   *
-   * @since 1
-   */
-  js_platform_t *js;
 };
 
 int
@@ -196,10 +189,7 @@ int
 appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb);
 
 int
-appling_launch (uv_loop_t *loop, js_platform_t *js, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
-
-int
-appling_main (int argc, char *argv[], const char *dir, appling_platform_t *platform, appling_app_t *app);
+appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
 #ifdef __cplusplus
 }

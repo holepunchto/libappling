@@ -68,7 +68,6 @@ target_sources(
     src/bootstrap.bundle.h
     src/launch.c
     src/lock.c
-    src/main.c
     src/unlock.c
     src/parse.c
     src/paths.c

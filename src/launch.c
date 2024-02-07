@@ -10,7 +10,7 @@
 #include "../include/appling.h"
 
 int
-appling_launch (uv_loop_t *loop, js_platform_t *js, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link) {
+appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link) {
   int err;
 
   appling_path_t path;
@@ -37,7 +37,6 @@ appling_launch (uv_loop_t *loop, js_platform_t *js, const appling_platform_t *pl
     .platform = platform,
     .app = app,
     .link = link,
-    .js = js,
   };
 
   return launch(&info);

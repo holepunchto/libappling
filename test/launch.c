@@ -27,7 +27,7 @@ on_resolve (appling_resolve_t *req, int status) {
     .key = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   };
 
-  int err = appling_launch(loop, NULL, &platform, &app, &link);
+  int err = appling_launch(loop, &platform, &app, &link);
   assert(err == 0);
 }
 

@@ -24,12 +24,10 @@ appling_launch_v0 (const appling_launch_info_t *info) {
     (const char *[]) {
       platform->path,
         "bin",
-#if defined(APPLING_OS_LINUX)
-        "holepunch-runtime/holepunch-runtime",
+#if defined(APPLING_OS_LINUX) || defined(APPLING_OS_DARWIN)
+        "pear-runtime",
 #elif defined(APPLING_OS_WIN32)
-        "holepunch-runtime\\Holepunch Runtime.exe",
-#elif defined(APPLING_OS_DARWIN)
-        "Holepunch Runtime.app/Contents/MacOS/Holepunch Runtime",
+        "pear-runtime.exe",
 #endif
         NULL,
     },
@@ -66,7 +64,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *args[] = {file, "-", "--appling", appling, "--launch", launch, NULL};
+  char *args[] = {file, "run", "--appling", appling, launch, NULL};
 
 #if defined(APPLING_OS_WIN32)
   err = _execv(file, args);

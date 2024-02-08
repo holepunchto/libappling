@@ -19,7 +19,7 @@
     "corestore": "^6.15.13",
     "hyperdrive": "^11.6.3",
     "hyperswarm": "^4.7.13",
-    "pear-updater": "^2.0.0"
+    "pear-updater": "^3.0.2"
   },
   "devDependencies": {
     "standard": "^17.0.0"

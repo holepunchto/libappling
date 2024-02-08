@@ -24,10 +24,12 @@ appling_launch_v0 (const appling_launch_info_t *info) {
     (const char *[]) {
       platform->path,
         "bin",
-#if defined(APPLING_OS_LINUX) || defined(APPLING_OS_DARWIN)
-        "pear-runtime",
+#if defined(APPLING_OS_LINUX)
+        "pear-runtime-app/pear-runtime",
+#elif defined(APPLING_OS_DARWIN)
+        "Pear Runtime.app/Contents/MacOS/Pear Runtime",
 #elif defined(APPLING_OS_WIN32)
-        "pear-runtime.exe",
+        "pear-runtime-app\Pear Runtime.exe",
 #else
 #error Unsupported operating system
 #endif
@@ -66,7 +68,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *args[] = {file, "run", "--appling", appling, launch, NULL};
+  char *args[] = {file, "--run", launch, "--appling", appling, NULL};
 
 #if defined(APPLING_OS_WIN32)
   err = _execv(file, args);

@@ -11,4 +11,4 @@ Bare
   .on('uncaughtException', onerror)
   .on('unhandledRejection', onerror)
 
-require('pear-updater-bootstrap')(key, directory)
+require('pear-updater-bootstrap')(key, directory, { lock: false })

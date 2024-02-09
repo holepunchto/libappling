@@ -189,7 +189,7 @@ int
 appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb);
 
 int
-appling_launch (uv_loop_t *loop, const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
+appling_launch (const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
 #ifdef __cplusplus
 }

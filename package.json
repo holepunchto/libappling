@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "libapping",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/libappling.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/libappling/issues"
+  },
+  "homepage": "https://github.com/holepunchto/libappling#readme",
+  "dependencies": {
+    "pear-updater-bootstrap": "^1.0.1"
+  },
+  "devDependencies": {
+    "standard": "^17.0.0"
+  }
+}

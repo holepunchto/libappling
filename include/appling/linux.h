@@ -8,8 +8,6 @@
 
 #define APPLING_PLATFORM_DIR ".config/pear"
 
-#define APPLING_PLATFORM_BUNDLE "../../resources/app/platform.tar"
-
 #define APPLING_PLATFORM_ENTRY "launch.so"
 
 #endif // APPLING_LINUX_H

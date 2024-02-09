@@ -1,6 +1,3 @@
-[submodule "vendor/libarchive"]
-	path = vendor/libarchive
-	url = ../../libarchive/libarchive.git
 [submodule "vendor/libfs"]
 	path = vendor/libfs
 	url = ../../holepunchto/libfs.git
@@ -16,9 +13,9 @@
 [submodule "vendor/libhex"]
 	path = vendor/libhex
 	url = ../../holepunchto/libhex.git
-[submodule "vendor/libz32"]
-	path = vendor/libz32
-	url = ../../holepunchto/libz32.git
 [submodule "vendor/libcompact"]
 	path = vendor/libcompact
 	url = ../../holepunchto/libcompact.git
+[submodule "vendor/bare"]
+	path = vendor/bare
+	url = ../../holepunchto/bare.git

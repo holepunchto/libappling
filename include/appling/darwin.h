@@ -8,8 +8,6 @@
 
 #define APPLING_PLATFORM_DIR "Library/Application Support/pear"
 
-#define APPLING_PLATFORM_BUNDLE "../Resources/app/platform.mp3"
-
 #define APPLING_PLATFORM_ENTRY "launch.dylib"
 
 #endif // APPLING_MAC_H

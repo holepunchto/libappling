@@ -1,8 +1,5 @@
 list(APPEND tests
-  bootstrap-dangling-tmp
-  bootstrap-existing-corestores
   bootstrap-no-platform
-  extract
   launch
   launch-data
   lock
@@ -35,6 +32,7 @@ foreach(test IN LISTS tests)
     ${test}
     PRIVATE
       $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
+      $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
       $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
   )
 

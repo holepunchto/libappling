@@ -1,8 +1,5 @@
-#include <hex.h>
 #include <stddef.h>
 #include <string.h>
-#include <utf.h>
-#include <z32.h>
 
 #include "../include/appling.h"
 

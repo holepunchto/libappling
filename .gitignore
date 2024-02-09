@@ -1,3 +1,6 @@
 build/
 install/
-.DS_Store
+sandbox/
+node_modules/
+*.bundle.h
+*.bundle.h.d

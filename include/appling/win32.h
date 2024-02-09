@@ -8,8 +8,6 @@
 
 #define APPLING_PLATFORM_DIR "AppData\\Roaming\\pear"
 
-#define APPLING_PLATFORM_BUNDLE "resources\\app\\platform.tar"
-
 #define APPLING_PLATFORM_ENTRY "launch.dll"
 
 #endif // APPLING_WIN_H

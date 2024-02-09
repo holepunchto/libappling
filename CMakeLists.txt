@@ -2,36 +2,16 @@ cmake_minimum_required(VERSION 3.25)
 
 project(appling C)
 
+include(bare)
+
 # Force position independent code for all compilation units to allow linking
 # the static libuv archive to the dynamic platform entry point.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-option(ENABLE_ACL OFF)
-option(ENABLE_BZip2 OFF)
-option(ENABLE_CAT OFF)
-option(ENABLE_CNG OFF)
-option(ENABLE_CPIO OFF)
-option(ENABLE_EXPAT OFF)
-option(ENABLE_ICONV OFF)
-option(ENABLE_LIBB2 OFF)
-option(ENABLE_LibGCC OFF)
-option(ENABLE_LIBXML2 OFF)
-option(ENABLE_LZ4 OFF)
-option(ENABLE_LZMA OFF)
-option(ENABLE_LZO OFF)
-option(ENABLE_OPENSSL OFF)
-option(ENABLE_PCREPOSIX OFF)
-option(ENABLE_TEST OFF)
-option(ENABLE_XATTR OFF)
-option(ENABLE_ZLIB OFF)
-option(ENABLE_ZSTD OFF)
+install_node_modules(LOCKFILE)
 
 if(NOT TARGET uv)
   add_subdirectory(vendor/libuv EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET archive)
-  add_subdirectory(vendor/libarchive EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET path)
@@ -50,12 +30,12 @@ if(NOT TARGET hex)
   add_subdirectory(vendor/libhex EXCLUDE_FROM_ALL)
 endif()
 
-if(NOT TARGET z32)
-  add_subdirectory(vendor/libz32 EXCLUDE_FROM_ALL)
-endif()
-
 if(NOT TARGET compact)
   add_subdirectory(vendor/libcompact EXCLUDE_FROM_ALL)
+endif()
+
+if(NOT TARGET bare)
+  add_subdirectory(vendor/bare EXCLUDE_FROM_ALL)
 endif()
 
 add_library(appling OBJECT)
@@ -65,6 +45,12 @@ set_target_properties(
   PROPERTIES
   C_STANDARD 99
   POSITION_INDEPENDENT_CODE ON
+)
+
+add_bare_bundle(
+  ENTRY src/bootstrap.js
+  OUT src/bootstrap.bundle.h
+  TARGET c
 )
 
 target_sources(
@@ -79,10 +65,9 @@ target_sources(
     include/appling/win32.h
   PRIVATE
     src/bootstrap.c
-    src/extract.c
+    src/bootstrap.bundle.h
     src/launch.c
     src/lock.c
-    src/main.c
     src/unlock.c
     src/parse.c
     src/paths.c
@@ -95,14 +80,37 @@ target_include_directories(
     include
     $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:fs,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:z32,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
-    $<TARGET_PROPERTY:archive,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
 )
+
+add_library(appling_static STATIC)
+
+set_target_properties(
+  appling_static
+  PROPERTIES
+  OUTPUT_NAME appling
+  PREFIX lib
+)
+
+target_link_libraries(
+  appling_static
+  PUBLIC
+    appling
+  PRIVATE
+    $<LINK_LIBRARY:WHOLE_ARCHIVE,bare_static>
+    fs_static
+    path_static
+    log_static
+    hex_static
+    compact_static
+)
+
+link_bare_modules(appling_static)
 
 add_library(appling_launch OBJECT)
 
@@ -121,38 +129,18 @@ target_sources(
 
 target_include_directories(
   appling_launch
-  PUBLIC
-    include
-    $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
-
-set_target_properties(
-  appling_static
-  PROPERTIES
-  OUTPUT_NAME appling
-  PREFIX lib
-)
-
 target_link_libraries(
-  appling_static
+  appling_launch
   PUBLIC
-    uv_a
-  PRIVATE
-    archive_static
-    fs_static
-    path_static
-    log_static
-    hex_static
-    z32_static
-    compact_static
+    appling
 )
 
-add_library(appling_launch_shared SHARED $<TARGET_OBJECTS:appling_launch>)
+add_library(appling_launch_shared SHARED)
 
 set_target_properties(
   appling_launch_shared
@@ -165,10 +153,9 @@ set_target_properties(
 target_link_libraries(
   appling_launch_shared
   PRIVATE
-    uv_a
+    appling_launch
     path_static
     log_static
-    hex_static
 )
 
 install(TARGETS appling_static)
@@ -179,6 +166,8 @@ install(DIRECTORY include/appling DESTINATION include)
 
 if(PROJECT_IS_TOP_LEVEL)
   enable_testing()
+
   add_subdirectory(test)
+
   add_subdirectory(example/app)
 endif()

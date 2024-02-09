@@ -1,327 +1,77 @@
+#include <assert.h>
+#include <bare.h>
 #include <hex.h>
-#include <log.h>
+#include <js.h>
 #include <path.h>
-#include <stdlib.h>
 #include <string.h>
-#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
+#include "bootstrap.bundle.h"
 
 static void
-on_symlink (fs_symlink_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
+on_thread (void *data) {
+  int err;
 
-  if (status >= 0) {
-    if (req->cb) req->cb(req, 0);
-  } else {
-    if (req->cb) req->cb(req, status);
-  }
-}
+  appling_bootstrap_t *req = (appling_bootstrap_t *) data;
 
-static void
-symlink_current (appling_bootstrap_t *req) {
-  char key[65];
-  size_t key_len = 65;
+  uv_loop_t loop;
+  err = uv_loop_init(&loop);
+  assert(err == 0);
 
-  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
+  char dkey[65];
+  size_t dkey_len = 65;
 
-  appling_path_t target;
-  size_t path_len = sizeof(appling_path_t);
+  err = hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) dkey, &dkey_len);
+  assert(err == 0);
 
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "0", NULL},
-    target,
-    &path_len,
-    path_behavior_system
-  );
+  char *argv[2] = {dkey, req->dir};
 
-  appling_path_t link;
-  path_len = sizeof(appling_path_t);
+  bare_t *bare;
+  err = bare_setup(&loop, req->js, NULL, 2, argv, NULL, &bare);
+  assert(err == 0);
 
-  path_join(
-    (const char *[]){req->dir, "current", NULL},
-    link,
-    &path_len,
-    path_behavior_system
-  );
+  uv_buf_t source = uv_buf_init((char *) bundle, bundle_len);
 
-  log_debug("appling_bootstrap() linking platform at %s", target);
+  err = bare_run(bare, "/bootstrap.bundle", &source);
+  assert(err == 0);
 
-  fs_symlink(req->loop, &req->symlink, target, link, UV_FS_SYMLINK_JUNCTION, on_symlink);
+  err = bare_teardown(bare, &req->status);
+  assert(err == 0);
+
+  err = uv_loop_close(&loop);
+  assert(err == 0);
+
+  err = uv_async_send(&req->signal);
+  assert(err == 0);
 }
 
 static void
-on_merge (fs_merge_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
+on_close (uv_handle_t *handle) {
+  appling_bootstrap_t *req = (appling_bootstrap_t *) handle->data;
 
-  if (status >= 0) {
-    symlink_current(req);
-  } else {
-    if (req->cb) req->cb(req, status);
-  }
+  if (req->cb) req->cb(req, req->status);
 }
 
 static void
-on_mkdir (fs_mkdir_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (status >= 0) {
-    char key[65];
-    size_t key_len = 65;
-
-    hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
-
-    appling_path_t base;
-    size_t path_len = sizeof(appling_path_t);
-
-    path_join(
-      (const char *[]){req->dir, "by-dkey", key, "0", "corestore", NULL},
-      base,
-      &path_len,
-      path_behavior_system
-    );
-
-    appling_path_t onto;
-    path_len = sizeof(appling_path_t);
-
-    path_join(
-      (const char *[]){req->dir, "corestores", "platform", NULL},
-      onto,
-      &path_len,
-      path_behavior_system
-    );
-
-    log_debug("appling_bootstrap() merging corestores at %s", onto);
-
-    fs_merge(req->loop, &req->merge, base, onto, true, on_merge);
-  } else {
-    if (req->cb) req->cb(req, status);
-  }
-}
-
-static void
-on_rmdir_tmp (fs_rmdir_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  status = req->status;
-
-  if (status >= 0) {
-    appling_path_t path;
-    size_t path_len = sizeof(appling_path_t);
-
-    path_join(
-      (const char *[]){req->dir, "corestores", NULL},
-      path,
-      &path_len,
-      path_behavior_system
-    );
-
-    fs_mkdir(req->loop, &req->mkdir, path, 0777, true, on_mkdir);
-  } else {
-    if (req->cb) req->cb(req, status);
-  }
-}
-
-static void
-discard_tmp (appling_bootstrap_t *req) {
-  char key[65];
-  size_t key_len = 65;
-
-  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
-
-  appling_path_t tmp;
-  size_t path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
-    tmp,
-    &path_len,
-    path_behavior_system
-  );
-
-  fs_rmdir(req->loop, &req->rmdir, tmp, true, on_rmdir_tmp);
-}
-
-static void
-on_rename (fs_rename_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (status >= 0) {
-    req->status = 0;
-  } else {
-    req->status = status; // Propagate
-  }
-
-  discard_tmp(req);
-}
-
-static inline void
-rename_platform (appling_bootstrap_t *req) {
-  char key[65];
-  size_t key_len = 65;
-
-  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
-
-  appling_path_t to;
-  size_t path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "0", NULL},
-    to,
-    &path_len,
-    path_behavior_system
-  );
-
-  appling_path_t from;
-  path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
-    from,
-    &path_len,
-    path_behavior_system
-  );
-
-  log_debug("appling_bootstrap() renaming platform at %s", to);
-
-  fs_rename(req->loop, &req->rename, from, to, on_rename);
-}
-
-static void
-on_swap (fs_swap_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  if (status >= 0) {
-    discard_tmp(req);
-  } else {
-    req->status = status; // Propagate
-
-    rename_platform(req);
-  }
-}
-
-static inline void
-swap_platform (appling_bootstrap_t *req) {
-  char key[65];
-  size_t key_len = 65;
-
-  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
-
-  appling_path_t to;
-  size_t path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "0", NULL},
-    to,
-    &path_len,
-    path_behavior_system
-  );
-
-  appling_path_t from;
-  path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
-    from,
-    &path_len,
-    path_behavior_system
-  );
-
-  log_debug("appling_bootstrap() swapping platform at %s", to);
-
-  fs_swap(req->loop, &req->swap, from, to, on_swap);
-}
-
-static void
-on_extract (appling_extract_t *extract, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) extract->data;
-
-  if (status >= 0) {
-    swap_platform(req);
-  } else {
-    req->status = status; // Propagate
-
-    discard_tmp(req);
-  }
-}
-
-static inline void
-extract_platform (appling_bootstrap_t *req) {
-  char key[65];
-  size_t key_len = 65;
-
-  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
-
-  appling_path_t archive;
-  size_t path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->exe, "..", appling_platform_bundle, NULL},
-    archive,
-    &path_len,
-    path_behavior_system
-  );
-
-  appling_path_t dest;
-  path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
-    dest,
-    &path_len,
-    path_behavior_system
-  );
-
-  log_debug("appling_bootstrap() extracting platform archive to %s", dest);
-
-  appling_extract(req->loop, &req->extract, archive, dest, on_extract);
-}
-
-static void
-on_rmdir_tmp_maybe (fs_rmdir_t *fs_req, int status) {
-  appling_bootstrap_t *req = (appling_bootstrap_t *) fs_req->data;
-
-  extract_platform(req);
-}
-
-static inline int
-discard_tmp_maybe (appling_bootstrap_t *req) {
-  char key[65];
-  size_t key_len = 65;
-
-  hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) key, &key_len);
-
-  appling_path_t tmp;
-  size_t path_len = sizeof(appling_path_t);
-
-  path_join(
-    (const char *[]){req->dir, "by-dkey", key, "tmp", NULL},
-    tmp,
-    &path_len,
-    path_behavior_system
-  );
-
-  return fs_rmdir(req->loop, &req->rmdir, tmp, true, on_rmdir_tmp_maybe);
+on_signal (uv_async_t *handle) {
+  uv_close((uv_handle_t *) handle, on_close);
 }
 
 int
-appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *exe, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb) {
+  int err;
+
   req->loop = loop;
+  req->js = js;
   req->cb = cb;
   req->status = 0;
-  req->swap.data = (void *) req;
-  req->rename.data = (void *) req;
-  req->rmdir.data = (void *) req;
-  req->mkdir.data = (void *) req;
-  req->merge.data = (void *) req;
-  req->symlink.data = (void *) req;
-  req->extract.data = (void *) req;
-  req->resolve.data = (void *) req;
+  req->signal.data = (void *) req;
+
+  err = uv_async_init(loop, &req->signal, on_signal);
+  if (err < 0) return err;
 
   memcpy(req->dkey, dkey, sizeof(appling_dkey_t));
-
-  strcpy(req->exe, exe);
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {
@@ -356,5 +106,5 @@ appling_bootstrap (uv_loop_t *loop, appling_bootstrap_t *req, const appling_dkey
     );
   }
 
-  return discard_tmp_maybe(req);
+  return uv_thread_create(&req->thread, on_thread, (void *) req);
 }

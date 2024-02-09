@@ -21,8 +21,7 @@ main (int argc, char *argv[]) {
   err = log_open("Appling", 0);
   assert(err == 0);
 
-  err = appling_main(argc, argv, PLATFORM_DIR, &platform, &app);
-  assert(err == 0);
+  // TODO
 
   return 0;
 }

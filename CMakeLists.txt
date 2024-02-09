@@ -88,7 +88,7 @@ target_include_directories(
     $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-add_library(appling_static STATIC $<TARGET_OBJECTS:appling>)
+add_library(appling_static STATIC)
 
 set_target_properties(
   appling_static
@@ -99,6 +99,8 @@ set_target_properties(
 
 target_link_libraries(
   appling_static
+  PUBLIC
+    appling
   PRIVATE
     $<LINK_LIBRARY:WHOLE_ARCHIVE,bare_static>
     fs_static
@@ -127,15 +129,18 @@ target_sources(
 
 target_include_directories(
   appling_launch
-  PUBLIC
-    include
-    $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
     $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-add_library(appling_launch_shared SHARED $<TARGET_OBJECTS:appling_launch>)
+target_link_libraries(
+  appling_launch
+  PUBLIC
+    appling
+)
+
+add_library(appling_launch_shared SHARED)
 
 set_target_properties(
   appling_launch_shared
@@ -148,6 +153,7 @@ set_target_properties(
 target_link_libraries(
   appling_launch_shared
   PRIVATE
+    appling_launch
     path_static
     log_static
 )

@@ -24,7 +24,9 @@ appling_open (const appling_app_t *app, const char *argument) {
 
     NSWorkspaceOpenConfiguration *configuration = [NSWorkspaceOpenConfiguration configuration];
 
-    configuration.arguments = @[ [NSString stringWithFormat:@"%s", argument] ];
+    if (argument) {
+      configuration.arguments = @[ [NSString stringWithFormat:@"%s", argument] ];
+    }
 
     [[NSWorkspace sharedWorkspace]
       openApplicationAtURL:path

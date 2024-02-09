@@ -191,6 +191,9 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
 int
 appling_launch (const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
+int
+appling_open (const appling_app_t *app, const char *argument);
+
 #ifdef __cplusplus
 }
 #endif

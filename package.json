@@ -12,7 +12,7 @@
   },
   "homepage": "https://github.com/holepunchto/libappling#readme",
   "dependencies": {
-    "pear-updater-bootstrap": "^1.0.1"
+    "pear-updater-bootstrap": "^1.1.0"
   },
   "devDependencies": {
     "standard": "^17.0.0"

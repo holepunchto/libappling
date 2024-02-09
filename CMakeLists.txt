@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.25)
 
 project(appling C)
 
+if(APPLE)
+  enable_language(OBJC)
+endif()
+
 include(bare)
 
 # Force position independent code for all compilation units to allow linking
@@ -47,6 +51,14 @@ set_target_properties(
   POSITION_INDEPENDENT_CODE ON
 )
 
+if(APPLE)
+  set_target_properties(
+    appling
+    PROPERTIES
+    OBJC_STANDARD 99
+  )
+endif()
+
 add_bare_bundle(
   ENTRY src/bootstrap.js
   OUT src/bootstrap.bundle.h
@@ -73,6 +85,30 @@ target_sources(
     src/paths.c
     src/resolve.c
 )
+
+if(APPLE)
+  target_sources(
+    appling
+    PRIVATE
+      src/darwin/open.m
+  )
+endif()
+
+if(WIN32)
+  target_sources(
+    appling
+    PRIVATE
+      src/win32/open.c
+  )
+endif()
+
+if(LINUX)
+  target_sources(
+    appling
+    PRIVATE
+      src/linux/open.c
+  )
+endif()
 
 target_include_directories(
   appling

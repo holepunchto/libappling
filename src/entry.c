@@ -29,7 +29,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 #elif defined(APPLING_OS_DARWIN)
         "Pear Runtime.app/Contents/MacOS/Pear Runtime",
 #elif defined(APPLING_OS_WIN32)
-        "pear-runtime-app\Pear Runtime.exe",
+        "pear-runtime-app\\Pear Runtime.exe",
 #else
 #error Unsupported operating system
 #endif

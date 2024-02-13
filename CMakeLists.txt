@@ -59,12 +59,6 @@ if(APPLE)
   )
 endif()
 
-add_bare_bundle(
-  ENTRY src/bootstrap.js
-  OUT src/bootstrap.bundle.h
-  TARGET c
-)
-
 target_sources(
   appling
   INTERFACE
@@ -76,8 +70,6 @@ target_sources(
     include/appling/os.h
     include/appling/win32.h
   PRIVATE
-    src/bootstrap.c
-    src/bootstrap.bundle.h
     src/launch.c
     src/lock.c
     src/unlock.c
@@ -124,6 +116,45 @@ target_include_directories(
     $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
+add_bare_bundle(
+  ENTRY src/bootstrap.js
+  OUT src/bootstrap.bundle.h
+  TARGET c
+)
+
+add_library(appling_bootstrap OBJECT)
+
+set_target_properties(
+  appling_bootstrap
+  PROPERTIES
+  C_STANDARD 99
+  POSITION_INDEPENDENT_CODE ON
+)
+
+target_sources(
+  appling_bootstrap
+  PRIVATE
+    src/bootstrap.c
+    src/bootstrap.bundle.h
+)
+
+target_include_directories(
+  appling_bootstrap
+  PUBLIC
+    include
+    $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+target_link_libraries(
+  appling_bootstrap
+  PUBLIC
+    appling
+)
+
 add_library(appling_static STATIC)
 
 set_target_properties(
@@ -137,6 +168,7 @@ target_link_libraries(
   appling_static
   PUBLIC
     appling
+    appling_bootstrap
   PRIVATE
     $<LINK_LIBRARY:WHOLE_ARCHIVE,bare_static>
     fs_static

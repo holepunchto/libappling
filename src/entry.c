@@ -68,7 +68,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *args[] = {file, "--run", launch, "--appling", appling, NULL};
+  char *args[] = {file, "--appling", appling, "--run", launch, NULL};
 
 #if defined(APPLING_OS_WIN32)
   err = _execv(file, args);

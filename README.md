@@ -8,10 +8,6 @@ Low-level plumbing for Pear application shells. Application shells, referred to 
 
 Once created and distributed, an appling never needs to be recreated and redistributed as the Pear platform and application are themselves fully self updating.
 
-## Usage
-
-See [`example/`](example).
-
 ## API
 
 See [`include/appling.h`](include/appling.h) for the public API.

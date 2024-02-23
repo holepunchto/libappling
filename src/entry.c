@@ -68,13 +68,35 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *args[] = {file, "--appling", appling, "--run", launch, NULL};
-
 #if defined(APPLING_OS_WIN32)
-  err = _execv(file, args);
-#else
-  err = execv(file, args);
-#endif
+  size_t len = snprintf(NULL, 0, "\"%s\" --appling \"%s\" --run %s", file, appling, launch);
 
-  return err;
+  len += 1 /* NULL */;
+
+  char *command = malloc(len);
+
+  snprintf(command, len, "\"%s\" --appling \"%s\" --run %s", file, appling, launch);
+
+  STARTUPINFOA si;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
+
+  BOOL success = CreateProcessA(NULL, command, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+
+  free(command);
+
+  if (!success) return -1;
+
+  WaitForSingleObject(pi.hProcess, INFINITE);
+
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+
+  return 0;
+#else
+  return execl(file, file, "--appling", appling, "--run", launch, NULL);
+#endif
 }

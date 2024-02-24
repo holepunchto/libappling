@@ -69,34 +69,29 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   log_debug("appling_launch() launching link %s", launch);
 
 #if defined(APPLING_OS_WIN32)
-  size_t len = snprintf(NULL, 0, "\"%s\" --appling \"%s\" --run %s", file, appling, launch);
+  size_t len;
 
+  len = snprintf(NULL, 0, "\"%s\"", file);
   len += 1 /* NULL */;
 
-  char *command = malloc(len);
+  char *quoted_file = malloc(len);
 
-  snprintf(command, len, "\"%s\" --appling \"%s\" --run %s", file, appling, launch);
+  snprintf(quoted_file, len, "\"%s\"", file);
 
-  STARTUPINFOA si;
-  ZeroMemory(&si, sizeof(si));
-  si.cb = sizeof(si);
+  len = snprintf(NULL, 0, "\"%s\"", appling);
+  len += 1 /* NULL */;
 
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&pi, sizeof(pi));
+  char *quoted_appling = malloc(len);
 
-  BOOL success = CreateProcessA(NULL, command, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+  snprintf(quoted_appling, len, "\"%s\"", appling);
 
-  free(command);
+  err = _execl(file, quoted_file, "--appling", quoted_appling, "--run", launch, NULL);
 
-  if (!success) return -1;
-
-  WaitForSingleObject(pi.hProcess, INFINITE);
-
-  CloseHandle(pi.hProcess);
-  CloseHandle(pi.hThread);
-
-  return 0;
+  free(quoted_file);
+  free(quoted_appling);
 #else
-  return execl(file, file, "--appling", appling, "--run", launch, NULL);
+  err = execl(file, file, "--appling", appling, "--run", launch, NULL);
 #endif
+
+  return err;
 }

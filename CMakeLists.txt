@@ -155,6 +155,8 @@ target_link_libraries(
     appling
 )
 
+link_bare_modules(appling_bootstrap)
+
 add_library(appling_static STATIC)
 
 set_target_properties(
@@ -177,8 +179,6 @@ target_link_libraries(
     hex_static
     compact_static
 )
-
-link_bare_modules(appling_static)
 
 add_library(appling_launch OBJECT)
 

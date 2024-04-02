@@ -26,14 +26,7 @@ foreach(test IN LISTS tests)
     ${test}
     PRIVATE
       appling_static
-  )
-
-  target_include_directories(
-    ${test}
-    PRIVATE
-      $<TARGET_PROPERTY:appling,INTERFACE_INCLUDE_DIRECTORIES>
-      $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
-      $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
+      compact_static
   )
 
   add_test(

@@ -90,7 +90,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   free(quoted_file);
   free(quoted_appling);
 #else
-  err = execl(file, file, "--appling", appling, "--run", launch, NULL);
+  err = execl(file, file, "--appling", appling, "--run", launch, "--no-sandbox", NULL);
 #endif
 
   return err;

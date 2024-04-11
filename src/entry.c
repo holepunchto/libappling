@@ -89,12 +89,14 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   free(quoted_file);
   free(quoted_appling);
-#else
+#elif defined(APPLING_OS_LINUX)
   if (access("/.flatpak-info", F_OK) == 0) {
     err = execl(file, file, "--no-sandbox", "--appling", appling, "--run", launch, NULL);
   } else {
     err = execl(file, file, "--appling", appling, "--run", launch, NULL);
   }
+#else 
+  err = execl(file, file, "--appling", appling, "--run", launch, NULL);
 #endif
 
   return err;

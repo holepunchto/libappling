@@ -15,7 +15,6 @@ extern "C" {
 #include "appling/arch.h"
 #include "appling/constants.h"
 #include "appling/os.h"
-#include "appling/version.h"
 
 #define APPLING_DKEY_LEN      32
 #define APPLING_KEY_MAX       64

@@ -28,7 +28,7 @@ appling_launch (const appling_platform_t *platform, const appling_app_t *app, co
   if (err < 0) return err;
 
   appling_launch_cb launch;
-  err = uv_dlsym(&library, "appling_launch_v" APPLING_STRING(APPLING_VERSION_MAJOR), (void **) &launch);
+  err = uv_dlsym(&library, "appling_launch_v0", (void **) &launch);
   if (err < 0) return err;
 
   appling_launch_info_t info = {

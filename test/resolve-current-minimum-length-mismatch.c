@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <hex.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <utf.h>
 #include <uv.h>
 
@@ -19,10 +18,7 @@ static void
 on_resolve (appling_resolve_t *req, int status) {
   resolve_called = true;
 
-  assert(status == 0);
-
-  printf("path=%s\n", platform.path);
-  printf("length=%lld\n", platform.length);
+  assert(status != 0);
 }
 
 int
@@ -31,7 +27,7 @@ main () {
 
   loop = uv_default_loop();
 
-  err = appling_resolve(loop, &req, "test/fixtures/resolve/next", &platform, 0, on_resolve);
+  err = appling_resolve(loop, &req, "test/fixtures/resolve/current", &platform, 124, on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

@@ -43,6 +43,7 @@ typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 struct appling_platform_s {
   appling_path_t path;
   appling_dkey_t dkey;
+  uint64_t length;
 };
 
 struct appling_app_s {
@@ -81,6 +82,10 @@ struct appling_resolve_s {
   appling_resolve_cb cb;
 
   fs_realpath_t realpath;
+  fs_open_t open;
+  fs_stat_t stat;
+  fs_read_t read;
+  fs_close_t close;
 
   appling_path_t path;
 
@@ -90,6 +95,8 @@ struct appling_resolve_s {
   size_t candidate;
 
   appling_platform_t *platform;
+
+  uint64_t minimum_length;
 
   int status;
 
@@ -179,7 +186,7 @@ int
 appling_unlock (uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
 
 int
-appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb);
+appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, uint64_t minimum_length, appling_resolve_cb cb);
 
 int
 appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);

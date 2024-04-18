@@ -10,7 +10,7 @@
 #include "bootstrap.bundle.h"
 
 static void
-on_thread (void *data) {
+appling_bootstrap__on_thread (void *data) {
   int err;
 
   appling_bootstrap_t *req = (appling_bootstrap_t *) data;
@@ -47,15 +47,15 @@ on_thread (void *data) {
 }
 
 static void
-on_close (uv_handle_t *handle) {
+appling_bootstrap__on_close (uv_handle_t *handle) {
   appling_bootstrap_t *req = (appling_bootstrap_t *) handle->data;
 
   if (req->cb) req->cb(req, req->status);
 }
 
 static void
-on_signal (uv_async_t *handle) {
-  uv_close((uv_handle_t *) handle, on_close);
+appling_bootstrap__on_signal (uv_async_t *handle) {
+  uv_close((uv_handle_t *) handle, appling_bootstrap__on_close);
 }
 
 int
@@ -68,7 +68,7 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
   req->status = 0;
   req->signal.data = (void *) req;
 
-  err = uv_async_init(loop, &req->signal, on_signal);
+  err = uv_async_init(loop, &req->signal, appling_bootstrap__on_signal);
   if (err < 0) return err;
 
   memcpy(req->dkey, dkey, sizeof(appling_dkey_t));
@@ -106,5 +106,5 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
     );
   }
 
-  return uv_thread_create(&req->thread, on_thread, (void *) req);
+  return uv_thread_create(&req->thread, appling_bootstrap__on_thread, (void *) req);
 }

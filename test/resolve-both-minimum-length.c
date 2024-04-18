@@ -31,7 +31,7 @@ main () {
 
   loop = uv_default_loop();
 
-  err = appling_resolve(loop, &req, "test/fixtures/resolve/next", &platform, 0, on_resolve);
+  err = appling_resolve(loop, &req, "test/fixtures/resolve/both", &platform, 123, on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

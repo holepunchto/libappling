@@ -10,7 +10,11 @@ list(APPEND tests
   parse-z32
   paths
   resolve-both
+  resolve-both-minimum-length
+  resolve-both-minimum-length-mismatch
   resolve-current
+  resolve-current-minimum-length
+  resolve-current-minimum-length-mismatch
   resolve-next
 )
 

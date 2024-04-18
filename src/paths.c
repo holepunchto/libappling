@@ -10,12 +10,12 @@
 #include "../include/appling.h"
 
 static void *
-on_alloc (size_t len, void *data) {
+appling_paths__on_alloc (size_t len, void *data) {
   return malloc(len * sizeof(appling_app_t));
 }
 
 static int
-on_decode (compact_state_t *state, void *array, size_t i, void *data) {
+appling_paths__on_decode (compact_state_t *state, void *array, size_t i, void *data) {
   int err;
 
   appling_app_t *apps = (appling_app_t *) array;
@@ -45,7 +45,7 @@ err:
 }
 
 static void
-on_close (fs_close_t *fs_req, int status) {
+appling_paths__on_close (fs_close_t *fs_req, int status) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   status = req->status;
@@ -60,7 +60,7 @@ on_close (fs_close_t *fs_req, int status) {
 }
 
 static void
-on_read (fs_read_t *fs_req, int status, size_t read) {
+appling_paths__on_read (fs_read_t *fs_req, int status, size_t read) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   if (status >= 0) {
@@ -75,7 +75,7 @@ on_read (fs_read_t *fs_req, int status, size_t read) {
     err = compact_decode_uint(&state, NULL);
     if (err < 0) goto done;
 
-    err = compact_decode_array(&state, (void **) &req->apps, &req->apps_len, NULL, on_alloc, on_decode);
+    err = compact_decode_array(&state, (void **) &req->apps, &req->apps_len, NULL, appling_paths__on_alloc, appling_paths__on_decode);
     if (err < 0) goto done;
 
   done:
@@ -86,33 +86,33 @@ on_read (fs_read_t *fs_req, int status, size_t read) {
 
   free(req->buf.base);
 
-  fs_close(req->loop, &req->close, req->file, on_close);
+  fs_close(req->loop, &req->close, req->file, appling_paths__on_close);
 }
 
 static void
-on_stat (fs_stat_t *fs_req, int status, const uv_stat_t *st) {
+applings_paths__on_stat (fs_stat_t *fs_req, int status, const uv_stat_t *st) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   if (status >= 0) {
     req->buf.len = st->st_size;
     req->buf.base = malloc(st->st_size);
 
-    fs_read(req->loop, &req->read, req->file, &req->buf, 1, 0, on_read);
+    fs_read(req->loop, &req->read, req->file, &req->buf, 1, 0, appling_paths__on_read);
   } else {
     req->status = status; // Propagate
 
-    fs_close(req->loop, &req->close, req->file, on_close);
+    fs_close(req->loop, &req->close, req->file, appling_paths__on_close);
   }
 }
 
 static void
-on_open (fs_open_t *fs_req, int status, uv_file file) {
+appling_paths__on_open (fs_open_t *fs_req, int status, uv_file file) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   if (status >= 0) {
     req->file = file;
 
-    fs_stat(req->loop, &req->stat, file, on_stat);
+    fs_stat(req->loop, &req->stat, file, applings_paths__on_stat);
   } else {
     if (req->cb) req->cb(req, status, NULL, 0);
   }
@@ -173,7 +173,7 @@ appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_p
     path_behavior_system
   );
 
-  fs_open(loop, &req->open, req->path, O_RDONLY, 0, on_open);
+  fs_open(loop, &req->open, req->path, O_RDONLY, 0, appling_paths__on_open);
 
   return 0;
 }

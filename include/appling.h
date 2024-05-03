@@ -118,6 +118,8 @@ struct appling_bootstrap_s {
 
   int status;
 
+  char *error;
+
   void *data;
 };
 

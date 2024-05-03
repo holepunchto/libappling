@@ -3,11 +3,41 @@
 #include <hex.h>
 #include <js.h>
 #include <path.h>
+#include <stdlib.h>
 #include <string.h>
+#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
 #include "bootstrap.bundle.h"
+
+static js_value_t *
+appling_bootstrap__error (js_env_t *env, js_callback_info_t *info) {
+  int err;
+
+  appling_bootstrap_t *req;
+
+  size_t argc = 1;
+  js_value_t *argv[1];
+
+  err = js_get_callback_info(env, info, &argc, argv, NULL, (void **) &req);
+  assert(err == 0);
+
+  assert(argc == 1);
+
+  size_t len;
+  err = js_get_value_string_utf8(env, argv[0], NULL, 0, &len);
+  assert(err == 0);
+
+  len += 1 /* NULL */;
+
+  req->error = calloc(len, sizeof(char));
+
+  err = js_get_value_string_utf8(env, argv[0], (utf8_t *) req->error, len, NULL);
+  assert(err == 0);
+
+  return NULL;
+}
 
 static void
 appling_bootstrap__on_thread (void *data) {
@@ -19,16 +49,53 @@ appling_bootstrap__on_thread (void *data) {
   err = uv_loop_init(&loop);
   assert(err == 0);
 
-  char dkey[65];
-  size_t dkey_len = 65;
-
-  err = hex_encode(req->dkey, APPLING_DKEY_LEN, (utf8_t *) dkey, &dkey_len);
-  assert(err == 0);
-
-  char *argv[2] = {dkey, req->dir};
+  js_env_t *env;
 
   bare_t *bare;
-  err = bare_setup(&loop, req->js, NULL, 2, argv, NULL, &bare);
+  err = bare_setup(&loop, req->js, &env, 0, NULL, NULL, &bare);
+  assert(err == 0);
+
+  js_handle_scope_t *scope;
+  err = js_open_handle_scope(env, &scope);
+  assert(err == 0);
+
+  js_value_t *global;
+  err = js_get_global(env, &global);
+  assert(err == 0);
+
+  js_value_t *exports;
+  err = js_create_object(env, &exports);
+  assert(err == 0);
+
+  err = js_set_named_property(env, global, "Appling", exports);
+  assert(err == 0);
+
+  void *buffer;
+
+  js_value_t *dkey;
+  err = js_create_arraybuffer(env, sizeof(req->dkey), &buffer, &dkey);
+  assert(err == 0);
+
+  memcpy(buffer, req->dkey, sizeof(req->dkey));
+
+  err = js_set_named_property(env, exports, "dkey", dkey);
+  assert(err == 0);
+
+  js_value_t *directory;
+  err = js_create_string_utf8(env, (utf8_t *) req->dir, -1, &directory);
+  assert(err == 0);
+
+  err = js_set_named_property(env, exports, "directory", directory);
+  assert(err == 0);
+
+  js_value_t *error;
+  err = js_create_function(env, "error", -1, appling_bootstrap__error, (void *) req, &error);
+  assert(err == 0);
+
+  err = js_set_named_property(env, exports, "error", error);
+  assert(err == 0);
+
+  err = js_close_handle_scope(env, scope);
   assert(err == 0);
 
   uv_buf_t source = uv_buf_init((char *) bundle, bundle_len);
@@ -51,6 +118,8 @@ appling_bootstrap__on_close (uv_handle_t *handle) {
   appling_bootstrap_t *req = (appling_bootstrap_t *) handle->data;
 
   if (req->cb) req->cb(req, req->status);
+
+  if (req->error) free(req->error);
 }
 
 static void
@@ -66,6 +135,7 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
   req->js = js;
   req->cb = cb;
   req->status = 0;
+  req->error = NULL;
   req->signal.data = (void *) req;
 
   err = uv_async_init(loop, &req->signal, appling_bootstrap__on_signal);
@@ -78,7 +148,7 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
     appling_path_t cwd;
     size_t path_len = sizeof(appling_path_t);
 
-    int err = uv_cwd(cwd, &path_len);
+    err = uv_cwd(cwd, &path_len);
     if (err < 0) return err;
 
     path_len = sizeof(appling_path_t);
@@ -93,7 +163,7 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
     appling_path_t homedir;
     size_t path_len = sizeof(appling_path_t);
 
-    int err = uv_os_homedir(homedir, &path_len);
+    err = uv_os_homedir(homedir, &path_len);
     if (err < 0) return err;
 
     path_len = sizeof(appling_path_t);

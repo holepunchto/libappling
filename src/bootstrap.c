@@ -100,7 +100,10 @@ appling_bootstrap__on_thread (void *data) {
 
   uv_buf_t source = uv_buf_init((char *) bundle, bundle_len);
 
-  err = bare_run(bare, "/bootstrap.bundle", &source);
+  err = bare_load(bare, "/bootstrap.bundle", &source, NULL);
+  assert(err == 0);
+
+  err = bare_run(bare);
   assert(err == 0);
 
   err = bare_teardown(bare, &req->status);

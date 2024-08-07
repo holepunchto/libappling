@@ -90,7 +90,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   free(quoted_file);
   free(quoted_appling);
 #elif defined(APPLING_OS_LINUX)
-  if (access("/.flatpak-info", F_OK) == 0 || getenv("SNAP")) {
+  if (access("/.flatpak-info", F_OK) == 0 || getenv("SNAP") != NULL) {
     err = execl(file, file, "--no-sandbox", "--appling", appling, "--run", launch, NULL);
   } else {
     err = execl(file, file, "--appling", appling, "--run", launch, NULL);

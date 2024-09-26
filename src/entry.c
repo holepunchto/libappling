@@ -85,17 +85,13 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   snprintf(quoted_appling, len, "\"%s\"", appling);
 
-  err = _execl(file, quoted_file, "--appling", quoted_appling, "--run", launch, NULL);
+  err = _execl(file, quoted_file, "--no-sandbox", "--appling", quoted_appling, "--run", launch, NULL);
 
   free(quoted_file);
   free(quoted_appling);
 #elif defined(APPLING_OS_LINUX)
-  if (access("/.flatpak-info", F_OK) == 0 || getenv("SNAP") != NULL) {
     err = execl(file, file, "--no-sandbox", "--appling", appling, "--run", launch, NULL);
-  } else {
-    err = execl(file, file, "--appling", appling, "--run", launch, NULL);
-  }
-#else 
+#else
   err = execl(file, file, "--appling", appling, "--run", launch, NULL);
 #endif
 

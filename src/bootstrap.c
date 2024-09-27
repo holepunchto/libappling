@@ -98,9 +98,9 @@ appling_bootstrap__on_thread (void *data) {
   err = js_close_handle_scope(env, scope);
   assert(err == 0);
 
-  uv_buf_t source = uv_buf_init((char *) bundle, bundle_len);
+  uv_buf_t source = uv_buf_init((char *) bootstrap_bundle, bootstrap_bundle_len);
 
-  err = bare_load(bare, "/bootstrap.bundle", &source, NULL);
+  err = bare_load(bare, "bare:/appling.bundle", &source, NULL);
   assert(err == 0);
 
   err = bare_run(bare);

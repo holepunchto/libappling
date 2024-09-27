@@ -119,7 +119,6 @@ target_include_directories(
 add_bare_bundle(
   ENTRY src/bootstrap.js
   OUT src/bootstrap.bundle.h
-  TARGET c
 )
 
 add_library(appling_bootstrap OBJECT)

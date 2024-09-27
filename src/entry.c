@@ -21,19 +21,19 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]) {
+    (const char *[]){
       platform->path,
-        "bin",
+      "bin",
 #if defined(APPLING_OS_LINUX)
-        "pear-runtime-app/pear-runtime",
+      "pear-runtime-app/pear-runtime",
 #elif defined(APPLING_OS_DARWIN)
-        "Pear Runtime.app/Contents/MacOS/Pear Runtime",
+      "Pear Runtime.app/Contents/MacOS/Pear Runtime",
 #elif defined(APPLING_OS_WIN32)
-        "pear-runtime-app\\Pear Runtime.exe",
+      "pear-runtime-app\\Pear Runtime.exe",
 #else
 #error Unsupported operating system
 #endif
-        NULL,
+      NULL,
     },
     file,
     &path_len,
@@ -85,17 +85,13 @@ appling_launch_v0 (const appling_launch_info_t *info) {
 
   snprintf(quoted_appling, len, "\"%s\"", appling);
 
-  err = _execl(file, quoted_file, "--appling", quoted_appling, "--run", launch, NULL);
+  err = _execl(file, quoted_file, "--no-sandbox", "--appling", quoted_appling, "--run", launch, NULL);
 
   free(quoted_file);
   free(quoted_appling);
 #elif defined(APPLING_OS_LINUX)
-  if (access("/.flatpak-info", F_OK) == 0 || getenv("SNAP") != NULL) {
-    err = execl(file, file, "--no-sandbox", "--appling", appling, "--run", launch, NULL);
-  } else {
-    err = execl(file, file, "--appling", appling, "--run", launch, NULL);
-  }
-#else 
+  err = execl(file, file, "--no-sandbox", "--appling", appling, "--run", launch, NULL);
+#else
   err = execl(file, file, "--appling", appling, "--run", launch, NULL);
 #endif
 

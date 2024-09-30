@@ -17,9 +17,9 @@ jobs:
         - os: macos-latest
           platform: darwin
           arch: arm64
-        # - os: windows-latest
-        #   platform: win32
-        #   arch: x64
+        - os: windows-latest
+          platform: win32
+          arch: x64
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.platform }}-${{ matrix.arch }}
     steps:
@@ -37,3 +37,4 @@ jobs:
     - run: bare-dev configure --debug --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
     - run: bare-dev build --debug
     - run: bare-dev test --debug
+      if: ${{ matrix.platform == 'linux' || matrix.platform == 'darwin' }}

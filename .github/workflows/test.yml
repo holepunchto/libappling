@@ -37,3 +37,12 @@ jobs:
     - run: bare-dev configure --debug --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
     - run: bare-dev build --debug
     - run: bare-dev test --debug
+  bootstrap:
+    runs-on: windows-latest
+    name: bootstrap
+    steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - run: npm i -g pear-updater-bootstrap
+    - run: pear-updater-bootstrap 6b8374f1c0809ed23cfc371e87896c8d3bb593f2451d4d8de895d628941818dc bootstrap

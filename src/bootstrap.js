@@ -13,4 +13,8 @@ Bare
     console.error('Bare is exiting')
   })
 
-require('pear-updater-bootstrap')(Buffer.from(Appling.dkey), Appling.directory, { lock: false })
+console.error('Bootstrapping')
+
+require('pear-updater-bootstrap')(Buffer.from(Appling.dkey), Appling.directory, { lock: false }).then(() => {
+  console.log('Done!')
+})

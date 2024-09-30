@@ -1,6 +1,8 @@
 /* global Bare, Appling */
 
 const onerror = (err) => {
+  console.error(err.stack)
+
   Appling.error(err.stack)
 
   Bare.exit(1) // Cleanly exit and return to C

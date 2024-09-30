@@ -37,20 +37,17 @@ jobs:
     - run: bare-dev configure --debug --verbose --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
     - run: bare-dev build --debug
     - run: bare-dev test --debug
-  # bootstrap:
-  #   runs-on: windows-latest
-  #   name: bootstrap
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       submodules: recursive
-  #   - uses: actions/setup-node@v4
-  #     with:
-  #       node-version: lts/*
-  #   - run: npm i -g bare-runtime
-  #   - run: npm i
-  #   - run: node --version
-  #   - run: node bootstrap.js
-  #   - run: rm -r bootstrap
-  #   - run: bare --version
-  #   - run: bare bootstrap.js
+  bootstrap:
+    runs-on: windows-latest
+    name: bootstrap
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - run: npm i -g bare-runtime
+    - run: npm i
+    - run: bare --version
+    - run: bare bootstrap.js

@@ -34,7 +34,7 @@ jobs:
       with:
         node-version: lts/*
     - run: npm install -g bare-dev
-    - run: bare-dev configure --debug --verbose --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
+    - run: bare-dev configure --debug --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
     - run: bare-dev build --debug
     - run: bare-dev test --debug
   bootstrap:

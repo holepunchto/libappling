@@ -39,9 +39,9 @@ foreach(test IN LISTS tests)
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   )
 
-  # set_tests_properties(
-  #   ${test}
-  #   PROPERTIES
-  #   TIMEOUT 300
-  # )
+  set_tests_properties(
+    ${test}
+    PROPERTIES
+    TIMEOUT 0
+  )
 endforeach()

@@ -42,6 +42,6 @@ foreach(test IN LISTS tests)
   set_tests_properties(
     ${test}
     PROPERTIES
-    TIMEOUT 600
+    TIMEOUT 300
   )
 endforeach()

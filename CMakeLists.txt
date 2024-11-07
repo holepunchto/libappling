@@ -1,18 +1,22 @@
 cmake_minimum_required(VERSION 3.25)
 
+# Force position independent code for all compilation units to allow linking
+# the static libuv archive to the dynamic platform entry point.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
+find_package(cmake-bare-bundle REQUIRED PATHS node_modules/cmake-bare-bundle)
+find_package(cmake-drive REQUIRED PATHS node_modules/cmake-drive)
+find_package(cmake-napi REQUIRED PATHS node_modules/cmake-napi)
+find_package(cmake-npm REQUIRED PATHS node_modules/cmake-npm)
+
 project(appling C)
 
 if(APPLE)
   enable_language(OBJC)
 endif()
 
-include(bare)
-
-# Force position independent code for all compilation units to allow linking
-# the static libuv archive to the dynamic platform entry point.
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-install_node_modules(LOCKFILE)
+install_node_modules()
 
 if(NOT TARGET uv)
   add_subdirectory(vendor/libuv EXCLUDE_FROM_ALL)
@@ -117,8 +121,10 @@ target_include_directories(
 )
 
 add_bare_bundle(
+  appling_bootstrap_bundle
   ENTRY src/bootstrap.js
   OUT src/bootstrap.bundle.h
+  BUILTINS src/builtins.json
 )
 
 add_library(appling_bootstrap OBJECT)

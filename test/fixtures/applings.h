@@ -19,10 +19,12 @@ on_preencode (compact_state_t *state, void *array, size_t i, void *data) {
 
   appling_app_t *apps = (appling_app_t *) array;
 
-  err = compact_preencode_utf8(state, (utf8_t *) apps[i].path, -1);
+  utf8_string_view_t path = utf8_string_view_init((utf8_t *) apps[i].path, strlen(apps[i].path));
+  err = compact_preencode_utf8(state, path);
   assert(err == 0);
 
-  err = compact_preencode_utf8(state, (utf8_t *) apps[i].key, -1);
+  utf8_string_view_t key = utf8_string_view_init((utf8_t *) apps[i].key, strlen(apps[i].key));
+  err = compact_preencode_utf8(state, key);
   assert(err == 0);
 
   return 0;
@@ -34,10 +36,12 @@ on_encode (compact_state_t *state, void *array, size_t i, void *data) {
 
   appling_app_t *apps = (appling_app_t *) array;
 
-  err = compact_encode_utf8(state, (utf8_t *) apps[i].path, -1);
+  utf8_string_view_t path = utf8_string_view_init((utf8_t *) apps[i].path, strlen(apps[i].path));
+  err = compact_encode_utf8(state, path);
   assert(err == 0);
 
-  err = compact_encode_utf8(state, (utf8_t *) apps[i].key, -1);
+  utf8_string_view_t key = utf8_string_view_init((utf8_t *) apps[i].key, strlen(apps[i].key));
+  err = compact_encode_utf8(state, key);
   assert(err == 0);
 
   return 0;

@@ -15,6 +15,11 @@
     "pear-updater-bootstrap": "^1.1.0"
   },
   "devDependencies": {
+    "cmake-bare": "^1.1.15",
+    "cmake-bare-bundle": "^2.1.2",
+    "cmake-drive": "^1.1.1",
+    "cmake-napi": "^1.0.7",
+    "cmake-npm": "^1.0.2",
     "standard": "^17.0.0"
   }
 }

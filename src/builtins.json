@@ -1,0 +1,9 @@
+[
+  "constants",
+  "fs",
+  "fsctl",
+  "os",
+  "path",
+  { "addon": "bare-fs" },
+  { "addon": "bare-os" }
+]

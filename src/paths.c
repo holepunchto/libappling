@@ -20,26 +20,20 @@ appling_paths__on_decode (compact_state_t *state, void *array, size_t i, void *d
 
   appling_app_t *apps = (appling_app_t *) array;
 
-  utf8_t *path = NULL;
-  utf8_t *key = NULL;
-
-  err = compact_decode_utf8(state, &path, NULL);
+  utf8_string_view_t path;
+  err = compact_decode_utf8(state, &path);
   if (err < 0) goto err;
 
-  err = compact_decode_utf8(state, &key, NULL);
+  utf8_string_view_t key;
+  err = compact_decode_utf8(state, &key);
   if (err < 0) goto err;
 
-  strcpy(apps[i].path, (char *) path);
-  strcpy(apps[i].key, (char *) key);
-
-  free(path);
-  free(key);
+  strncpy(apps[i].path, (char *) path.data, path.len);
+  strncpy(apps[i].key, (char *) key.data, key.len);
 
   return 0;
 
 err:
-  if (path) free(path);
-  if (key) free(key);
 
   return err;
 }
@@ -144,7 +138,7 @@ appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_p
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){cwd, dir, NULL},
+      (const char *[]) {cwd, dir, NULL},
       base,
       &path_len,
       path_behavior_system
@@ -157,7 +151,7 @@ appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_p
     if (err < 0) return err;
 
     path_join(
-      (const char *[]){homedir, appling_platform_dir, NULL},
+      (const char *[]) {homedir, appling_platform_dir, NULL},
       base,
       &path_len,
       path_behavior_system
@@ -167,7 +161,7 @@ appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_p
   path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){base, "applings", NULL},
+    (const char *[]) {base, "applings", NULL},
     req->path,
     &path_len,
     path_behavior_system

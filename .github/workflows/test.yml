@@ -17,7 +17,7 @@ jobs:
         - os: macos-14
           platform: darwin
           arch: arm64
-        - os: windows-11-arm64
+        - os: windows-server-latest
           platform: win32
           arch: x64
     runs-on: ${{ matrix.os }}

@@ -11,15 +11,15 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           platform: linux
           arch: x64
-        - os: macos-latest
+        - os: macos-14
           platform: darwin
           arch: arm64
-        # - os: windows-latest
-        #   platform: win32
-        #   arch: x64
+        - os: windows-11-arm64
+          platform: win32
+          arch: x64
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.platform }}-${{ matrix.arch }}
     steps:

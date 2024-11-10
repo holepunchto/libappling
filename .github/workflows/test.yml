@@ -36,6 +36,6 @@ jobs:
     - run: npm install -g bare-make
     - run: npm install
     - run: npm install --prefix vendor/bare
-    - run: bare-make generate --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} --debug --verbose
+    - run: bare-make generate --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} --debug
     - run: bare-make build
     - run: bare-make test

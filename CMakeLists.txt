@@ -16,13 +16,12 @@ endif()
 
 install_node_modules()
 
-fetch_package("github:libuv/libuv@1.48.0")
+fetch_package("github:holepunchto/bare")
 fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")
 fetch_package("github:holepunchto/libhex")
 fetch_package("github:holepunchto/libcompact")
-fetch_package("github:holepunchto/bare")
 
 add_library(appling OBJECT)
 

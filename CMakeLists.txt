@@ -7,6 +7,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
 find_package(cmake-bare-bundle REQUIRED PATHS node_modules/cmake-bare-bundle)
 find_package(cmake-drive REQUIRED PATHS node_modules/cmake-drive)
+find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
 find_package(cmake-napi REQUIRED PATHS node_modules/cmake-napi)
 find_package(cmake-npm REQUIRED PATHS node_modules/cmake-npm)
 
@@ -18,33 +19,13 @@ endif()
 
 install_node_modules()
 
-if(NOT TARGET uv)
-  add_subdirectory(vendor/libuv EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET path)
-  add_subdirectory(vendor/libpath EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET fs)
-  add_subdirectory(vendor/libfs EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET log)
-  add_subdirectory(vendor/liblog EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET hex)
-  add_subdirectory(vendor/libhex EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET compact)
-  add_subdirectory(vendor/libcompact EXCLUDE_FROM_ALL)
-endif()
-
-if(NOT TARGET bare)
-  add_subdirectory(vendor/bare EXCLUDE_FROM_ALL)
-endif()
+fetch_package("github:libuv/libuv@1.48.0")
+fetch_package("github:holepunchto/libpath")
+fetch_package("github:holepunchto/libfs")
+fetch_package("github:holepunchto/liblog")
+fetch_package("github:holepunchto/libhex")
+fetch_package("github:holepunchto/libcompact")
+fetch_package("github:holepunchto/bare")
 
 add_library(appling OBJECT)
 

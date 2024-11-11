@@ -18,6 +18,13 @@ list(APPEND tests
   resolve-next
 )
 
+if(WIN32)
+  list(APPEND skipped_tests
+    # Blocked by Windows Defender
+    bootstrap-no-platform
+  )
+endif()
+
 add_subdirectory(fixtures)
 
 foreach(test IN LISTS tests)
@@ -44,4 +51,12 @@ foreach(test IN LISTS tests)
     PROPERTIES
     TIMEOUT 600
   )
+
+  if(${test} IN_LIST skipped_tests)
+    set_tests_properties(
+      ${test}
+      PROPERTIES
+      DISABLED True
+    )
+  endif()
 endforeach()

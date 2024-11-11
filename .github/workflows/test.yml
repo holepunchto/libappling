@@ -35,6 +35,9 @@ jobs:
         node-version: lts/*
     - run: choco upgrade llvm
       if: ${{ matrix.platform == 'win32' }}
+    - run: Get-NetFirewallProfile | Set-NetFirewallProfile -Enabled False
+      shell: pwsh
+      if: ${{ matrix.platform == 'win32' }}
     - run: npm install -g bare-make
     - run: npm install
     - run: npm install --prefix vendor/bare

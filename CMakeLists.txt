@@ -16,7 +16,7 @@ endif()
 
 install_node_modules()
 
-fetch_package("github:holepunchto/bare@1.12.1")
+fetch_package("github:holepunchto/bare")
 fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")

@@ -21,7 +21,6 @@ fetch_package("github:holepunchto/bare")
 fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")
-fetch_package("github:holepunchto/libhex")
 fetch_package("github:holepunchto/libcompact")
 
 add_library(appling OBJECT)
@@ -98,7 +97,6 @@ target_link_libraries(
   PUBLIC
     compact
     fs
-    hex
     log
     path
 )
@@ -136,7 +134,6 @@ target_link_libraries(
   appling_bootstrap
   PUBLIC
     appling
-    hex
     path
 )
 
@@ -161,7 +158,6 @@ target_link_libraries(
     fs_static
     path_static
     log_static
-    hex_static
     compact_static
 )
 

@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <bare.h>
-#include <hex.h>
 #include <js.h>
 #include <path.h>
 #include <stdlib.h>

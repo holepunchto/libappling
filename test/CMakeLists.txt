@@ -38,7 +38,6 @@ foreach(test IN LISTS tests)
     PRIVATE
       appling_static
       compact_static
-      hex_static
   )
 
   add_test(

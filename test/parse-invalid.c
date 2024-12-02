@@ -12,7 +12,7 @@
   }
 
 int
-main () {
+main() {
   // Empty
   test_parse_invalid("");
 

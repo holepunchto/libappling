@@ -12,7 +12,7 @@
 #endif
 
 int
-appling_launch_v0 (const appling_launch_info_t *info) {
+appling_launch_v0(const appling_launch_info_t *info) {
   int err;
 
   const appling_platform_t *platform = info->platform;
@@ -21,7 +21,7 @@ appling_launch_v0 (const appling_launch_info_t *info) {
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){
+    (const char *[]) {
       platform->path,
       "bin",
 #if defined(APPLING_OS_LINUX)

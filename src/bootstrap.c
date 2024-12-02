@@ -12,7 +12,7 @@
 #include "bootstrap.bundle.h"
 
 static js_value_t *
-appling_bootstrap__error (js_env_t *env, js_callback_info_t *info) {
+appling_bootstrap__error(js_env_t *env, js_callback_info_t *info) {
   int err;
 
   appling_bootstrap_t *req;
@@ -40,7 +40,7 @@ appling_bootstrap__error (js_env_t *env, js_callback_info_t *info) {
 }
 
 static void
-appling_bootstrap__on_thread (void *data) {
+appling_bootstrap__on_thread(void *data) {
   int err;
 
   appling_bootstrap_t *req = (appling_bootstrap_t *) data;
@@ -117,7 +117,7 @@ appling_bootstrap__on_thread (void *data) {
 }
 
 static void
-appling_bootstrap__on_close (uv_handle_t *handle) {
+appling_bootstrap__on_close(uv_handle_t *handle) {
   appling_bootstrap_t *req = (appling_bootstrap_t *) handle->data;
 
   if (req->cb) req->cb(req, req->status);
@@ -126,12 +126,12 @@ appling_bootstrap__on_close (uv_handle_t *handle) {
 }
 
 static void
-appling_bootstrap__on_signal (uv_async_t *handle) {
+appling_bootstrap__on_signal(uv_async_t *handle) {
   uv_close((uv_handle_t *) handle, appling_bootstrap__on_close);
 }
 
 int
-appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb) {
   int err;
 
   req->loop = loop;
@@ -157,7 +157,7 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){cwd, dir, NULL},
+      (const char *[]) {cwd, dir, NULL},
       req->dir,
       &path_len,
       path_behavior_system
@@ -172,7 +172,7 @@ appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req,
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){homedir, appling_platform_dir, NULL},
+      (const char *[]) {homedir, appling_platform_dir, NULL},
       req->dir,
       &path_len,
       path_behavior_system

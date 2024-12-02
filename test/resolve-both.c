@@ -16,7 +16,7 @@ appling_resolve_t req;
 bool resolve_called = false;
 
 static void
-on_resolve (appling_resolve_t *req, int status) {
+on_resolve(appling_resolve_t *req, int status) {
   resolve_called = true;
 
   assert(status == 0);
@@ -26,7 +26,7 @@ on_resolve (appling_resolve_t *req, int status) {
 }
 
 int
-main () {
+main() {
   int err;
 
   loop = uv_default_loop();

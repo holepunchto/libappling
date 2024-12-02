@@ -16,7 +16,7 @@ appling_platform_t platform;
 appling_resolve_t req;
 
 static void
-on_resolve (appling_resolve_t *req, int status) {
+on_resolve(appling_resolve_t *req, int status) {
   appling_app_t app = {
     .path = EXE,
   };
@@ -31,7 +31,7 @@ on_resolve (appling_resolve_t *req, int status) {
 }
 
 int
-main () {
+main() {
   int err;
 
   loop = uv_default_loop();

@@ -179,28 +179,28 @@ struct appling_launch_info_s {
 };
 
 int
-appling_parse (const char *link, appling_link_t *result);
+appling_parse(const char *link, appling_link_t *result);
 
 int
-appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb);
+appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb);
 
 int
-appling_unlock (uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
+appling_unlock(uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
 
 int
-appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, uint64_t minimum_length, appling_resolve_cb cb);
+appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, uint64_t minimum_length, appling_resolve_cb cb);
 
 int
-appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
+appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap (uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb);
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb);
 
 int
-appling_launch (const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
+appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
 int
-appling_open (const appling_app_t *app, const char *argument);
+appling_open(const appling_app_t *app, const char *argument);
 
 #ifdef __cplusplus
 }

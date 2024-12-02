@@ -4,7 +4,7 @@
 #include "../include/appling.h"
 
 int
-appling_parse (const char *link, appling_link_t *result) {
+appling_parse(const char *link, appling_link_t *result) {
   size_t link_len = strlen(link);
 
   if (link_len == 0) goto err;

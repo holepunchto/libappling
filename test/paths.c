@@ -12,7 +12,7 @@ appling_paths_t req;
 bool paths_called = false;
 
 static void
-on_paths (appling_paths_t *req, int status, const appling_app_t *apps, size_t len) {
+on_paths(appling_paths_t *req, int status, const appling_app_t *apps, size_t len) {
   paths_called = true;
 
   assert(status == 0);
@@ -25,7 +25,7 @@ on_paths (appling_paths_t *req, int status, const appling_app_t *apps, size_t le
 }
 
 int
-main () {
+main() {
   loop = uv_default_loop();
 
   appling_generate_paths(loop);

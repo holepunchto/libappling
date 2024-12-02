@@ -16,7 +16,7 @@
   }
 
 int
-main () {
+main() {
   test_parse_hex("pear://" KEY, KEY, "");
   test_parse_hex("punch://" KEY, KEY, "");
 

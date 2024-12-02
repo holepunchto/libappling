@@ -6,7 +6,7 @@
 #include "../include/appling.h"
 
 static void
-appling_lock__on_close (fs_close_t *fs_req, int status) {
+appling_lock__on_close(fs_close_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (req->status < 0) status = req->status;
@@ -19,7 +19,7 @@ appling_lock__on_close (fs_close_t *fs_req, int status) {
 }
 
 static void
-appling_lock__on_lock (fs_lock_t *fs_req, int status) {
+appling_lock__on_lock(fs_lock_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
@@ -32,7 +32,7 @@ appling_lock__on_lock (fs_lock_t *fs_req, int status) {
 }
 
 static void
-appling_lock__on_open (fs_open_t *fs_req, int status, uv_file file) {
+appling_lock__on_open(fs_open_t *fs_req, int status, uv_file file) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
@@ -45,14 +45,14 @@ appling_lock__on_open (fs_open_t *fs_req, int status, uv_file file) {
 }
 
 static void
-appling_lock__on_mkdir (fs_mkdir_t *fs_req, int status) {
+appling_lock__on_mkdir(fs_mkdir_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->dir, "lock", NULL},
+    (const char *[]) {req->dir, "lock", NULL},
     path,
     &path_len,
     path_behavior_system
@@ -66,7 +66,7 @@ appling_lock__on_mkdir (fs_mkdir_t *fs_req, int status) {
 }
 
 int
-appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb) {
+appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb) {
   req->loop = loop;
   req->on_lock = cb;
   req->file = -1;
@@ -86,7 +86,7 @@ appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_loc
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){cwd, dir, NULL},
+      (const char *[]) {cwd, dir, NULL},
       req->dir,
       &path_len,
       path_behavior_system
@@ -101,7 +101,7 @@ appling_lock (uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_loc
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){homedir, appling_platform_dir, NULL},
+      (const char *[]) {homedir, appling_platform_dir, NULL},
       req->dir,
       &path_len,
       path_behavior_system

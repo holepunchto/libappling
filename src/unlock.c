@@ -4,7 +4,7 @@
 #include "../include/appling.h"
 
 static void
-appling_unlock__on_close (fs_close_t *fs_req, int status) {
+appling_unlock__on_close(fs_close_t *fs_req, int status) {
   appling_lock_t *req = (appling_lock_t *) fs_req->data;
 
   if (status >= 0) {
@@ -15,7 +15,7 @@ appling_unlock__on_close (fs_close_t *fs_req, int status) {
 }
 
 int
-appling_unlock (uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb) {
+appling_unlock(uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb) {
   req->loop = loop;
   req->on_unlock = cb;
   req->close.data = (void *) req;

@@ -16,7 +16,7 @@
   }
 
 int
-main () {
+main() {
   test_parse_z32("pear://" KEY, KEY, "");
   test_parse_z32("punch://" KEY, KEY, "");
 

@@ -10,12 +10,12 @@
 #include "../include/appling.h"
 
 static void *
-appling_paths__on_alloc (size_t len, void *data) {
+appling_paths__on_alloc(size_t len, void *data) {
   return malloc(len * sizeof(appling_app_t));
 }
 
 static int
-appling_paths__on_decode (compact_state_t *state, void *array, size_t i, void *data) {
+appling_paths__on_decode(compact_state_t *state, void *array, size_t i, void *data) {
   int err;
 
   appling_app_t *apps = (appling_app_t *) array;
@@ -39,7 +39,7 @@ err:
 }
 
 static void
-appling_paths__on_close (fs_close_t *fs_req, int status) {
+appling_paths__on_close(fs_close_t *fs_req, int status) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   status = req->status;
@@ -54,7 +54,7 @@ appling_paths__on_close (fs_close_t *fs_req, int status) {
 }
 
 static void
-appling_paths__on_read (fs_read_t *fs_req, int status, size_t read) {
+appling_paths__on_read(fs_read_t *fs_req, int status, size_t read) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   if (status >= 0) {
@@ -84,7 +84,7 @@ appling_paths__on_read (fs_read_t *fs_req, int status, size_t read) {
 }
 
 static void
-applings_paths__on_stat (fs_stat_t *fs_req, int status, const uv_stat_t *st) {
+applings_paths__on_stat(fs_stat_t *fs_req, int status, const uv_stat_t *st) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   if (status >= 0) {
@@ -100,7 +100,7 @@ applings_paths__on_stat (fs_stat_t *fs_req, int status, const uv_stat_t *st) {
 }
 
 static void
-appling_paths__on_open (fs_open_t *fs_req, int status, uv_file file) {
+appling_paths__on_open(fs_open_t *fs_req, int status, uv_file file) {
   appling_paths_t *req = (appling_paths_t *) fs_req->data;
 
   if (status >= 0) {
@@ -113,7 +113,7 @@ appling_paths__on_open (fs_open_t *fs_req, int status, uv_file file) {
 }
 
 int
-appling_paths (uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb) {
+appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->status = 0;

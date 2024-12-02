@@ -11,14 +11,14 @@ appling_lock_t req;
 bool lock_called = false;
 
 static void
-on_lock (appling_lock_t *req, int status) {
+on_lock(appling_lock_t *req, int status) {
   lock_called = true;
 
   assert(status == 0);
 }
 
 int
-main () {
+main() {
   loop = uv_default_loop();
 
   int err = appling_lock(loop, &req, "test/fixtures/lock/missing/directory", on_lock);

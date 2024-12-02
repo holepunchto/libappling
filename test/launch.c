@@ -16,7 +16,7 @@ appling_platform_t platform;
 appling_resolve_t req;
 
 static void
-on_resolve (appling_resolve_t *req, int status) {
+on_resolve(appling_resolve_t *req, int status) {
   assert(status == 0);
 
   appling_app_t app = {
@@ -32,7 +32,7 @@ on_resolve (appling_resolve_t *req, int status) {
 }
 
 int
-main () {
+main() {
   int err;
 
   loop = uv_default_loop();

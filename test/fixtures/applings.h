@@ -14,7 +14,7 @@
 #define KEY "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 static int
-on_preencode (compact_state_t *state, void *array, size_t i, void *data) {
+on_preencode(compact_state_t *state, void *array, size_t i, void *data) {
   int err;
 
   appling_app_t *apps = (appling_app_t *) array;
@@ -31,7 +31,7 @@ on_preencode (compact_state_t *state, void *array, size_t i, void *data) {
 }
 
 static int
-on_encode (compact_state_t *state, void *array, size_t i, void *data) {
+on_encode(compact_state_t *state, void *array, size_t i, void *data) {
   int err;
 
   appling_app_t *apps = (appling_app_t *) array;
@@ -48,7 +48,7 @@ on_encode (compact_state_t *state, void *array, size_t i, void *data) {
 }
 
 static inline void
-appling_generate_paths (uv_loop_t *loop) {
+appling_generate_paths(uv_loop_t *loop) {
   int err;
 
   appling_app_t apps[] = {

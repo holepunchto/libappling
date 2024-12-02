@@ -11,10 +11,10 @@
 #include "../include/appling.h"
 
 static void
-appling_resolve__realpath (appling_resolve_t *req);
+appling_resolve__realpath(appling_resolve_t *req);
 
 static void
-appling_resolve__on_close (fs_close_t *fs_req, int status) {
+appling_resolve__on_close(fs_close_t *fs_req, int status) {
   appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (req->status < 0) status = req->status;
@@ -30,7 +30,7 @@ appling_resolve__on_close (fs_close_t *fs_req, int status) {
 }
 
 static void
-appling_resolve__on_read (fs_read_t *fs_req, int status, size_t read) {
+appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
   int err;
 
   appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
@@ -69,7 +69,7 @@ close:
 }
 
 static void
-appling_resolve__on_stat (fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
+appling_resolve__on_stat(fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
   appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
@@ -86,7 +86,7 @@ appling_resolve__on_stat (fs_stat_t *fs_req, int status, const uv_stat_t *stat) 
 }
 
 static void
-appling_resolve__on_open (fs_open_t *fs_req, int status, uv_file file) {
+appling_resolve__on_open(fs_open_t *fs_req, int status, uv_file file) {
   appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
@@ -99,12 +99,12 @@ appling_resolve__on_open (fs_open_t *fs_req, int status, uv_file file) {
 }
 
 static void
-appling_resolve__open (appling_resolve_t *req) {
+appling_resolve__open(appling_resolve_t *req) {
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->platform->path, "..", "..", "length", NULL},
+    (const char *[]) {req->platform->path, "..", "..", "length", NULL},
     path,
     &path_len,
     path_behavior_system
@@ -116,7 +116,7 @@ appling_resolve__open (appling_resolve_t *req) {
 }
 
 static void
-appling_resolve__on_realpath (fs_realpath_t *fs_req, int status, const char *path) {
+appling_resolve__on_realpath(fs_realpath_t *fs_req, int status, const char *path) {
   appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
 
   if (status >= 0) {
@@ -132,14 +132,14 @@ appling_resolve__on_realpath (fs_realpath_t *fs_req, int status, const char *pat
 }
 
 static void
-appling_resolve__realpath (appling_resolve_t *req) {
+appling_resolve__realpath(appling_resolve_t *req) {
   size_t i = req->candidate;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]){req->path, appling_platform_candidates[i], NULL},
+    (const char *[]) {req->path, appling_platform_candidates[i], NULL},
     path,
     &path_len,
     path_behavior_system
@@ -151,7 +151,7 @@ appling_resolve__realpath (appling_resolve_t *req) {
 }
 
 int
-appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, uint64_t minimum_length, appling_resolve_cb cb) {
+appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, uint64_t minimum_length, appling_resolve_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->platform = platform;
@@ -175,7 +175,7 @@ appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appli
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){cwd, dir, NULL},
+      (const char *[]) {cwd, dir, NULL},
       req->path,
       &path_len,
       path_behavior_system
@@ -190,7 +190,7 @@ appling_resolve (uv_loop_t *loop, appling_resolve_t *req, const char *dir, appli
     path_len = sizeof(appling_path_t);
 
     path_join(
-      (const char *[]){homedir, appling_platform_dir, NULL},
+      (const char *[]) {homedir, appling_platform_dir, NULL},
       req->path,
       &path_len,
       path_behavior_system

@@ -18,7 +18,7 @@ js_platform_t *js;
 bool bootstrap_called = false;
 
 static void
-on_bootstrap (appling_bootstrap_t *req, int status) {
+on_bootstrap(appling_bootstrap_t *req, int status) {
   int e;
 
   bootstrap_called = true;
@@ -30,7 +30,7 @@ on_bootstrap (appling_bootstrap_t *req, int status) {
 }
 
 static void
-on_unlink (fs_unlink_t *req, int status) {
+on_unlink(fs_unlink_t *req, int status) {
   int e;
 
   (void) status;
@@ -42,7 +42,7 @@ on_unlink (fs_unlink_t *req, int status) {
 }
 
 int
-main () {
+main() {
   int e;
 
   loop = uv_default_loop();

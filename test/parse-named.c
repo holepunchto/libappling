@@ -14,7 +14,7 @@
   }
 
 int
-main () {
+main() {
   test_parse_named("pear://foo", "foo", "");
   test_parse_named("punch://foo", "foo", "");
 

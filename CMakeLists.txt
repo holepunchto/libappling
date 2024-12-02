@@ -16,7 +16,7 @@ endif()
 
 install_node_modules()
 
-fetch_package("github:holepunchto/bare")
+fetch_package("github:holepunchto/bare@1.12.1")
 fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")
@@ -85,16 +85,21 @@ endif()
 
 target_include_directories(
   appling
-  PUBLIC
+  INTERFACE
     include
+  PUBLIC
     $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:fs,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
-  PRIVATE
-    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:compact,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:js,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+target_link_libraries(
+  appling
+  PUBLIC
+    compact
+    fs
+    hex
+    log
+    path
 )
 
 add_bare_bundle(
@@ -122,19 +127,16 @@ target_sources(
 
 target_include_directories(
   appling_bootstrap
-  PUBLIC
-    include
-    $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
   PRIVATE
-    $<TARGET_PROPERTY:hex,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(
   appling_bootstrap
   PUBLIC
     appling
+    hex
+    path
 )
 
 link_bare_modules(appling_bootstrap)
@@ -177,17 +179,12 @@ target_sources(
     src/entry.c
 )
 
-target_include_directories(
-  appling_launch
-  PRIVATE
-    $<TARGET_PROPERTY:path,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:log,INTERFACE_INCLUDE_DIRECTORIES>
-)
-
 target_link_libraries(
   appling_launch
   PUBLIC
     appling
+    log
+    path
 )
 
 add_library(appling_launch_shared SHARED)
@@ -202,10 +199,11 @@ set_target_properties(
 
 target_link_libraries(
   appling_launch_shared
-  PRIVATE
+  PUBLIC
     appling_launch
-    path_static
+  PRIVATE
     log_static
+    path_static
 )
 
 install(TARGETS appling_static)

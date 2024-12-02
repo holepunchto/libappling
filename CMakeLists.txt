@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.25)
 # the static libuv archive to the dynamic platform entry point.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
 find_package(cmake-bare-bundle REQUIRED PATHS node_modules/cmake-bare-bundle)
 find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
 find_package(cmake-npm REQUIRED PATHS node_modules/cmake-npm)

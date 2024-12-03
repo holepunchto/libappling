@@ -22,6 +22,7 @@ on_resolve(appling_resolve_t *req, int status) {
 
   printf("path=%s\n", platform.path);
   printf("length=%lld\n", platform.length);
+  printf("fork=%lld\n", platform.fork);
 }
 
 int
@@ -30,7 +31,7 @@ main() {
 
   loop = uv_default_loop();
 
-  err = appling_resolve(loop, &req, "test/fixtures/resolve/both", &platform, 0, on_resolve);
+  err = appling_resolve(loop, &req, "test/fixtures/resolve/both", &platform, on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

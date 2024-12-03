@@ -8,7 +8,10 @@
 
 uv_loop_t *loop;
 
-appling_platform_t platform;
+appling_platform_t platform = {
+  .dkey = {0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa},
+  .length = 123,
+};
 
 appling_resolve_t req;
 
@@ -30,7 +33,7 @@ main() {
 
   loop = uv_default_loop();
 
-  err = appling_resolve(loop, &req, "test/fixtures/resolve/current", &platform, 123, on_resolve);
+  err = appling_resolve(loop, &req, "test/fixtures/resolve/current", &platform, on_resolve);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

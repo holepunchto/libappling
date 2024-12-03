@@ -42,6 +42,14 @@ appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
       (uint8_t *) req->buf.base,
     };
 
+    uint8_t dkey[APPLING_DKEY_LEN];
+    err = compact_decode_fixed32(&state, dkey);
+
+    if (err < 0) {
+      req->status = err; // Propagate
+      goto close;
+    }
+
     uintmax_t length;
     err = compact_decode_uint(&state, &length);
 
@@ -50,12 +58,25 @@ appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
       goto close;
     }
 
-    if (length < req->minimum_length) {
-      req->status = -1;
+    uintmax_t fork;
+    err = compact_decode_uint(&state, &fork);
+
+    if (err < 0) {
+      req->status = err; // Propagate
       goto close;
     }
 
+    if (memcmp(dkey, req->platform->dkey, APPLING_DKEY_LEN) == 0) {
+      if (length < req->platform->length || fork != req->platform->fork) {
+        req->status = -1;
+        goto close;
+      }
+    }
+
+    memcpy(req->platform->dkey, dkey, APPLING_DKEY_LEN);
+
     req->platform->length = length;
+    req->platform->fork = fork;
 
     req->status = 0; // Reset
   } else {
@@ -104,7 +125,7 @@ appling_resolve__open(appling_resolve_t *req) {
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]) {req->platform->path, "..", "..", "length", NULL},
+    (const char *[]) {req->platform->path, "..", "..", "checkout", NULL},
     path,
     &path_len,
     path_behavior_system
@@ -151,11 +172,10 @@ appling_resolve__realpath(appling_resolve_t *req) {
 }
 
 int
-appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, uint64_t minimum_length, appling_resolve_cb cb) {
+appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb) {
   req->loop = loop;
   req->cb = cb;
   req->platform = platform;
-  req->minimum_length = minimum_length;
   req->candidate = 0;
   req->status = 0;
   req->realpath.data = (void *) req;

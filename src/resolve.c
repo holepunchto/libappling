@@ -42,8 +42,8 @@ appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
       (uint8_t *) req->buf.base,
     };
 
-    uint8_t dkey[APPLING_DKEY_LEN];
-    err = compact_decode_fixed32(&state, dkey);
+    uint8_t key[APPLING_KEY_LEN];
+    err = compact_decode_fixed32(&state, key);
 
     if (err < 0) {
       req->status = err; // Propagate
@@ -66,14 +66,14 @@ appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
       goto close;
     }
 
-    if (memcmp(dkey, req->platform->dkey, APPLING_DKEY_LEN) == 0) {
+    if (memcmp(key, req->platform->key, APPLING_KEY_LEN) == 0) {
       if (length < req->platform->length || fork != req->platform->fork) {
         req->status = -1;
         goto close;
       }
     }
 
-    memcpy(req->platform->dkey, dkey, APPLING_DKEY_LEN);
+    memcpy(req->platform->key, key, APPLING_KEY_LEN);
 
     req->platform->length = length;
     req->platform->fork = fork;

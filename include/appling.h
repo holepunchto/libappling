@@ -16,13 +16,13 @@ extern "C" {
 #include "appling/constants.h"
 #include "appling/os.h"
 
-#define APPLING_DKEY_LEN      32
-#define APPLING_KEY_MAX       64
+#define APPLING_KEY_LEN       32
+#define APPLING_ID_MAX        64
 #define APPLING_LINK_DATA_MAX 4096
 
+typedef uint8_t appling_key_t[APPLING_KEY_LEN];
+typedef char appling_id_t[APPLING_ID_MAX + 1 /* NULL */];
 typedef char appling_path_t[4096 + 1 /* NULL */];
-typedef char appling_key_t[APPLING_KEY_MAX + 1 /* NULL */];
-typedef uint8_t appling_dkey_t[APPLING_DKEY_LEN];
 
 typedef struct appling_platform_s appling_platform_t;
 typedef struct appling_app_s appling_app_t;
@@ -42,18 +42,18 @@ typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
 struct appling_platform_s {
   appling_path_t path;
-  appling_dkey_t dkey;
+  appling_key_t key;
   uint64_t length;
   uint64_t fork;
 };
 
 struct appling_app_s {
   appling_path_t path;
-  appling_key_t key;
+  appling_id_t id;
 };
 
 struct appling_link_s {
-  appling_key_t key;
+  appling_id_t id;
   char data[APPLING_LINK_DATA_MAX + 1 /* NULL */];
 };
 
@@ -107,7 +107,7 @@ struct appling_bootstrap_s {
 
   appling_bootstrap_cb cb;
 
-  appling_dkey_t dkey;
+  appling_key_t key;
   appling_path_t dir;
 
   js_platform_t *js;
@@ -193,7 +193,7 @@ int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb);
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb);
 
 int
 appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);

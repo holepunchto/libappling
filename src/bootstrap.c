@@ -71,13 +71,13 @@ appling_bootstrap__on_thread(void *data) {
 
   void *buffer;
 
-  js_value_t *dkey;
-  err = js_create_arraybuffer(env, sizeof(req->dkey), &buffer, &dkey);
+  js_value_t *key;
+  err = js_create_arraybuffer(env, sizeof(req->key), &buffer, &key);
   assert(err == 0);
 
-  memcpy(buffer, req->dkey, sizeof(req->dkey));
+  memcpy(buffer, req->key, sizeof(req->key));
 
-  err = js_set_named_property(env, exports, "dkey", dkey);
+  err = js_set_named_property(env, exports, "key", key);
   assert(err == 0);
 
   js_value_t *directory;
@@ -130,7 +130,7 @@ appling_bootstrap__on_signal(uv_async_t *handle) {
 }
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_dkey_t dkey, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb) {
   int err;
 
   req->loop = loop;
@@ -143,7 +143,7 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
   err = uv_async_init(loop, &req->signal, appling_bootstrap__on_signal);
   if (err < 0) return err;
 
-  memcpy(req->dkey, dkey, sizeof(appling_dkey_t));
+  memcpy(req->key, key, sizeof(appling_key_t));
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {

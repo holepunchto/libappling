@@ -24,7 +24,7 @@ on_resolve(appling_resolve_t *req, int status) {
   };
 
   appling_link_t link = {
-    .key = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    .id = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   };
 
   int err = appling_launch(&platform, &app, &link);

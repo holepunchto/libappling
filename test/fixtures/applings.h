@@ -11,7 +11,7 @@
 #include "app.h"
 
 #define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
-#define KEY "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+#define ID  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 static int
 on_preencode(compact_state_t *state, void *array, size_t i, void *data) {
@@ -23,8 +23,8 @@ on_preencode(compact_state_t *state, void *array, size_t i, void *data) {
   err = compact_preencode_utf8(state, path);
   assert(err == 0);
 
-  utf8_string_view_t key = utf8_string_view_init((utf8_t *) apps[i].key, strlen(apps[i].key));
-  err = compact_preencode_utf8(state, key);
+  utf8_string_view_t id = utf8_string_view_init((utf8_t *) apps[i].id, strlen(apps[i].id));
+  err = compact_preencode_utf8(state, id);
   assert(err == 0);
 
   return 0;
@@ -40,8 +40,8 @@ on_encode(compact_state_t *state, void *array, size_t i, void *data) {
   err = compact_encode_utf8(state, path);
   assert(err == 0);
 
-  utf8_string_view_t key = utf8_string_view_init((utf8_t *) apps[i].key, strlen(apps[i].key));
-  err = compact_encode_utf8(state, key);
+  utf8_string_view_t id = utf8_string_view_init((utf8_t *) apps[i].id, strlen(apps[i].id));
+  err = compact_encode_utf8(state, id);
   assert(err == 0);
 
   return 0;
@@ -54,7 +54,7 @@ appling_generate_paths(uv_loop_t *loop) {
   appling_app_t apps[] = {
     {
       .path = EXE,
-      .key = KEY,
+      .id = ID,
     },
   };
 

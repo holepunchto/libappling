@@ -4,27 +4,27 @@
 
 #include "../include/appling.h"
 
-#define KEY "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+#define ID "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-#define test_parse_z32(input, expected_key, expected_data) \
+#define test_parse_z32(input, expected_id, expected_data) \
   { \
     appling_link_t link; \
     int err = appling_parse(input, &link); \
     assert(err == 0); \
-    assert(strcmp(link.key, expected_key) == 0); \
+    assert(strcmp(link.id, expected_id) == 0); \
     assert(strcmp(link.data, expected_data) == 0); \
   }
 
 int
 main() {
-  test_parse_z32("pear://" KEY, KEY, "");
-  test_parse_z32("punch://" KEY, KEY, "");
+  test_parse_z32("pear://" ID, ID, "");
+  test_parse_z32("punch://" ID, ID, "");
 
-  test_parse_z32("pear://" KEY "/", KEY, "");
-  test_parse_z32("punch://" KEY "/", KEY, "");
+  test_parse_z32("pear://" ID "/", ID, "");
+  test_parse_z32("punch://" ID "/", ID, "");
 
-  test_parse_z32("pear://" KEY "/data", KEY, "data");
-  test_parse_z32("punch://" KEY "/data", KEY, "data");
+  test_parse_z32("pear://" ID "/data", ID, "data");
+  test_parse_z32("punch://" ID "/data", ID, "data");
 
   return 0;
 }

@@ -15,20 +15,20 @@ appling_parse(const char *link, appling_link_t *result) {
   else if (strncmp(link, "punch://", 8) == 0) i += 8;
   else goto err;
 
-  for (size_t j = 0; j < APPLING_KEY_MAX; i++, j++) {
+  for (size_t j = 0; j < APPLING_ID_MAX; i++, j++) {
     char c = link[i];
 
     if (c == '\0' || c == '/') {
-      result->key[j] = '\0';
+      result->id[j] = '\0';
       break;
     }
 
-    result->key[j] = c;
+    result->id[j] = c;
   }
 
-  if (strlen(result->key) == 0) goto err;
+  if (strlen(result->id) == 0) goto err;
 
-  result->key[APPLING_KEY_MAX] = '\0';
+  result->id[APPLING_ID_MAX] = '\0';
 
   if (link[i] == '/') i++;
   else if (link[i] != '\0') goto err;

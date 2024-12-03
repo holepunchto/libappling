@@ -2,7 +2,7 @@
 
 #include "../include/appling.h"
 
-#define KEY "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+#define ID "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 #define test_parse_invalid(input) \
   { \
@@ -23,11 +23,11 @@ main() {
   test_parse_invalid("punch:///");
 
   // Key longer than 64 characters
-  test_parse_invalid("pear://" KEY "aaaa");
-  test_parse_invalid("punch://" KEY "aaaa");
+  test_parse_invalid("pear://" ID "aaaa");
+  test_parse_invalid("punch://" ID "aaaa");
 
   // Incorrect protocol
-  test_parse_invalid("holepunch://" KEY);
+  test_parse_invalid("holepunch://" ID);
 
   return 0;
 }

@@ -24,12 +24,12 @@ appling_paths__on_decode(compact_state_t *state, void *array, size_t i, void *da
   err = compact_decode_utf8(state, &path);
   if (err < 0) goto err;
 
-  utf8_string_view_t key;
-  err = compact_decode_utf8(state, &key);
+  utf8_string_view_t id;
+  err = compact_decode_utf8(state, &id);
   if (err < 0) goto err;
 
   strncpy(apps[i].path, (char *) path.data, path.len);
-  strncpy(apps[i].key, (char *) key.data, key.len);
+  strncpy(apps[i].id, (char *) id.data, id.len);
 
   return 0;
 

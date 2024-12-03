@@ -4,12 +4,12 @@
 
 #include "../include/appling.h"
 
-#define test_parse_named(input, expected_key, expected_data) \
+#define test_parse_named(input, expected_id, expected_data) \
   { \
     appling_link_t link; \
     int err = appling_parse(input, &link); \
     assert(err == 0); \
-    assert(strcmp(link.key, expected_key) == 0); \
+    assert(strcmp(link.id, expected_id) == 0); \
     assert(strcmp(link.data, expected_data) == 0); \
   }
 

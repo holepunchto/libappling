@@ -18,6 +18,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   const appling_platform_t *platform = info->platform;
 
   appling_path_t file;
+
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
@@ -69,31 +70,35 @@ appling_launch_v0(const appling_launch_info_t *info) {
   log_debug("appling_launch() launching link %s", launch);
 
 #if defined(APPLING_OS_WIN32)
-  size_t len;
+  appling_path_t tmp;
 
-  len = snprintf(NULL, 0, "\"%s\"", file);
-  len += 1 /* NULL */;
+  snprintf(tmp, sizeof(tmp), "\"%s\"", file);
+  strcpy(file, tmp);
 
-  char *quoted_file = malloc(len);
-
-  snprintf(quoted_file, len, "\"%s\"", file);
-
-  len = snprintf(NULL, 0, "\"%s\"", appling);
-  len += 1 /* NULL */;
-
-  char *quoted_appling = malloc(len);
-
-  snprintf(quoted_appling, len, "\"%s\"", appling);
-
-  err = _execl(file, quoted_file, "--no-sandbox", "--appling", quoted_appling, "--run", launch, NULL);
-
-  free(quoted_file);
-  free(quoted_appling);
-#elif defined(APPLING_OS_LINUX)
-  err = execl(file, file, "--no-sandbox", "--appling", appling, "--run", launch, NULL);
-#else
-  err = execl(file, file, "--appling", appling, "--run", launch, NULL);
+  snprintf(tmp, sizeof(tmp), "\"%s\"", appling);
+  strcpy(appling, tmp);
 #endif
 
-  return err;
+  char *argv[9];
+
+  size_t i = 0;
+
+  argv[i++] = file;
+  argv[i++] = "--appling";
+  argv[i++] = appling;
+  argv[i++] = "--run";
+  argv[i++] = launch;
+
+  if (info->version >= 1 && info->name) {
+    argv[i++] = "--name";
+    argv[i++] = (char *) info->name;
+  }
+
+#if defined(APPLING_OS_WIN32) || defined(APPLING_OS_LINUX)
+  argv[i++] = "--no-sandbox";
+#endif
+
+  argv[i] = NULL;
+
+  return execv(file, argv);
 }

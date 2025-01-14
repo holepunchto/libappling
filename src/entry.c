@@ -90,7 +90,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   argv[i++] = launch;
 
   if (info->version >= 1 && info->name) {
-    argv[i++] = "--name";
+    argv[i++] = "--app-name";
     argv[i++] = (char *) info->name;
   }
 

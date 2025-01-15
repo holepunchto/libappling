@@ -27,7 +27,7 @@ on_resolve(appling_resolve_t *req, int status) {
     .id = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   };
 
-  int err = appling_launch(&platform, &app, &link);
+  int err = appling_launch(&platform, &app, &link, "Example");
   assert(err == 0);
 }
 

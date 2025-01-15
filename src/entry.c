@@ -69,6 +69,10 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
+  appling_path_t entry;
+
+  strcpy(entry, file);
+
 #if defined(APPLING_OS_WIN32)
   appling_path_t tmp;
 
@@ -100,5 +104,5 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   argv[i] = NULL;
 
-  return execv(file, argv);
+  return execv(entry, argv);
 }

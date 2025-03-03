@@ -5,5 +5,12 @@
   "os",
   "path",
   { "addon": "bare-fs" },
-  { "addon": "bare-os" }
+  { "addon": "bare-os" },
+  { "addon": "bare-url" },
+  { "addon": "sodium-native" },
+  { "addon": "udx-native" },
+  { "addon": "quickbit-native" },
+  { "addon": "simdle-native" },
+  { "addon": "crc-native" },
+  { "addon": "fs-native-extensions" }
 ]

@@ -4,7 +4,7 @@
 #import "../../include/appling.h"
 
 int
-appling_open (const appling_app_t *app, const char *argument) {
+appling_open(const appling_app_t *app, const char *argument) {
   @autoreleasepool {
     NSURL *path = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%s", app->path]];
 
@@ -30,7 +30,7 @@ appling_open (const appling_app_t *app, const char *argument) {
       configuration.arguments = @[ [NSString stringWithFormat:@"%s", argument] ];
     }
 
-    __block NSError *error = Nil;
+    __block NSError *error = nil;
 
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 

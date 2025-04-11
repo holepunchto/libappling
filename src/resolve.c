@@ -73,6 +73,32 @@ appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
       }
     }
 
+    utf8_string_view_t os;
+    err = compact_decode_utf8(&state, &os);
+
+    if (err < 0) {
+      req->status = err; // Propagate
+      goto close;
+    }
+
+    if (utf8_string_view_compare_literal(os, (const utf8_t *) APPLING_OS, -1) != 0) {
+      req->status = -1;
+      goto close;
+    }
+
+    utf8_string_view_t arch;
+    err = compact_decode_utf8(&state, &arch);
+
+    if (err < 0) {
+      req->status = err; // Propagate
+      goto close;
+    }
+
+    if (utf8_string_view_compare_literal(arch, (const utf8_t *) APPLING_ARCH, -1) != 0) {
+      req->status = -1;
+      goto close;
+    }
+
     memcpy(req->platform->key, key, APPLING_KEY_LEN);
 
     req->platform->length = length;

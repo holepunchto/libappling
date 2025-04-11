@@ -34,3 +34,11 @@ file(
   ${CMAKE_CURRENT_LIST_DIR}/resolve/next/next
   SYMBOLIC
 )
+
+execute_process(
+  COMMAND node ${CMAKE_CURRENT_LIST_DIR}/applings.js
+)
+
+execute_process(
+  COMMAND node ${CMAKE_CURRENT_LIST_DIR}/checkouts.js
+)

@@ -1,5 +1,3 @@
-/* global Bare, Appling */
-
 const onerror = (err) => {
   Appling.error(err.stack)
 

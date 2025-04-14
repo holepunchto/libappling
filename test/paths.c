@@ -3,7 +3,6 @@
 #include <uv.h>
 
 #include "../include/appling.h"
-#include "fixtures/applings.h"
 
 uv_loop_t *loop;
 
@@ -27,8 +26,6 @@ on_paths(appling_paths_t *req, int status, const appling_app_t *apps, size_t len
 int
 main() {
   loop = uv_default_loop();
-
-  appling_generate_paths(loop);
 
   int err = appling_paths(loop, &req, "test/fixtures/platform", on_paths);
   assert(err == 0);

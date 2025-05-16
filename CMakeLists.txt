@@ -139,6 +139,16 @@ target_link_libraries(
 
 link_bare_modules(appling_bootstrap)
 
+if(WIN32)
+  target_compile_options(
+    rocksdb_facebook
+    PRIVATE
+      # Disable optimisations due to a bug in the MSVC STL where inlining
+      # causes symbol collisions.
+      /Od
+  )
+endif()
+
 add_library(appling_static STATIC)
 
 set_target_properties(

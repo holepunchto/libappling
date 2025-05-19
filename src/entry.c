@@ -25,12 +25,10 @@ appling_launch_v0(const appling_launch_info_t *info) {
     (const char *[]) {
       platform->path,
       "bin",
-#if defined(APPLING_OS_LINUX)
-      "pear-runtime-app/pear-runtime",
-#elif defined(APPLING_OS_DARWIN)
-      "Pear Runtime.app/Contents/MacOS/Pear Runtime",
-#elif defined(APPLING_OS_WIN32)
-      "pear-runtime-app\\Pear Runtime.exe",
+#if defined(APPLING_OS_WIN32)
+    "pear-runtime.exe",
+#elif defined(APPLING_OS_LINUX) || defined(APPLING_OS_DARWIN)
+    "pear-runtime",
 #else
 #error Unsupported operating system
 #endif
@@ -88,10 +86,9 @@ appling_launch_v0(const appling_launch_info_t *info) {
   size_t i = 0;
 
   argv[i++] = file;
+  argv[i++] = "run";
   argv[i++] = "--appling";
   argv[i++] = appling;
-  argv[i++] = "--run";
-  argv[i++] = launch;
 
   if (info->version >= 1 && info->name) {
     argv[i++] = "--app-name";
@@ -102,6 +99,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   argv[i++] = "--no-sandbox";
 #endif
 
+  argv[i++] = launch;
   argv[i] = NULL;
 
   return execv(entry, argv);

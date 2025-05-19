@@ -28,7 +28,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
 #if defined(APPLING_OS_WIN32)
       "pear-runtime.exe",
 #elif defined(APPLING_OS_LINUX) || defined(APPLING_OS_DARWIN)
-    "pear-runtime",
+      "pear-runtime",
 #else
 #error Unsupported operating system
 #endif

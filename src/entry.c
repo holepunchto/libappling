@@ -7,6 +7,7 @@
 
 #if defined(APPLING_OS_WIN32)
 #include <process.h>
+#include <windows.h>
 #else
 #include <unistd.h>
 #endif
@@ -81,12 +82,14 @@ appling_launch_v0(const appling_launch_info_t *info) {
   strcpy(appling, tmp);
 #endif
 
-  char *argv[9];
+#define MAX_ARGS 10
+  char *argv[MAX_ARGS];
 
   size_t i = 0;
 
   argv[i++] = file;
   argv[i++] = "run";
+  argv[i++] = "--detached";
   argv[i++] = "--appling";
   argv[i++] = appling;
 
@@ -102,5 +105,39 @@ appling_launch_v0(const appling_launch_info_t *info) {
   argv[i++] = launch;
   argv[i] = NULL;
 
+#if defined(APPLING_OS_WIN32)
+  int cmd_length = 0;
+  for (int i = 0; i < MAX_ARGS && argv[i] != NULL; i++) {
+    cmd_length = cmd_length + strlen(argv[i]) + 1; // +1 for space
+  }
+  cmd_length += 1; // +1 for final null terminator
+
+  char cmd[cmd_length];
+  cmd[0] = '\0'; // empty string
+
+  for (int i = 0; i < MAX_ARGS && argv[i] != NULL; i++) {
+    strncat(cmd, argv[i], strlen(argv[i]));
+    if (argv[i + 1] != NULL) {
+      strncat(cmd, " ", 1);
+    }
+  }
+
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  ZeroMemory(&pi, sizeof(pi));
+
+  if (!CreateProcess(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+    printf("CreateProcess failed (%lu). \n", GetLastError());
+    return 1;
+  }
+  WaitForSingleObject(pi.hProcess, INFINITE);
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+  return 0;
+#else
   return execv(entry, argv);
+#endif
 }

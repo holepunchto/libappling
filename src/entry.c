@@ -82,14 +82,13 @@ appling_launch_v0(const appling_launch_info_t *info) {
   strcpy(appling, tmp);
 #endif
 
-#define MAX_ARGS 10
+#define MAX_ARGS 9
   char *argv[MAX_ARGS];
 
   size_t i = 0;
 
   argv[i++] = file;
   argv[i++] = "run";
-  argv[i++] = "--detached";
   argv[i++] = "--appling";
   argv[i++] = appling;
 

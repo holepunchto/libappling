@@ -303,7 +303,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   ZeroMemory(&pi, sizeof(pi));
 
   WCHAR *application_name;
-  err = appling__utf8_to_utf16(file, &application_name);
+  err = appling__utf8_to_utf16(entry, &application_name);
   if (err < 0) return err;
 
   WCHAR *command_line;

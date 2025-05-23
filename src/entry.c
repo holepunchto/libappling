@@ -258,20 +258,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  appling_path_t entry;
-
-  strcpy(entry, file);
-
-#if defined(APPLING_OS_WIN32)
-  appling_path_t tmp;
-
-  snprintf(tmp, sizeof(tmp), "\"%s\"", file);
-  strcpy(file, tmp);
-
-  snprintf(tmp, sizeof(tmp), "\"%s\"", appling);
-  strcpy(appling, tmp);
-#endif
-
   char *argv[9];
 
   size_t i = 0;
@@ -303,7 +289,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   ZeroMemory(&pi, sizeof(pi));
 
   WCHAR *application_name;
-  err = appling__utf8_to_utf16(entry, &application_name);
+  err = appling__utf8_to_utf16(file, &application_name);
   if (err < 0) return err;
 
   WCHAR *command_line;
@@ -339,6 +325,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   return 0;
 #else
-  return execv(entry, argv);
+  return execv(file, argv);
 #endif
 }

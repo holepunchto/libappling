@@ -258,7 +258,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *argv[9];
+  char *argv[7];
 
   size_t i = 0;
 
@@ -266,11 +266,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
   argv[i++] = "run";
   argv[i++] = "--appling";
   argv[i++] = appling;
-
-  if (info->version >= 1 && info->name) {
-    argv[i++] = "--app-name";
-    argv[i++] = (char *) info->name;
-  }
 
 #if defined(APPLING_OS_WIN32) || defined(APPLING_OS_LINUX)
   argv[i++] = "--no-sandbox";

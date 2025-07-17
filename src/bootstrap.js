@@ -10,8 +10,8 @@ require('pear-updater-bootstrap')(Buffer.from(Appling.key), Appling.directory, {
   lock: false
 })
 
-// require('pear-distributable-bootstrap')({
-//   pearKey: Buffer.from(Appling.key),
-//   pearDir: Appling.directory,
-//   appLink: 'pear://yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo' // TEMP: keet-next
-// })
+require('pear-distributable-bootstrap')({
+  pearKey: Buffer.from(Appling.key),
+  pearDir: Appling.directory,
+  appLink: 'pear://yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo' // TEMP: keet-next
+})

@@ -9,3 +9,8 @@ Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 require('pear-updater-bootstrap')(Buffer.from(Appling.key), Appling.directory, {
   lock: false
 })
+
+require('pear-distributable-bootstrap')({
+  pearKey: Buffer.from(Appling.key),
+  pearDir: Appling.directory
+})

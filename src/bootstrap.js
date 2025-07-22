@@ -6,14 +6,8 @@ const onerror = (err) => {
 
 Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 
-async function bootstrap () {
-  await require('pear-updater-bootstrap')(Buffer.from(Appling.key), Appling.directory, {
-    lock: false
-  })
-  await require('pear-distributable-bootstrap')({
-    pearKey: Buffer.from(Appling.key),
-    pearDir: Appling.directory,
-    appLink: 'pear://yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo' // TEMP: hardcoded keet-next
-  })
-}
-bootstrap()
+require('pear-distributable-bootstrap')({
+  pearKey: Buffer.from(Appling.key),
+  pearDir: Appling.directory,
+  appLink: 'pear://yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo' // TEMP: hardcoded keet-next
+})

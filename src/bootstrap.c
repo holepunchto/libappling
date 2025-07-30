@@ -87,6 +87,13 @@ appling_bootstrap__on_thread(void *data) {
   err = js_set_named_property(env, exports, "directory", directory);
   assert(err == 0);
 
+  js_value_t *link;
+  err = js_create_string_utf8(env, (utf8_t *) req->link, -1, &link);
+  assert(err == 0);
+
+  err = js_set_named_property(env, exports, "link", link);
+  assert(err == 0);
+
   js_value_t *error;
   err = js_create_function(env, "error", -1, appling_bootstrap__error, (void *) req, &error);
   assert(err == 0);

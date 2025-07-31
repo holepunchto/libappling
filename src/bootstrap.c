@@ -137,7 +137,7 @@ appling_bootstrap__on_signal(uv_async_t *handle) {
 }
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, const char *link, appling_bootstrap_cb cb) {
   int err;
 
   req->loop = loop;
@@ -184,6 +184,8 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
       path_behavior_system
     );
   }
+
+  if (link) strcpy(req->link, link);
 
   return uv_thread_create(&req->thread, appling_bootstrap__on_thread, (void *) req);
 }

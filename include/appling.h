@@ -23,6 +23,7 @@ extern "C" {
 typedef uint8_t appling_key_t[APPLING_KEY_LEN];
 typedef char appling_id_t[APPLING_ID_MAX + 1 /* NULL */];
 typedef char appling_path_t[4096 + 1 /* NULL */];
+typedef char appling_link_t[4096 + 1 /* NULL */];
 
 typedef struct appling_platform_s appling_platform_t;
 typedef struct appling_app_s appling_app_t;
@@ -109,6 +110,7 @@ struct appling_bootstrap_s {
 
   appling_key_t key;
   appling_path_t dir;
+  appling_link_t link;
 
   js_platform_t *js;
 
@@ -200,7 +202,7 @@ int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb);
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, const char *link, appling_bootstrap_cb cb);
 
 int
 appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name);

@@ -6,6 +6,8 @@ const onerror = (err) => {
 
 Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 
-require('pear-updater-bootstrap')(Buffer.from(Appling.key), Appling.directory, {
-  lock: false
+require('pear-distributable-bootstrap')({
+  pearKey: Buffer.from(Appling.key),
+  pearDir: Appling.directory,
+  appLink: 'pear://iq5qet37admn5cqszhzgwds3k53pfj73zgtx7936wr6fki6pz8sy' // TEMP
 })

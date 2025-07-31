@@ -9,5 +9,5 @@ Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 require('pear-distributable-bootstrap')({
   pearKey: Buffer.from(Appling.key),
   pearDir: Appling.directory,
-  appLink: 'pear://yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo' // TEMP: hardcoded keet-next
+  appLink: 'pear://iq5qet37admn5cqszhzgwds3k53pfj73zgtx7936wr6fki6pz8sy' // TEMP
 })

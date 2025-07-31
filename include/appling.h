@@ -23,7 +23,6 @@ extern "C" {
 typedef uint8_t appling_key_t[APPLING_KEY_LEN];
 typedef char appling_id_t[APPLING_ID_MAX + 1 /* NULL */];
 typedef char appling_path_t[4096 + 1 /* NULL */];
-typedef char appling_link_t[4096 + 1 /* NULL */];
 
 typedef struct appling_platform_s appling_platform_t;
 typedef struct appling_app_s appling_app_t;

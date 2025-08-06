@@ -90,10 +90,10 @@ appling_bootstrap__on_thread(void *data) {
   void *buffer_link;
 
   js_value_t *link;
-  err = js_create_arraybuffer(env, sizeof(req->link), &buffer_link, &link);
+  err = js_create_arraybuffer(env, sizeof(req->link.id), &buffer_link, &link);
   assert(err == 0);
 
-  memcpy(buffer_link, req->link, sizeof(req->link));
+  memcpy(buffer_link, req->link.id, sizeof(req->link.id));
 
   err = js_set_named_property(env, exports, "link", link);
   assert(err == 0);
@@ -141,7 +141,7 @@ appling_bootstrap__on_signal(uv_async_t *handle) {
 }
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb, const appling_key_t link) {
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb, const appling_id_t link_key) {
   int err;
 
   req->loop = loop;
@@ -155,7 +155,7 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
   if (err < 0) return err;
 
   memcpy(req->key, key, sizeof(appling_key_t));
-  memcpy(req->link, link, sizeof(appling_key_t));
+  memcpy(req->link.id, link_key, sizeof(appling_id_t));
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {

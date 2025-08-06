@@ -87,9 +87,13 @@ appling_bootstrap__on_thread(void *data) {
   err = js_set_named_property(env, exports, "directory", directory);
   assert(err == 0);
 
+  void *buffer_link;
+
   js_value_t *link;
-  err = js_create_string_utf8(env, (utf8_t *) req->link, -1, &link);
+  err = js_create_arraybuffer(env, sizeof(req->link), &buffer_link, &link);
   assert(err == 0);
+
+  memcpy(buffer_link, req->link, sizeof(req->link));
 
   err = js_set_named_property(env, exports, "link", link);
   assert(err == 0);
@@ -151,6 +155,7 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
   if (err < 0) return err;
 
   memcpy(req->key, key, sizeof(appling_key_t));
+  if (link != NULL) memcpy(req->link, link, sizeof(appling_key_t));
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {
@@ -184,8 +189,5 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
       path_behavior_system
     );
   }
-
-  if (link_key) memcpy(req->link, link, sizeof(appling_key_t));
-
   return uv_thread_create(&req->thread, appling_bootstrap__on_thread, (void *) req);
 }

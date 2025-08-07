@@ -189,5 +189,6 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
       path_behavior_system
     );
   }
+
   return uv_thread_create(&req->thread, appling_bootstrap__on_thread, (void *) req);
 }

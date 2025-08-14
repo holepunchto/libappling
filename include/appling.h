@@ -144,7 +144,7 @@ struct appling_paths_s {
   void *data;
 };
 
-/** @version 1 */
+/** @version 2 */
 struct appling_launch_info_s {
   int version;
 
@@ -182,6 +182,13 @@ struct appling_launch_info_s {
    * @since 1
    */
   const char *name;
+
+  /**
+   * The compatibility version of the appling.
+   *
+   * @since 2
+   */
+  uint64_t compatibility_version;
 };
 
 int
@@ -203,7 +210,7 @@ int
 appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb);
 
 int
-appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name);
+appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name, uint64_t compatibility_version);
 
 int
 appling_open(const appling_app_t *app, const char *argument);

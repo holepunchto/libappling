@@ -19,6 +19,7 @@ bool bootstrap_called = false;
 
 static void
 on_bootstrap(appling_bootstrap_t *req, int status) {
+  if (req->error) fprintf(stderr, "on_bootstrap: %s\n\n", req->error);
   int e;
 
   bootstrap_called = true;

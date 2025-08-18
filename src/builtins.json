@@ -8,5 +8,10 @@
   { "addon": "simdle-native" },
   { "addon": "crc-native" },
   { "addon": "rocksdb-native" },
-  { "addon": "fs-native-extensions" }
+  { "addon": "fs-native-extensions" },
+  { "addon": "bare-pipe" },
+  { "addon": "bare-signals" },
+  { "addon": "bare-tty" },
+  { "addon": "bare-hrtime" },
+  { "addon": "bare-daemon" }
 ]

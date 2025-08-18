@@ -201,7 +201,7 @@ int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb, const appling_id_t link_key);
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb, const char *link);
 
 int
 appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name);

@@ -36,10 +36,9 @@ on_unlink(fs_unlink_t *req, int status) {
   (void) status;
 
   appling_key_t key = {0x1f, 0x1a, 0xcd, 0x89, 0xab, 0x72, 0xb0, 0x2b, 0x3f, 0x27, 0x9f, 0x24, 0x7e, 0x66, 0x74, 0x68, 0xdb, 0xe3, 0x7e, 0x6a, 0x85, 0xc8, 0xe0, 0x33, 0x55, 0x20, 0x79, 0x42, 0x55, 0x03, 0x02, 0x39};
-  appling_id_t link_key = NULL;
-  // appling_id_t link_key = "ma9zo8zmfat3ih314mne1q47shrfho1odyfm9methgnn7b866w6y";
+  const char *link = "pear://ma9zo8zmfat3ih314mne1q47shrfho1odyfm9methgnn7b866w6y";
 
-  e = appling_bootstrap(loop, js, &bootstrap_req, key, "test/fixtures/bootstrap/no-platform", on_bootstrap, link_key);
+  e = appling_bootstrap(loop, js, &bootstrap_req, key, "test/fixtures/bootstrap/no-platform", on_bootstrap, link);
   assert(e == 0);
 }
 

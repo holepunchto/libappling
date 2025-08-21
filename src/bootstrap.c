@@ -137,7 +137,7 @@ appling_bootstrap__on_signal(uv_async_t *handle) {
 }
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb, const char *link) {
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const appling_link_t link, const char *dir, appling_bootstrap_cb cb) {
   int err;
 
   req->loop = loop;
@@ -151,9 +151,7 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
   if (err < 0) return err;
 
   memcpy(req->key, key, sizeof(appling_key_t));
-
-  err = appling_parse(link, &req->link);
-  assert(err == 0);
+  memcpy(req->link, link, sizeof(appling_link_t));
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {

@@ -151,7 +151,7 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
   if (err < 0) return err;
 
   memcpy(req->key, key, sizeof(appling_key_t));
-  memcpy(req->link, link, sizeof(appling_link_t));
+  memcpy(&req->link, &link, sizeof(appling_link_t));
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {

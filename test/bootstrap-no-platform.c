@@ -40,8 +40,8 @@ on_unlink(fs_unlink_t *req, int status) {
 
   const char *pear_link = "pear://oeeoz3w6fjjt7bym3ndpa6hhicm8f8naxyk11z4iypeoupn6jzpo";
   appling_link_t link;
-  err = appling_parse(pear_link, &link);
-  assert(err == 0);
+  e = appling_parse(pear_link, &link);
+  assert(e == 0);
 
   e = appling_bootstrap(loop, js, &bootstrap_req, key, link, "test/fixtures/bootstrap/no-platform", on_bootstrap);
   assert(e == 0);

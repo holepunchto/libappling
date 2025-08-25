@@ -9,7 +9,8 @@ Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 const opts = {
   pearKey: Buffer.from(Appling.key),
   pearDir: Appling.directory,
-  appLink: `pear://${Appling.link}`
+  appLink: `pear://${Appling.link}`,
+  useLock: false
 }
 console.log(opts)
 

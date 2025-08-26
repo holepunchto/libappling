@@ -22,6 +22,7 @@ fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")
 fetch_package("github:holepunchto/libcompact")
+fetch_package("github:holepunchto/libjstl")
 
 add_library(appling OBJECT)
 

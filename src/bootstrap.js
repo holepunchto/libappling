@@ -6,12 +6,9 @@ const onerror = (err) => {
 
 Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 
-const opts = {
+require('pear-distributable-bootstrap')({
   pearKey: Buffer.from(Appling.key),
   pearDir: Appling.directory,
   appLink: `pear://${Appling.link}`,
   useLock: false
-}
-console.log(opts)
-
-require('pear-distributable-bootstrap')(opts)
+})

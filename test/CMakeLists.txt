@@ -1,5 +1,6 @@
 list(APPEND tests
   bootstrap-no-platform
+  bootstrap-no-platform-next
   launch
   launch-data
   lock
@@ -22,6 +23,7 @@ if(WIN32)
   list(APPEND skipped_tests
     # Blocked by Windows Defender
     bootstrap-no-platform
+    bootstrap-no-platform-next
   )
 endif()
 

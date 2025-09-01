@@ -10,7 +10,7 @@
 #include "../include/appling.h"
 
 int
-appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name) {
+appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name, uint64_t compatibility_version) {
   int err;
 
   appling_path_t path;
@@ -32,12 +32,13 @@ appling_launch(const appling_platform_t *platform, const appling_app_t *app, con
   if (err < 0) return err;
 
   appling_launch_info_t info = {
-    .version = 1,
+    .version = 2,
     .path = path,
     .platform = platform,
     .app = app,
     .link = link,
     .name = name,
+    .compatibility_version = compatibility_version,
   };
 
   return launch(&info);

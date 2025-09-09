@@ -12,6 +12,15 @@ Once created and distributed, an appling never needs to be recreated and redistr
 
 See [`include/appling.h`](include/appling.h) for the public API.
 
+## Building
+
+```console
+npm i
+bare-make generate
+bare-make build
+bare-make test
+```
+
 ## License
 
 Apache-2.0

@@ -109,6 +109,7 @@ struct appling_bootstrap_s {
 
   appling_key_t key;
   appling_path_t dir;
+  appling_link_t link;
 
   js_platform_t *js;
 
@@ -200,7 +201,7 @@ int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb);
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const appling_link_t link, const char *dir, appling_bootstrap_cb cb);
 
 int
 appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name);

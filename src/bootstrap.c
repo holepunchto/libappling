@@ -109,10 +109,10 @@ appling_bootstrap__on_thread(void *data) {
   err = bare_load(bare, "bare:/appling.bundle", &source, NULL);
   assert(err == 0);
 
-  err = bare_run(bare);
+  err = bare_run(bare, UV_RUN_DEFAULT);
   assert(err == 0);
 
-  err = bare_teardown(bare, &req->status);
+  err = bare_teardown(bare, UV_RUN_DEFAULT, &req->status);
   assert(err == 0);
 
   err = uv_loop_close(&loop);

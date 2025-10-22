@@ -9,6 +9,11 @@
 
 #include "../include/appling.h"
 
+static void
+appling_preflight__on_progress(uint64_t downloaded, uint64_t total) {
+  // TODO
+}
+
 int
 appling_preflight(const char *swap, const appling_link_t *link) {
   int err;
@@ -40,6 +45,7 @@ appling_preflight(const char *swap, const appling_link_t *link) {
     .path = path,
     .swap = swap,
     .link = link,
+    .progress = appling_preflight__on_progress,
   };
 
   err = preflight(&info);

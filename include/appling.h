@@ -39,6 +39,7 @@ typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
 typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
+typedef void (*appling_progress_cb)(uint64_t downloaded, uint64_t total);
 typedef int (*appling_preflight_cb)(const appling_preflight_info_t *info);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
@@ -171,6 +172,13 @@ struct appling_preflight_info_s {
    * @since 0
    */
   const appling_link_t *link;
+
+  /**
+   * Callback for reporting preflight progress.
+   *
+   * @since 0
+   */
+  appling_progress_cb progress;
 };
 
 /** @version 1 */

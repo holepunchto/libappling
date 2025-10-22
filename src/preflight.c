@@ -36,7 +36,7 @@ appling_preflight(const char *swap, const appling_link_t *link) {
   }
 
   appling_preflight_info_t info = {
-    .version = 1,
+    .version = 0,
     .path = path,
     .swap = swap,
     .link = link,

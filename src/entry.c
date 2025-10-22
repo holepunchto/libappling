@@ -361,12 +361,13 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching link %s", launch);
 
-  char *argv[7];
+  char *argv[8];
 
   size_t i = 0;
 
   argv[i++] = file;
   argv[i++] = "run";
+  argv[i++] = "--trusted";
   argv[i++] = "--appling";
   argv[i++] = appling;
 

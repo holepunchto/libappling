@@ -203,6 +203,109 @@ appling__argv_to_command_line(const char *const *args, WCHAR **result) {
 #endif
 
 int
+appling_preflight_v0(const appling_preflight_info_t *info) {
+  int err;
+
+  appling_path_t file;
+
+  size_t path_len = sizeof(appling_path_t);
+
+  path_join(
+    (const char *[]) {
+      info->swap,
+      "by-arch",
+      appling_target,
+      "bin",
+#if defined(APPLING_OS_DARWIN) || defined(APPLING_OS_LINUX)
+      "pear-runtime",
+#elif defined(APPLING_OS_WIN32)
+      "pear-runtime.exe",
+#else
+#error Unsupported operating system
+#endif
+      NULL,
+    },
+    file,
+    &path_len,
+    path_behavior_system
+  );
+
+  const appling_link_t *link = info->link;
+
+  char preflight[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
+
+  strcat(preflight, "pear://");
+  strcat(preflight, link->id);
+
+  if (strlen(link->data)) {
+    strcat(preflight, "/");
+    strcat(preflight, link->data);
+  }
+
+  log_debug("appling_preflight() running for link %s", preflight);
+
+  char *argv[6];
+
+  size_t i = 0;
+
+  argv[i++] = file;
+  argv[i++] = "run";
+  argv[i++] = "--preflight";
+  argv[i++] = "--trusted";
+  argv[i++] = preflight;
+  argv[i] = NULL;
+
+#if defined(APPLING_OS_WIN32)
+  STARTUPINFOW si;
+  ZeroMemory(&si, sizeof(si));
+
+  si.cb = sizeof(si);
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
+
+  WCHAR *application_name;
+  err = appling__utf8_to_utf16(file, &application_name);
+  if (err < 0) return err;
+
+  WCHAR *command_line;
+  err = appling__argv_to_command_line((const char *const *) argv, &command_line);
+  if (err < 0) {
+    free(application_name);
+
+    return err;
+  }
+
+  BOOL success = CreateProcessW(
+    application_name,
+    command_line,
+    NULL,
+    NULL,
+    FALSE,
+    CREATE_NO_WINDOW,
+    NULL,
+    NULL,
+    &si,
+    &pi
+  );
+
+  free(application_name);
+  free(command_line);
+
+  if (!success) return -1;
+
+  WaitForSingleObject(pi.hProcess, INFINITE);
+
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+
+  return 0;
+#else
+  return execv(file, argv);
+#endif
+}
+
+int
 appling_launch_v0(const appling_launch_info_t *info) {
   int err;
 

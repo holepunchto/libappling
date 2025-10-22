@@ -53,6 +53,7 @@ target_sources(
     src/unlock.c
     src/parse.c
     src/paths.c
+    src/preflight.c
     src/resolve.c
 )
 

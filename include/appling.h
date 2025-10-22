@@ -166,7 +166,7 @@ struct appling_preflight_info_s {
   const char *swap;
 
   /**
-   * The link to launch.
+   * The link to run preflight for.
    *
    * @since 0
    */

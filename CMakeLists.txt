@@ -211,7 +211,7 @@ target_link_libraries(
     path_static
 )
 
-install(TARGETS appling_static)
+install(TARGETS appling_static appling_launch_shared)
 
 install(FILES include/appling.h DESTINATION include)
 

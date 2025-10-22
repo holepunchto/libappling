@@ -250,8 +250,8 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   argv[i++] = file;
   argv[i++] = "run";
-  argv[i++] = "--preflight";
   argv[i++] = "--trusted";
+  argv[i++] = "--preflight";
   argv[i++] = preflight;
   argv[i] = NULL;
 

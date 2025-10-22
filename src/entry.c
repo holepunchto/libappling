@@ -11,6 +11,7 @@
 #include <wchar.h>
 #include <windows.h>
 #else
+#include <sys/wait.h>
 #include <unistd.h>
 #endif
 
@@ -296,12 +297,27 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   WaitForSingleObject(pi.hProcess, INFINITE);
 
+  DWORD status;
+  success = GetExitCodeProcess(pi.hProgress, &status);
+
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
 
-  return 0;
+  return success && status == 0 ? 0 : -1;
 #else
-  return execv(file, argv);
+  pid_t pid = fork();
+  if (pid < 0) return -1;
+  if (pid != 0) {
+    int status;
+    err = waitpid(pid, &status, 0);
+    if (err < 0) return -1;
+
+    return WIFEXITED(status) && WEXITSTATUS(status) == 0 ? 0 : -1;
+  }
+
+  execv(file, argv);
+
+  _exit(1);
 #endif
 }
 
@@ -419,10 +435,13 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   WaitForSingleObject(pi.hProcess, INFINITE);
 
+  DWORD status;
+  success = GetExitCodeProcess(pi.hProgress, &status);
+
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
 
-  return 0;
+  return success && status == 0 ? 0 : -1;
 #else
   return execv(file, argv);
 #endif

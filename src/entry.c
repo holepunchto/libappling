@@ -298,7 +298,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   WaitForSingleObject(pi.hProcess, INFINITE);
 
   DWORD status;
-  success = GetExitCodeProcess(pi.hProgress, &status);
+  success = GetExitCodeProcess(pi.hProcess, &status);
 
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
@@ -436,7 +436,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   WaitForSingleObject(pi.hProcess, INFINITE);
 
   DWORD status;
-  success = GetExitCodeProcess(pi.hProgress, &status);
+  success = GetExitCodeProcess(pi.hProcess, &status);
 
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);

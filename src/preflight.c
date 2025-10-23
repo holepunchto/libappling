@@ -9,15 +9,20 @@
 
 #include "../include/appling.h"
 
+static void
+appling_preflight__on_progress(uint64_t downloaded, uint64_t total) {
+  // TODO
+}
+
 int
-appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name) {
+appling_preflight(const char *swap, const appling_link_t *link) {
   int err;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
-    (const char *[]) {platform->path, "lib", appling_platform_entry, NULL},
+    (const char *[]) {swap, "by-arch", appling_target, "lib", appling_platform_entry, NULL},
     path,
     &path_len,
     path_behavior_system
@@ -27,24 +32,23 @@ appling_launch(const appling_platform_t *platform, const appling_app_t *app, con
   err = uv_dlopen(path, &library);
   if (err < 0) return err;
 
-  appling_launch_cb launch;
-  err = uv_dlsym(&library, "appling_launch_v0", (void **) &launch);
+  appling_preflight_cb preflight;
+  err = uv_dlsym(&library, "appling_preflight_v0", (void **) &preflight);
   if (err < 0) {
     uv_dlclose(&library);
 
-    return err; // Must exist
+    return 0; // May not exist
   }
 
-  appling_launch_info_t info = {
-    .version = 1,
+  appling_preflight_info_t info = {
+    .version = 0,
     .path = path,
-    .platform = platform,
-    .app = app,
+    .swap = swap,
     .link = link,
-    .name = name,
+    .progress = appling_preflight__on_progress,
   };
 
-  err = launch(&info);
+  err = preflight(&info);
 
   uv_dlclose(&library);
 

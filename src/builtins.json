@@ -2,16 +2,11 @@
   { "addon": "bare-fs" },
   { "addon": "bare-os" },
   { "addon": "bare-url" },
-  { "addon": "sodium-native" },
-  { "addon": "udx-native" },
-  { "addon": "quickbit-native" },
-  { "addon": "simdle-native" },
   { "addon": "crc-native" },
-  { "addon": "rocksdb-native" },
   { "addon": "fs-native-extensions" },
-  { "addon": "bare-pipe" },
-  { "addon": "bare-signals" },
-  { "addon": "bare-tty" },
-  { "addon": "bare-hrtime" },
-  { "addon": "bare-daemon" }
+  { "addon": "quickbit-native" },
+  { "addon": "rocksdb-native" },
+  { "addon": "simdle-native" },
+  { "addon": "sodium-native" },
+  { "addon": "udx-native" }
 ]

@@ -15,10 +15,10 @@ See [`include/appling.h`](include/appling.h) for the public API.
 ## Building
 
 ```console
+npm i -g bare-make
 npm i
 bare-make generate
 bare-make build
-bare-make test
 ```
 
 ## License

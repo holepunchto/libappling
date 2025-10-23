@@ -1,5 +1,6 @@
 list(APPEND tests
-  bootstrap-no-platform
+  bootstrap-no-platform-v1
+  bootstrap-no-platform-v2
   launch
   launch-data
   lock

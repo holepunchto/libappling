@@ -38,43 +38,6 @@ appling_bootstrap__error(js_env_t *env, js_callback_info_t *info) {
   return NULL;
 }
 
-static js_value_t *
-appling_bootstrap__preflight(js_env_t *env, js_callback_info_t *info) {
-  int err;
-
-  appling_bootstrap_t *req;
-
-  size_t argc = 1;
-  js_value_t *argv[1];
-
-  err = js_get_callback_info(env, info, &argc, argv, NULL, (void **) &req);
-  assert(err == 0);
-
-  assert(argc == 1);
-
-  size_t len;
-  err = js_get_value_string_utf8(env, argv[0], NULL, 0, &len);
-  assert(err == 0);
-
-  len += 1 /* NULL */;
-
-  char *swap = calloc(len, sizeof(char));
-
-  err = js_get_value_string_utf8(env, argv[0], (utf8_t *) swap, len, NULL);
-  assert(err == 0);
-
-  err = appling_preflight(swap, &req->link);
-
-  free(swap);
-
-  if (err < 0) {
-    err = js_throw_error(env, NULL, "Appling preflight failed");
-    assert(err == 0);
-  }
-
-  return NULL;
-}
-
 static void
 appling_bootstrap__on_thread(void *data) {
   int err;
@@ -131,13 +94,6 @@ appling_bootstrap__on_thread(void *data) {
   err = js_set_named_property(env, exports, "error", error);
   assert(err == 0);
 
-  js_value_t *preflight;
-  err = js_create_function(env, "preflight", -1, appling_bootstrap__preflight, (void *) req, &preflight);
-  assert(err == 0);
-
-  err = js_set_named_property(env, exports, "preflight", preflight);
-  assert(err == 0);
-
   err = js_close_handle_scope(env, scope);
   assert(err == 0);
 
@@ -174,7 +130,7 @@ appling_bootstrap__on_signal(uv_async_t *handle) {
 }
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const appling_link_t *link, const char *dir, appling_bootstrap_cb cb) {
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb) {
   int err;
 
   req->loop = loop;
@@ -188,7 +144,6 @@ appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, 
   if (err < 0) return err;
 
   memcpy(req->key, key, sizeof(appling_key_t));
-  memcpy(&req->link, link, sizeof(appling_link_t));
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {

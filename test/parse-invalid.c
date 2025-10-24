@@ -7,12 +7,14 @@
 #define test_parse_invalid(input) \
   { \
     appling_link_t link; \
-    int err = appling_parse(input, &link); \
+    err = appling_parse(input, &link); \
     assert(err < 0); \
   }
 
 int
 main() {
+  int err;
+
   // Empty
   test_parse_invalid("");
 

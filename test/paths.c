@@ -25,9 +25,11 @@ on_paths(appling_paths_t *req, int status, const appling_app_t *apps, size_t len
 
 int
 main() {
+  int err;
+
   loop = uv_default_loop();
 
-  int err = appling_paths(loop, &req, "test/fixtures/platform", on_paths);
+  err = appling_paths(loop, &req, "test/fixtures/platform", on_paths);
   assert(err == 0);
 
   uv_run(loop, UV_RUN_DEFAULT);

@@ -9,7 +9,7 @@
 #define test_parse_z32(input, expected_id, expected_data) \
   { \
     appling_link_t link; \
-    int err = appling_parse(input, &link); \
+    err = appling_parse(input, &link); \
     assert(err == 0); \
     assert(strcmp(link.id, expected_id) == 0); \
     assert(strcmp(link.data, expected_data) == 0); \
@@ -17,6 +17,8 @@
 
 int
 main() {
+  int err;
+
   test_parse_z32("pear://" ID, ID, "");
   test_parse_z32("punch://" ID, ID, "");
 

@@ -31,6 +31,7 @@ typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
 typedef struct appling_paths_s appling_paths_t;
 typedef struct appling_bootstrap_s appling_bootstrap_t;
+typedef struct appling_ready_info_s appling_ready_info_t;
 typedef struct appling_preflight_info_s appling_preflight_info_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
 
@@ -40,6 +41,7 @@ typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
 typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
 typedef void (*appling_progress_cb)(uint64_t downloaded, uint64_t total);
+typedef int (*appling_ready_cb)(const appling_ready_info_t *info);
 typedef int (*appling_preflight_cb)(const appling_preflight_info_t *info);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
 
@@ -149,6 +151,32 @@ struct appling_paths_s {
 };
 
 /** @version 0 */
+struct appling_ready_info_s {
+  int version;
+
+  /**
+   * The path to the object library from which the platform was launched.
+   *
+   * @since 0
+   */
+  const char *path;
+
+  /**
+   * The platform that was launched.
+   *
+   * @since 0
+   */
+  const appling_platform_t *platform;
+
+  /**
+   * The link to check readiness of.
+   *
+   * @since 0
+   */
+  const appling_link_t *link;
+};
+
+/** @version 0 */
 struct appling_preflight_info_s {
   int version;
 
@@ -160,11 +188,11 @@ struct appling_preflight_info_s {
   const char *path;
 
   /**
-   * The swap directory of the platform that was launched.
+   * The platform that was launched.
    *
    * @since 0
    */
-  const char *swap;
+  const appling_platform_t *platform;
 
   /**
    * The link to run preflight for.
@@ -237,10 +265,13 @@ int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const appling_link_t *link, const char *dir, appling_bootstrap_cb cb);
+appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb);
 
 int
-appling_preflight(const char *swap, const appling_link_t *link);
+appling_ready(const appling_platform_t *platform, const appling_link_t *link);
+
+int
+appling_preflight(const appling_platform_t *platform, const appling_link_t *link);
 
 int
 appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name);

@@ -9,13 +9,8 @@
 
 #include "../include/appling.h"
 
-static void
-appling_preflight__on_progress(uint64_t downloaded, uint64_t total) {
-  // TODO
-}
-
 int
-appling_preflight(const appling_platform_t *platform, const appling_link_t *link) {
+appling_ready(const appling_platform_t *platform, const appling_link_t *link) {
   int err;
 
   appling_path_t path;
@@ -32,23 +27,22 @@ appling_preflight(const appling_platform_t *platform, const appling_link_t *link
   err = uv_dlopen(path, &library);
   if (err < 0) return err;
 
-  appling_preflight_cb preflight;
-  err = uv_dlsym(&library, "appling_preflight_v0", (void **) &preflight);
+  appling_ready_cb ready;
+  err = uv_dlsym(&library, "appling_ready_v0", (void **) &ready);
   if (err < 0) {
     uv_dlclose(&library);
 
-    return 0; // May not exist
+    return 1; // May not exist
   }
 
-  appling_preflight_info_t info = {
+  appling_ready_info_t info = {
     .version = 0,
     .path = path,
     .platform = platform,
     .link = link,
-    .progress = appling_preflight__on_progress,
   };
 
-  err = preflight(&info);
+  err = ready(&info);
 
   uv_dlclose(&library);
 

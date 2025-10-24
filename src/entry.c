@@ -204,7 +204,7 @@ appling__argv_to_command_line(const char *const *args, WCHAR **result) {
 #endif
 
 int
-appling_preflight_v0(const appling_preflight_info_t *info) {
+appling_ready_v0(const appling_ready_info_t *info) {
   int err;
 
   appling_path_t file;
@@ -213,9 +213,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   path_join(
     (const char *[]) {
-      info->swap,
-      "by-arch",
-      appling_target,
+      info->platform->path,
       "bin",
 #if defined(APPLING_OS_DARWIN) || defined(APPLING_OS_LINUX)
       "pear-runtime",
@@ -231,19 +229,130 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
     path_behavior_system
   );
 
-  const appling_link_t *link = info->link;
+  char link[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
 
-  char preflight[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
+  strcat(link, "pear://");
+  strcat(link, info->link->id);
 
-  strcat(preflight, "pear://");
-  strcat(preflight, link->id);
-
-  if (strlen(link->data)) {
-    strcat(preflight, "/");
-    strcat(preflight, link->data);
+  if (strlen(info->link->data)) {
+    strcat(link, "/");
+    strcat(link, info->link->data);
   }
 
-  log_debug("appling_preflight() running for link %s", preflight);
+  log_debug("appling_ready() running for link %s", link);
+
+  char *argv[5];
+
+  size_t i = 0;
+
+  argv[i++] = file;
+  argv[i++] = "data";
+  argv[i++] = "currents";
+  argv[i++] = link;
+  argv[i] = NULL;
+
+#if defined(APPLING_OS_WIN32)
+  STARTUPINFOW si;
+  ZeroMemory(&si, sizeof(si));
+
+  si.cb = sizeof(si);
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
+
+  WCHAR *application_name;
+  err = appling__utf8_to_utf16(file, &application_name);
+  if (err < 0) return err;
+
+  WCHAR *command_line;
+  err = appling__argv_to_command_line((const char *const *) argv, &command_line);
+  if (err < 0) {
+    free(application_name);
+
+    return err;
+  }
+
+  BOOL success = CreateProcessW(
+    application_name,
+    command_line,
+    NULL,
+    NULL,
+    FALSE,
+    CREATE_NO_WINDOW,
+    NULL,
+    NULL,
+    &si,
+    &pi
+  );
+
+  free(application_name);
+  free(command_line);
+
+  if (!success) return -1;
+
+  WaitForSingleObject(pi.hProcess, INFINITE);
+
+  DWORD status;
+  success = GetExitCodeProcess(pi.hProcess, &status);
+
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+
+  return success ? status == 0 : -1;
+#else
+  pid_t pid = fork();
+  if (pid < 0) return -1;
+  if (pid != 0) {
+    int status;
+    err = waitpid(pid, &status, 0);
+    if (err < 0) return -1;
+
+    return WIFEXITED(status) ? WEXITSTATUS(status) == 0 : -1;
+  }
+
+  execv(file, argv);
+
+  _exit(1);
+#endif
+}
+
+int
+appling_preflight_v0(const appling_preflight_info_t *info) {
+  int err;
+
+  appling_path_t file;
+
+  size_t path_len = sizeof(appling_path_t);
+
+  path_join(
+    (const char *[]) {
+      info->platform->path,
+      "bin",
+#if defined(APPLING_OS_DARWIN) || defined(APPLING_OS_LINUX)
+      "pear-runtime",
+#elif defined(APPLING_OS_WIN32)
+      "pear-runtime.exe",
+#else
+#error Unsupported operating system
+#endif
+      NULL,
+    },
+    file,
+    &path_len,
+    path_behavior_system
+  );
+
+  char link[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
+
+  strcat(link, "pear://");
+  strcat(link, info->link->id);
+
+  if (strlen(info->link->data)) {
+    strcat(link, "/");
+    strcat(link, info->link->data);
+  }
+
+  log_debug("appling_preflight() running for link %s", link);
 
   char *argv[6];
 
@@ -253,7 +362,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   argv[i++] = "run";
   argv[i++] = "--trusted";
   argv[i++] = "--preflight";
-  argv[i++] = preflight;
+  argv[i++] = link;
   argv[i] = NULL;
 
 #if defined(APPLING_OS_WIN32)
@@ -325,15 +434,13 @@ int
 appling_launch_v0(const appling_launch_info_t *info) {
   int err;
 
-  const appling_platform_t *platform = info->platform;
-
   appling_path_t file;
 
   size_t path_len = sizeof(appling_path_t);
 
   path_join(
     (const char *[]) {
-      platform->path,
+      info->platform->path,
       "bin",
 #if defined(APPLING_OS_DARWIN) || defined(APPLING_OS_LINUX)
       "pear-runtime",
@@ -363,19 +470,17 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   log_debug("appling_launch() launching application shell %s", appling);
 
-  const appling_link_t *link = info->link;
+  char link[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
 
-  char launch[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
+  strcat(link, "pear://");
+  strcat(link, info->link->id);
 
-  strcat(launch, "pear://");
-  strcat(launch, link->id);
-
-  if (strlen(link->data)) {
-    strcat(launch, "/");
-    strcat(launch, link->data);
+  if (strlen(info->link->data)) {
+    strcat(link, "/");
+    strcat(link, info->link->data);
   }
 
-  log_debug("appling_launch() launching link %s", launch);
+  log_debug("appling_launch() launching link %s", link);
 
   char *argv[8];
 
@@ -391,7 +496,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
   argv[i++] = "--no-sandbox";
 #endif
 
-  argv[i++] = launch;
+  argv[i++] = link;
   argv[i] = NULL;
 
 #if defined(APPLING_OS_WIN32)

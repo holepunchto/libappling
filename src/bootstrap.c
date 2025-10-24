@@ -8,7 +8,6 @@
 #include <uv.h>
 
 #include "../include/appling.h"
-
 #include "bootstrap.bundle.h"
 
 static js_value_t *

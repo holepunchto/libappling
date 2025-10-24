@@ -67,6 +67,8 @@ appling_lock__on_mkdir(fs_mkdir_t *fs_req, int status) {
 
 int
 appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb) {
+  int err;
+
   req->loop = loop;
   req->on_lock = cb;
   req->file = -1;
@@ -80,7 +82,7 @@ appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock
     appling_path_t cwd;
     size_t path_len = sizeof(appling_path_t);
 
-    int err = uv_cwd(cwd, &path_len);
+    err = uv_cwd(cwd, &path_len);
     if (err < 0) return err;
 
     path_len = sizeof(appling_path_t);
@@ -95,7 +97,7 @@ appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock
     appling_path_t homedir;
     size_t path_len = sizeof(appling_path_t);
 
-    int err = uv_os_homedir(homedir, &path_len);
+    err = uv_os_homedir(homedir, &path_len);
     if (err < 0) return err;
 
     path_len = sizeof(appling_path_t);

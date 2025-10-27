@@ -3,15 +3,12 @@ cmake_minimum_required(VERSION 4.0)
 find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
 find_package(cmake-bare-bundle REQUIRED PATHS node_modules/cmake-bare-bundle)
 find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
-find_package(cmake-npm REQUIRED PATHS node_modules/cmake-npm)
 
 project(appling C CXX ASM)
 
 if(APPLE)
   enable_language(OBJC)
 endif()
-
-install_node_modules()
 
 fetch_package("github:holepunchto/bare")
 fetch_package("github:holepunchto/libpath")

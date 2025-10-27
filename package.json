@@ -18,7 +18,6 @@
     "cmake-bare": "^1.4.0",
     "cmake-bare-bundle": "^2.1.2",
     "cmake-fetch": "^1.1.0",
-    "cmake-npm": "^1.0.2",
     "compact-encoding": "^2.16.0",
     "prettier": "^3.4.1",
     "prettier-config-standard": "^7.0.0"

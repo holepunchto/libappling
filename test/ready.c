@@ -5,9 +5,6 @@
 #include <uv.h>
 
 #include "../include/appling.h"
-#include "fixtures/app.h"
-
-#define EXE "test/fixtures/app/" APPLING_TARGET "/" APPLING_TEST_EXE
 
 uv_loop_t *loop;
 
@@ -21,16 +18,12 @@ on_resolve(appling_resolve_t *req, int status) {
 
   assert(status == 0);
 
-  appling_app_t app = {
-    .path = EXE,
-  };
-
   appling_link_t link = {
     .id = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   };
 
-  err = appling_launch(&platform, &app, &link, "Example");
-  assert(err == 0);
+  err = appling_ready(&platform, &link);
+  assert(err == 1);
 }
 
 int

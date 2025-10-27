@@ -114,6 +114,8 @@ appling_paths__on_open(fs_open_t *fs_req, int status, uv_file file) {
 
 int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb) {
+  int err;
+
   req->loop = loop;
   req->cb = cb;
   req->status = 0;
@@ -132,7 +134,7 @@ appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_pa
     appling_path_t cwd;
     size_t path_len = sizeof(appling_path_t);
 
-    int err = uv_cwd(cwd, &path_len);
+    err = uv_cwd(cwd, &path_len);
     if (err < 0) return err;
 
     path_len = sizeof(appling_path_t);
@@ -147,7 +149,7 @@ appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_pa
     appling_path_t homedir;
     size_t homedir_len = sizeof(appling_path_t);
 
-    int err = uv_os_homedir(homedir, &homedir_len);
+    err = uv_os_homedir(homedir, &homedir_len);
     if (err < 0) return err;
 
     path_join(

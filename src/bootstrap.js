@@ -7,6 +7,5 @@ const onerror = (err) => {
 Bare.on('uncaughtException', onerror).on('unhandledRejection', onerror)
 
 require('pear-updater-bootstrap')(Buffer.from(Appling.key), Appling.directory, {
-  lock: false,
-  onapply: Appling.preflight
+  lock: false
 })

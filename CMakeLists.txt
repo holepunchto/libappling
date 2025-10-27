@@ -54,6 +54,7 @@ target_sources(
     src/parse.c
     src/paths.c
     src/preflight.c
+    src/ready.c
     src/resolve.c
 )
 

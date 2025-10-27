@@ -11,6 +11,7 @@ list(APPEND tests
   parse-z32
   paths
   preflight
+  ready
   resolve-both
   resolve-both-minimum-length
   resolve-both-minimum-length-mismatch

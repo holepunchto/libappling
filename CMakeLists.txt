@@ -62,7 +62,7 @@ if(APPLE)
   target_link_libraries(
     appling
     PUBLIC
-      "-framework CoreFoundation"
+      "-framework AppKit"
   )
 endif()
 

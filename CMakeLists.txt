@@ -58,6 +58,12 @@ if(APPLE)
     PRIVATE
       src/darwin/open.m
   )
+
+  target_link_libraries(
+    appling
+    PUBLIC
+      "-framework CoreFoundation"
+  )
 endif()
 
 if(WIN32)

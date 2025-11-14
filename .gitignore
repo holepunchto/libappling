@@ -3,5 +3,3 @@ install/
 sandbox/
 node_modules/
 prebuilds/
-*.bundle.h
-*.bundle.h.d

@@ -1,5 +1,3 @@
-#include <js.h>
-#include <log.h>
 #include <path.h>
 #include <stdint.h>
 #include <stdlib.h>

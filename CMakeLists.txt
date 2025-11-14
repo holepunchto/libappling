@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 
 find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
-find_package(cmake-bare-bundle REQUIRED PATHS node_modules/cmake-bare-bundle)
 find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
 
 project(appling C CXX ASM)
@@ -10,12 +9,10 @@ if(APPLE)
   enable_language(OBJC)
 endif()
 
-fetch_package("github:holepunchto/bare")
 fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")
 fetch_package("github:holepunchto/libcompact")
-fetch_package("github:holepunchto/libjstl")
 
 add_library(appling OBJECT)
 
@@ -85,7 +82,6 @@ target_include_directories(
     include
   PUBLIC
     $<TARGET_PROPERTY:uv,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:js,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(
@@ -96,54 +92,6 @@ target_link_libraries(
     log
     path
 )
-
-add_bare_bundle(
-  appling_bootstrap_bundle
-  ENTRY src/bootstrap.js
-  OUT src/bootstrap.bundle.h
-  BUILTINS src/builtins.json
-)
-
-add_library(appling_bootstrap OBJECT)
-
-set_target_properties(
-  appling_bootstrap
-  PROPERTIES
-  C_STANDARD 99
-  POSITION_INDEPENDENT_CODE ON
-)
-
-target_sources(
-  appling_bootstrap
-  PRIVATE
-    src/bootstrap.c
-    src/bootstrap.bundle.h
-)
-
-target_include_directories(
-  appling_bootstrap
-  PRIVATE
-    $<TARGET_PROPERTY:bare,INTERFACE_INCLUDE_DIRECTORIES>
-)
-
-target_link_libraries(
-  appling_bootstrap
-  PUBLIC
-    appling
-    path
-)
-
-link_bare_modules(appling_bootstrap)
-
-if(WIN32)
-  target_compile_options(
-    rocksdb_facebook
-    PRIVATE
-      # Disable optimisations due to a bug in the MSVC STL where inlining
-      # causes symbol collisions.
-      /Od
-  )
-endif()
 
 add_library(appling_static STATIC)
 
@@ -158,13 +106,11 @@ target_link_libraries(
   appling_static
   PUBLIC
     appling
-    appling_bootstrap
   PRIVATE
-    $<LINK_LIBRARY:WHOLE_ARCHIVE,bare_static>
-    fs_static
-    path_static
-    log_static
     compact_static
+    fs_static
+    log_static
+    path_static
 )
 
 add_library(appling_launch OBJECT)

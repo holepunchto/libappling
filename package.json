@@ -16,7 +16,6 @@
   },
   "devDependencies": {
     "cmake-bare": "^1.4.0",
-    "cmake-bare-bundle": "^2.1.2",
     "cmake-fetch": "^1.1.0",
     "compact-encoding": "^2.16.0",
     "prettier": "^3.4.1",

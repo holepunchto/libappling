@@ -11,9 +11,6 @@
     "url": "https://github.com/holepunchto/libappling/issues"
   },
   "homepage": "https://github.com/holepunchto/libappling#readme",
-  "dependencies": {
-    "pear-updater-bootstrap": "^2.3.0"
-  },
   "devDependencies": {
     "cmake-bare": "^1.4.0",
     "cmake-fetch": "^1.1.0",

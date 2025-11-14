@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <log.h>
 #include <path.h>
 #include <stdlib.h>

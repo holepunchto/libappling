@@ -1,5 +1,3 @@
-#include <js.h>
-#include <log.h>
 #include <path.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -10,7 +8,7 @@
 #include "../include/appling.h"
 
 int
-appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name) {
+appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link) {
   int err;
 
   appling_path_t path;
@@ -36,12 +34,11 @@ appling_launch(const appling_platform_t *platform, const appling_app_t *app, con
   }
 
   appling_launch_info_t info = {
-    .version = 1,
+    .version = 0,
     .path = path,
     .platform = platform,
     .app = app,
     .link = link,
-    .name = name,
   };
 
   err = launch(&info);

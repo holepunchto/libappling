@@ -1,6 +1,4 @@
 list(APPEND tests
-  bootstrap-no-platform-v1
-  bootstrap-no-platform-v2
   launch
   launch-data
   lock
@@ -20,13 +18,6 @@ list(APPEND tests
   resolve-current-minimum-length-mismatch
   resolve-next
 )
-
-if(WIN32)
-  list(APPEND skipped_tests
-    # Blocked by Windows Defender
-    bootstrap-no-platform
-  )
-endif()
 
 add_subdirectory(fixtures)
 
@@ -56,7 +47,7 @@ foreach(test IN LISTS tests)
     set_tests_properties(
       ${test}
       PROPERTIES
-      DISABLED True
+      DISABLED ON
     )
   endif()
 endforeach()

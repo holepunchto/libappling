@@ -8,7 +8,7 @@
 #include "../include/appling.h"
 
 int
-appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name) {
+appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link) {
   int err;
 
   appling_path_t path;

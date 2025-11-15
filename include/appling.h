@@ -185,7 +185,7 @@ struct appling_preflight_info_s {
   appling_progress_cb progress;
 };
 
-/** @version 1 */
+/** @version 0 */
 struct appling_launch_info_s {
   int version;
 
@@ -216,13 +216,6 @@ struct appling_launch_info_s {
    * @since 0
    */
   const appling_link_t *link;
-
-  /**
-   * The human-readable name of the application.
-   *
-   * @since 1
-   */
-  const char *name;
 };
 
 int

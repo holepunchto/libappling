@@ -34,12 +34,11 @@ appling_launch(const appling_platform_t *platform, const appling_app_t *app, con
   }
 
   appling_launch_info_t info = {
-    .version = 1,
+    .version = 0,
     .path = path,
     .platform = platform,
     .app = app,
     .link = link,
-    .name = name,
   };
 
   err = launch(&info);

@@ -34,7 +34,6 @@ typedef struct appling_preflight_info_s appling_preflight_info_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
 
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
-typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
 typedef void (*appling_progress_cb)(uint64_t downloaded, uint64_t total);
@@ -63,7 +62,6 @@ struct appling_lock_s {
   uv_loop_t *loop;
 
   appling_lock_cb on_lock;
-  appling_unlock_cb on_unlock;
 
   fs_mkdir_t mkdir;
   fs_open_t open;
@@ -225,7 +223,7 @@ int
 appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb);
 
 int
-appling_unlock(uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
+appling_unlock(appling_lock_t *req);
 
 int
 appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb);

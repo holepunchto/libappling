@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include <fs.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -61,12 +60,10 @@ struct appling_link_s {
 struct appling_lock_s {
   uv_loop_t *loop;
 
-  appling_lock_cb on_lock;
+  appling_lock_cb cb;
 
-  fs_mkdir_t mkdir;
-  fs_open_t open;
-  fs_lock_t lock;
-  fs_close_t close;
+  uv_thread_t thread;
+  uv_async_t signal;
 
   appling_path_t dir;
 
@@ -82,11 +79,7 @@ struct appling_resolve_s {
 
   appling_resolve_cb cb;
 
-  fs_realpath_t realpath;
-  fs_open_t open;
-  fs_stat_t stat;
-  fs_read_t read;
-  fs_close_t close;
+  uv_fs_t fs;
 
   appling_path_t path;
 
@@ -107,10 +100,7 @@ struct appling_paths_s {
 
   appling_paths_cb cb;
 
-  fs_open_t open;
-  fs_close_t close;
-  fs_stat_t stat;
-  fs_read_t read;
+  uv_fs_t fs;
 
   appling_path_t path;
   appling_app_t *apps;

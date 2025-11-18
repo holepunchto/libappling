@@ -9,8 +9,9 @@ if(APPLE)
   enable_language(OBJC)
 endif()
 
+fetch_package("github:libuv/libuv@1.51.0")
+
 fetch_package("github:holepunchto/libpath")
-fetch_package("github:holepunchto/libfs")
 fetch_package("github:holepunchto/liblog")
 fetch_package("github:holepunchto/libcompact")
 
@@ -56,6 +57,7 @@ if(APPLE)
   target_sources(
     appling
     PRIVATE
+      src/darwin/lock.h
       src/darwin/open.m
   )
 
@@ -66,19 +68,21 @@ if(APPLE)
   )
 endif()
 
-if(WIN32)
-  target_sources(
-    appling
-    PRIVATE
-      src/win32/open.c
-  )
-endif()
-
 if(LINUX)
   target_sources(
     appling
     PRIVATE
+      src/linux/lock.h
       src/linux/open.c
+  )
+endif()
+
+if(WIN32)
+  target_sources(
+    appling
+    PRIVATE
+      src/win32/lock.h
+      src/win32/open.c
   )
 endif()
 
@@ -94,7 +98,6 @@ target_link_libraries(
   appling
   PUBLIC
     compact
-    fs
     log
     path
 )
@@ -113,8 +116,8 @@ target_link_libraries(
   PUBLIC
     appling
   PRIVATE
+    uv_a
     compact_static
-    fs_static
     log_static
     path_static
 )

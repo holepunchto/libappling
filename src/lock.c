@@ -1,68 +1,113 @@
-#include <fs.h>
+#include <assert.h>
 #include <path.h>
+#include <stdlib.h>
 #include <string.h>
 #include <uv.h>
 
 #include "../include/appling.h"
 
+#if defined(APPLING_OS_DARWIN)
+#include "darwin/lock.h"
+#elif defined(APPLING_OS_LIUX)
+#include "linux/lock.h"
+#elif defined(APPLING_OS_WIN32)
+#include "win32/lock.h"
+#endif
+
 static void
-appling_lock__on_close(fs_close_t *fs_req, int status) {
-  appling_lock_t *req = (appling_lock_t *) fs_req->data;
+appling_lock__on_close(uv_handle_t *handle) {
+  int err;
 
-  if (req->status < 0) status = req->status;
+  appling_lock_t *req = (appling_lock_t *) handle->data;
 
-  if (status >= 0) {
-    if (req->on_lock) req->on_lock(req, 0);
-  } else {
-    if (req->on_lock) req->on_lock(req, status);
-  }
+  err = uv_thread_join(&req->thread);
+  assert(err == 0);
+
+  req->cb(req, req->status);
 }
 
 static void
-appling_lock__on_lock(fs_lock_t *fs_req, int status) {
-  appling_lock_t *req = (appling_lock_t *) fs_req->data;
-
-  if (status >= 0) {
-    if (req->on_lock) req->on_lock(req, 0);
-  } else {
-    req->status = status; // Propagate
-
-    fs_close(req->loop, &req->close, req->file, appling_lock__on_close);
-  }
+appling_lock__on_signal(uv_async_t *handle) {
+  uv_close((uv_handle_t *) handle, appling_lock__on_close);
 }
 
 static void
-appling_lock__on_open(fs_open_t *fs_req, int status, uv_file file) {
-  appling_lock_t *req = (appling_lock_t *) fs_req->data;
+appling_lock__on_lock(void *data) {
+  int err;
 
-  if (status >= 0) {
-    req->file = file;
-
-    fs_lock(req->loop, &req->lock, req->file, 0, 0, false, appling_lock__on_lock);
-  } else {
-    if (req->on_lock) req->on_lock(req, status);
-  }
-}
-
-static void
-appling_lock__on_mkdir(fs_mkdir_t *fs_req, int status) {
-  appling_lock_t *req = (appling_lock_t *) fs_req->data;
+  appling_lock_t *req = (appling_lock_t *) data;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {req->dir, "lock", NULL},
     path,
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
-  if (status >= 0) {
-    fs_open(req->loop, &req->open, path, UV_FS_O_RDWR | UV_FS_O_CREAT, 0666, appling_lock__on_open);
-  } else {
-    if (req->on_lock) req->on_lock(req, status);
+  uv_fs_t fs;
+
+  appling_path_t dir;
+
+  strcpy(dir, req->dir);
+
+  while (true) {
+    err = uv_fs_mkdir(NULL, &fs, dir, 0775, NULL);
+
+    uv_fs_req_cleanup(&fs);
+
+    switch (err) {
+    case UV_EACCES:
+    case UV_ENOSPC:
+    case UV_ENOTDIR:
+    case UV_EPERM:
+    default:
+      req->status = err; // Propagate
+      goto done;
+
+    case UV_EEXIST:
+    case 0: {
+      size_t len = strlen(dir);
+
+      if (len == strlen(req->dir)) goto open;
+
+      dir[len] = '/';
+
+      continue;
+    }
+
+    case UV_ENOENT: {
+      size_t dirname;
+      err = path_dirname(dir, &dirname, path_behavior_system);
+      assert(err == 0);
+
+      if (dirname == strlen(req->dir)) goto open;
+
+      dir[dirname - 1] = '\0';
+
+      continue;
+    }
+    }
   }
+
+open:
+  err = uv_fs_open(NULL, &fs, path, UV_FS_O_RDWR | UV_FS_O_CREAT, 0666, NULL);
+  if (err < 0) {
+    req->status = err; // Propagate
+    goto done;
+  }
+
+  req->file = err;
+  req->status = 0;
+
+  appling_lock__lock(req->file);
+
+done:
+  err = uv_async_send(&req->signal);
+  assert(err == 0);
 }
 
 int
@@ -70,12 +115,9 @@ appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock
   int err;
 
   req->loop = loop;
-  req->on_lock = cb;
+  req->cb = cb;
   req->file = -1;
-  req->mkdir.data = (void *) req;
-  req->open.data = (void *) req;
-  req->lock.data = (void *) req;
-  req->close.data = (void *) req;
+  req->signal.data = (void *) req;
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->dir, dir);
   else if (dir) {
@@ -87,12 +129,13 @@ appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock
 
     path_len = sizeof(appling_path_t);
 
-    path_join(
+    err = path_join(
       (const char *[]) {cwd, dir, NULL},
       req->dir,
       &path_len,
       path_behavior_system
     );
+    assert(err == 0);
   } else {
     appling_path_t homedir;
     size_t path_len = sizeof(appling_path_t);
@@ -102,13 +145,20 @@ appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock
 
     path_len = sizeof(appling_path_t);
 
-    path_join(
+    err = path_join(
       (const char *[]) {homedir, appling_platform_dir, NULL},
       req->dir,
       &path_len,
       path_behavior_system
     );
+    assert(err == 0);
   }
 
-  return fs_mkdir(req->loop, &req->mkdir, req->dir, 0777, true, appling_lock__on_mkdir);
+  err = uv_async_init(req->loop, &req->signal, appling_lock__on_signal);
+  assert(err == 0);
+
+  err = uv_thread_create(&req->thread, appling_lock__on_lock, req);
+  assert(err == 0);
+
+  return 0;
 }

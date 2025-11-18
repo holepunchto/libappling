@@ -5,12 +5,12 @@
 
 #include "arch.h"
 
-#if defined(__linux__)
+#if defined(__APPLE__)
+#include "darwin.h"
+#elif defined(__linux__)
 #include "linux.h"
 #elif defined(_WIN32)
 #include "win32.h"
-#elif defined(__APPLE__)
-#include "darwin.h"
 #else
 #error Unsupported operating system
 #endif

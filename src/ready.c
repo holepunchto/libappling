@@ -1,10 +1,6 @@
-#include <js.h>
-#include <log.h>
+#include <assert.h>
 #include <path.h>
-#include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
-#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"
@@ -16,12 +12,13 @@ appling_ready(const appling_platform_t *platform, const appling_link_t *link) {
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {platform->path, "lib", appling_platform_entry, NULL},
     path,
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
   uv_lib_t library;
   err = uv_dlopen(path, &library);

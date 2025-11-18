@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <log.h>
 #include <path.h>
 #include <stdlib.h>
@@ -11,6 +12,7 @@
 #include <wchar.h>
 #include <windows.h>
 #else
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
@@ -211,7 +213,7 @@ appling_ready_v0(const appling_ready_info_t *info) {
 
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {
       info->platform->path,
       "bin",
@@ -228,6 +230,7 @@ appling_ready_v0(const appling_ready_info_t *info) {
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
   char link[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
 
@@ -324,7 +327,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {
       info->platform->path,
       "bin",
@@ -341,6 +344,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
   char link[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
 
@@ -438,7 +442,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {
       info->platform->path,
       "bin",
@@ -455,6 +459,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
   const appling_app_t *app = info->app;
 

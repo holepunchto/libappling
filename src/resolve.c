@@ -1,8 +1,8 @@
+#include <assert.h>
 #include <compact.h>
-#include <fs.h>
 #include <log.h>
 #include <path.h>
-#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utf.h>
@@ -14,26 +14,33 @@ static void
 appling_resolve__realpath(appling_resolve_t *req);
 
 static void
-appling_resolve__on_close(fs_close_t *fs_req, int status) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
+appling_resolve__on_close(uv_fs_t *handle) {
+  appling_resolve_t *req = (appling_resolve_t *) handle->data;
 
-  if (req->status < 0) status = req->status;
+  int status = req->status;
+
+  uv_fs_req_cleanup(handle);
 
   if (status >= 0) {
-    if (req->cb) req->cb(req, 0);
+    req->cb(req, 0);
   } else {
     size_t i = ++req->candidate;
 
-    if (appling_platform_candidates[i]) appling_resolve__realpath(req);
-    else if (req->cb) req->cb(req, status);
+    if (appling_platform_candidates[i]) {
+      appling_resolve__realpath(req);
+    } else {
+      req->cb(req, status);
+    }
   }
 }
 
 static void
-appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
+appling_resolve__on_read(uv_fs_t *handle) {
   int err;
 
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
+  appling_resolve_t *req = (appling_resolve_t *) handle->data;
+
+  int status = handle->result;
 
   if (status >= 0) {
     compact_state_t state = {
@@ -112,89 +119,130 @@ appling_resolve__on_read(fs_read_t *fs_req, int status, size_t read) {
 close:
   free(req->buf.base);
 
-  fs_close(req->loop, &req->close, req->file, appling_resolve__on_close);
+  err = uv_fs_close(req->loop, &req->fs, req->file, appling_resolve__on_close);
+  assert(err == 0);
 }
 
 static void
-appling_resolve__on_stat(fs_stat_t *fs_req, int status, const uv_stat_t *stat) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
+appling_resolve__on_stat(uv_fs_t *handle) {
+  int err;
+
+  appling_resolve_t *req = (appling_resolve_t *) handle->data;
+
+  int status = handle->result;
 
   if (status >= 0) {
-    size_t len = stat->st_size;
+    const uv_stat_t *st = handle->ptr;
+
+    size_t len = st->st_size;
 
     req->buf = uv_buf_init(malloc(len), len);
 
-    fs_read(req->loop, &req->read, req->file, &req->buf, 1, 0, appling_resolve__on_read);
+    uv_fs_req_cleanup(handle);
+
+    err = uv_fs_read(req->loop, &req->fs, req->file, &req->buf, 1, 0, appling_resolve__on_read);
+    assert(err == 0);
   } else {
     req->status = status; // Propagate
 
-    fs_close(req->loop, &req->close, req->file, appling_resolve__on_close);
+    uv_fs_req_cleanup(handle);
+
+    err = uv_fs_close(req->loop, &req->fs, req->file, appling_resolve__on_close);
+    assert(err == 0);
   }
 }
 
 static void
-appling_resolve__on_open(fs_open_t *fs_req, int status, uv_file file) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
+appling_resolve__on_open(uv_fs_t *handle) {
+  int err;
+
+  appling_resolve_t *req = (appling_resolve_t *) handle->data;
+
+  int status = handle->result;
+
+  uv_fs_req_cleanup(handle);
 
   if (status >= 0) {
-    req->file = file;
+    req->file = status;
 
-    fs_stat(req->loop, &req->stat, req->file, appling_resolve__on_stat);
+    err = uv_fs_fstat(req->loop, &req->fs, req->file, appling_resolve__on_stat);
+    assert(err == 0);
   } else {
-    if (req->cb) req->cb(req, status);
+    req->cb(req, status);
   }
 }
 
 static void
 appling_resolve__open(appling_resolve_t *req) {
+  int err;
+
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {req->platform->path, "..", "..", "checkout", NULL},
     path,
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
   log_debug("appling_resolve() opening checkout file at %s", path);
 
-  fs_open(req->loop, &req->open, path, 0, UV_FS_READ, appling_resolve__on_open);
+  err = uv_fs_open(req->loop, &req->fs, path, 0, UV_FS_READ, appling_resolve__on_open);
+  assert(err == 0);
 }
 
 static void
-appling_resolve__on_realpath(fs_realpath_t *fs_req, int status, const char *path) {
-  appling_resolve_t *req = (appling_resolve_t *) fs_req->data;
+appling_resolve__on_realpath(uv_fs_t *handle) {
+  int err;
+
+  appling_resolve_t *req = (appling_resolve_t *) handle->data;
+
+  int status = handle->result;
 
   if (status >= 0) {
+    const char *path = handle->ptr;
+
     strcpy(req->platform->path, path);
+
+    uv_fs_req_cleanup(handle);
 
     appling_resolve__open(req);
   } else {
+    uv_fs_req_cleanup(handle);
+
     size_t i = ++req->candidate;
 
-    if (appling_platform_candidates[i]) appling_resolve__realpath(req);
-    else if (req->cb) req->cb(req, status);
+    if (appling_platform_candidates[i]) {
+      appling_resolve__realpath(req);
+    } else {
+      req->cb(req, status);
+    }
   }
 }
 
 static void
 appling_resolve__realpath(appling_resolve_t *req) {
+  int err;
+
   size_t i = req->candidate;
 
   appling_path_t path;
   size_t path_len = sizeof(appling_path_t);
 
-  path_join(
+  err = path_join(
     (const char *[]) {req->path, appling_platform_candidates[i], NULL},
     path,
     &path_len,
     path_behavior_system
   );
+  assert(err == 0);
 
   log_debug("appling_resolve() accessing platform at %s", path);
 
-  fs_realpath(req->loop, &req->realpath, path, appling_resolve__on_realpath);
+  err = uv_fs_realpath(req->loop, &req->fs, path, appling_resolve__on_realpath);
+  assert(err == 0);
 }
 
 int
@@ -206,11 +254,7 @@ appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, applin
   req->platform = platform;
   req->candidate = 0;
   req->status = 0;
-  req->realpath.data = (void *) req;
-  req->open.data = (void *) req;
-  req->stat.data = (void *) req;
-  req->read.data = (void *) req;
-  req->close.data = (void *) req;
+  req->fs.data = (void *) req;
 
   if (dir && path_is_absolute(dir, path_behavior_system)) strcpy(req->path, dir);
   else if (dir) {
@@ -222,12 +266,13 @@ appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, applin
 
     path_len = sizeof(appling_path_t);
 
-    path_join(
+    err = path_join(
       (const char *[]) {cwd, dir, NULL},
       req->path,
       &path_len,
       path_behavior_system
     );
+    assert(err == 0);
   } else {
     appling_path_t homedir;
     size_t path_len = sizeof(appling_path_t);
@@ -237,12 +282,13 @@ appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, applin
 
     path_len = sizeof(appling_path_t);
 
-    path_join(
+    err = path_join(
       (const char *[]) {homedir, appling_platform_dir, NULL},
       req->path,
       &path_len,
       path_behavior_system
     );
+    assert(err == 0);
   }
 
   appling_resolve__realpath(req);

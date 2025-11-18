@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-#include <fs.h>
-#include <js.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -30,16 +28,13 @@ typedef struct appling_link_s appling_link_t;
 typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
 typedef struct appling_paths_s appling_paths_t;
-typedef struct appling_bootstrap_s appling_bootstrap_t;
 typedef struct appling_ready_info_s appling_ready_info_t;
 typedef struct appling_preflight_info_s appling_preflight_info_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
 
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
-typedef void (*appling_unlock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
-typedef void (*appling_bootstrap_cb)(appling_bootstrap_t *req, int status);
 typedef void (*appling_progress_cb)(uint64_t downloaded, uint64_t total);
 typedef int (*appling_ready_cb)(const appling_ready_info_t *info);
 typedef int (*appling_preflight_cb)(const appling_preflight_info_t *info);
@@ -65,13 +60,10 @@ struct appling_link_s {
 struct appling_lock_s {
   uv_loop_t *loop;
 
-  appling_lock_cb on_lock;
-  appling_unlock_cb on_unlock;
+  appling_lock_cb cb;
 
-  fs_mkdir_t mkdir;
-  fs_open_t open;
-  fs_lock_t lock;
-  fs_close_t close;
+  uv_thread_t thread;
+  uv_async_t signal;
 
   appling_path_t dir;
 
@@ -87,11 +79,7 @@ struct appling_resolve_s {
 
   appling_resolve_cb cb;
 
-  fs_realpath_t realpath;
-  fs_open_t open;
-  fs_stat_t stat;
-  fs_read_t read;
-  fs_close_t close;
+  uv_fs_t fs;
 
   appling_path_t path;
 
@@ -107,36 +95,12 @@ struct appling_resolve_s {
   void *data;
 };
 
-struct appling_bootstrap_s {
-  uv_loop_t *loop;
-
-  appling_bootstrap_cb cb;
-
-  appling_key_t key;
-  appling_path_t dir;
-  appling_link_t link;
-
-  js_platform_t *js;
-
-  uv_thread_t thread;
-  uv_async_t signal;
-
-  int status;
-
-  char *error;
-
-  void *data;
-};
-
 struct appling_paths_s {
   uv_loop_t *loop;
 
   appling_paths_cb cb;
 
-  fs_open_t open;
-  fs_close_t close;
-  fs_stat_t stat;
-  fs_read_t read;
+  uv_fs_t fs;
 
   appling_path_t path;
   appling_app_t *apps;
@@ -209,7 +173,7 @@ struct appling_preflight_info_s {
   appling_progress_cb progress;
 };
 
-/** @version 1 */
+/** @version 0 */
 struct appling_launch_info_s {
   int version;
 
@@ -240,13 +204,6 @@ struct appling_launch_info_s {
    * @since 0
    */
   const appling_link_t *link;
-
-  /**
-   * The human-readable name of the application.
-   *
-   * @since 1
-   */
-  const char *name;
 };
 
 int
@@ -256,7 +213,7 @@ int
 appling_lock(uv_loop_t *loop, appling_lock_t *req, const char *dir, appling_lock_cb cb);
 
 int
-appling_unlock(uv_loop_t *loop, appling_lock_t *req, appling_unlock_cb cb);
+appling_unlock(appling_lock_t *req);
 
 int
 appling_resolve(uv_loop_t *loop, appling_resolve_t *req, const char *dir, appling_platform_t *platform, appling_resolve_cb cb);
@@ -265,16 +222,13 @@ int
 appling_paths(uv_loop_t *loop, appling_paths_t *req, const char *dir, appling_paths_cb cb);
 
 int
-appling_bootstrap(uv_loop_t *loop, js_platform_t *js, appling_bootstrap_t *req, const appling_key_t key, const char *dir, appling_bootstrap_cb cb);
-
-int
 appling_ready(const appling_platform_t *platform, const appling_link_t *link);
 
 int
 appling_preflight(const appling_platform_t *platform, const appling_link_t *link);
 
 int
-appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link, const char *name);
+appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);
 
 int
 appling_open(const appling_app_t *app, const char *argument);

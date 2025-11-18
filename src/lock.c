@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <path.h>
+#include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 #include <uv.h>
 
 #include "../include/appling.h"

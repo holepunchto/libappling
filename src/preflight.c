@@ -1,8 +1,7 @@
+#include <assert.h>
 #include <path.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
-#include <utf.h>
 #include <uv.h>
 
 #include "../include/appling.h"

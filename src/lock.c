@@ -8,7 +8,7 @@
 
 #if defined(APPLING_OS_DARWIN)
 #include "darwin/lock.h"
-#elif defined(APPLING_OS_LIUX)
+#elif defined(APPLING_OS_LINUX)
 #include "linux/lock.h"
 #elif defined(APPLING_OS_WIN32)
 #include "win32/lock.h"

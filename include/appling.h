@@ -28,6 +28,7 @@ typedef struct appling_link_s appling_link_t;
 typedef struct appling_lock_s appling_lock_t;
 typedef struct appling_resolve_s appling_resolve_t;
 typedef struct appling_paths_s appling_paths_t;
+typedef struct appling_progress_info_s appling_progress_info_t;
 typedef struct appling_ready_info_s appling_ready_info_t;
 typedef struct appling_preflight_info_s appling_preflight_info_t;
 typedef struct appling_launch_info_s appling_launch_info_t;
@@ -35,7 +36,7 @@ typedef struct appling_launch_info_s appling_launch_info_t;
 typedef void (*appling_lock_cb)(appling_lock_t *req, int status);
 typedef void (*appling_resolve_cb)(appling_resolve_t *req, int status);
 typedef void (*appling_paths_cb)(appling_paths_t *req, int status, const appling_app_t *apps, size_t len);
-typedef void (*appling_progress_cb)(uint64_t downloaded, uint64_t total);
+typedef void (*appling_progress_cb)(const appling_progress_info_t *info);
 typedef int (*appling_ready_cb)(const appling_ready_info_t *info);
 typedef int (*appling_preflight_cb)(const appling_preflight_info_t *info);
 typedef int (*appling_launch_cb)(const appling_launch_info_t *info);
@@ -112,6 +113,51 @@ struct appling_paths_s {
   int status;
 
   void *data;
+};
+
+/** @version 0 */
+struct appling_progress_info_s {
+  int version;
+
+  /**
+   * @since 0
+   */
+  int64_t peers;
+
+  /**
+   * @since 0
+   */
+  double progress;
+
+  /**
+   * @since 0
+   */
+  double upload_speed;
+
+  /**
+   * @since 0
+   */
+  int64_t uploaded_bytes;
+
+  /**
+   * @since 0
+   */
+  int64_t uploaded_blocks;
+
+  /**
+   * @since 0
+   */
+  double download_speed;
+
+  /**
+   * @since 0
+   */
+  int64_t downloaded_bytes;
+
+  /**
+   * @since 0
+   */
+  int64_t downloaded_blocks;
 };
 
 /** @version 0 */

@@ -7,7 +7,7 @@
 #include "../include/appling.h"
 
 static void
-appling_preflight__on_progress(uint64_t downloaded, uint64_t total) {
+appling_preflight__on_progress(const appling_progress_info_t *progress) {
   // TODO
 }
 

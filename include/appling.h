@@ -127,11 +127,6 @@ struct appling_progress_info_s {
   /**
    * @since 0
    */
-  double progress;
-
-  /**
-   * @since 0
-   */
   double upload_speed;
 
   /**
@@ -158,6 +153,11 @@ struct appling_progress_info_s {
    * @since 0
    */
   int64_t downloaded_blocks;
+
+  /**
+   * @since 0
+   */
+  double download_progress;
 };
 
 /** @version 0 */

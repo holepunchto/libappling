@@ -13,6 +13,9 @@ appling_platform_t platform;
 appling_resolve_t req;
 
 static void
+on_progress(const appling_progress_info_t *info) {}
+
+static void
 on_resolve(appling_resolve_t *req, int status) {
   int err;
 
@@ -22,7 +25,7 @@ on_resolve(appling_resolve_t *req, int status) {
     .id = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   };
 
-  err = appling_preflight(&platform, &link);
+  err = appling_preflight(&platform, &link, on_progress);
   assert(err == 0);
 }
 

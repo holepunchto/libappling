@@ -271,7 +271,7 @@ int
 appling_ready(const appling_platform_t *platform, const appling_link_t *link);
 
 int
-appling_preflight(const appling_platform_t *platform, const appling_link_t *link);
+appling_preflight(const appling_platform_t *platform, const appling_link_t *link, appling_progress_cb cb);
 
 int
 appling_launch(const appling_platform_t *platform, const appling_app_t *app, const appling_link_t *link);

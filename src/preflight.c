@@ -6,13 +6,8 @@
 
 #include "../include/appling.h"
 
-static void
-appling_preflight__on_progress(const appling_progress_info_t *progress) {
-  // TODO
-}
-
 int
-appling_preflight(const appling_platform_t *platform, const appling_link_t *link) {
+appling_preflight(const appling_platform_t *platform, const appling_link_t *link, appling_progress_cb cb) {
   int err;
 
   appling_path_t path;
@@ -43,7 +38,7 @@ appling_preflight(const appling_platform_t *platform, const appling_link_t *link
     .path = path,
     .platform = platform,
     .link = link,
-    .progress = appling_preflight__on_progress,
+    .progress = cb,
   };
 
   err = preflight(&info);

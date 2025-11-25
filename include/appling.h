@@ -147,17 +147,17 @@ struct appling_progress_info_s {
   /**
    * @since 0
    */
+  double download_progress;
+
+  /**
+   * @since 0
+   */
   int64_t downloaded_bytes;
 
   /**
    * @since 0
    */
   int64_t downloaded_blocks;
-
-  /**
-   * @since 0
-   */
-  double download_progress;
 };
 
 /** @version 0 */

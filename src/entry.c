@@ -343,6 +343,11 @@ appling_preflight__on_line(const appling_preflight_info_t *info, uint8_t *line, 
   err = json_decode_utf8(line, len, &value);
   if (err < 0) return;
 
+  if (!json_is_object(value)) {
+    json_deref(value);
+    return;
+  }
+
   json_t *tag = json_object_get_literal_utf8(value, (utf8_t *) "tag", -1);
 
   if (tag == NULL || !json_is_string(tag) || strcmp((const char *) json_string_value_utf8(tag), "stats") != 0) {

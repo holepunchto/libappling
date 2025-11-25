@@ -4,6 +4,7 @@ install(
   TARGETS appling_launch_shared
   DESTINATION ${CMAKE_CURRENT_LIST_DIR}/platform/by-dkey/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/0/by-arch/${target}/lib
   COMPONENT fixtures
+  EXCLUDE_FROM_ALL
 )
 
 add_executable(appling_platform_runtime runtime.c)
@@ -18,6 +19,7 @@ install(
   TARGETS appling_platform_runtime
   DESTINATION ${CMAKE_CURRENT_LIST_DIR}/platform/by-dkey/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/0/by-arch/${target}/bin
   COMPONENT fixtures
+  EXCLUDE_FROM_ALL
 )
 
 file(

@@ -1,6 +1,9 @@
 #include <assert.h>
+#include <json.h>
 #include <log.h>
 #include <path.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,10 +15,20 @@
 #include <wchar.h>
 #include <windows.h>
 #else
+#include <errno.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
+
+typedef struct appling_line_parser_s appling_line_parser_t;
+
+struct appling_line_parser_s {
+  uint8_t buffer[1024];
+  size_t len;
+  bool skip;
+};
 
 #if defined(APPLING_OS_WIN32)
 static inline int32_t
@@ -304,19 +317,198 @@ appling_ready_v0(const appling_ready_info_t *info) {
   return success ? status == 0 : -1;
 #else
   pid_t pid = fork();
-  if (pid < 0) return -1;
-  if (pid != 0) {
-    int status;
-    err = waitpid(pid, &status, 0);
-    if (err < 0) return -1;
 
-    return WIFEXITED(status) ? WEXITSTATUS(status) == 0 : -1;
+  if (pid < 0) return -1;
+
+  if (pid == 0) {
+    execv(file, argv);
+    _exit(1);
   }
 
-  execv(file, argv);
+  int status;
+  err = waitpid(pid, &status, 0);
+  if (err < 0) return -1;
 
-  _exit(1);
+  return WIFEXITED(status) ? WEXITSTATUS(status) == 0 : -1;
 #endif
+}
+
+static void
+appling_preflight__on_line(const appling_preflight_info_t *info, uint8_t *line, size_t len) {
+  int err;
+
+  appling_progress_info_t progress = {.version = 0};
+
+  json_t *value;
+  err = json_decode_utf8(line, len, &value);
+  if (err < 0) return;
+
+  json_t *tag = json_object_get_literal_utf8(value, (utf8_t *) "tag", -1);
+
+  if (tag == NULL || !json_is_string(tag) || strcmp((const char *) json_string_value_utf8(tag), "stats") != 0) {
+    if (tag) json_deref(tag);
+    json_deref(value);
+    return;
+  }
+
+  json_deref(tag);
+
+  json_t *data = json_object_get_literal_utf8(value, (utf8_t *) "data", -1);
+
+  if (data == NULL || !json_is_object(data)) {
+    if (data) json_deref(data);
+    json_deref(value);
+    return;
+  }
+
+  json_deref(value);
+
+  json_t *peers = json_object_get_literal_utf8(data, (utf8_t *) "peers", -1);
+
+  if (peers == NULL || !json_is_number(peers)) {
+    if (peers) json_deref(peers);
+    json_deref(data);
+    return;
+  }
+
+  progress.peers = (int64_t) json_number_value(peers);
+
+  json_deref(peers);
+
+  json_t *download = json_object_get_literal_utf8(data, (utf8_t *) "download", -1);
+
+  if (download == NULL || !json_is_object(download)) {
+    if (download) json_deref(download);
+    json_deref(data);
+    return;
+  }
+
+  json_t *download_speed = json_object_get_literal_utf8(download, (utf8_t *) "speed", -1);
+
+  if (download_speed == NULL || !json_is_number(download_speed)) {
+    if (download_speed) json_deref(download_speed);
+    json_deref(download);
+    json_deref(data);
+    return;
+  }
+
+  progress.download_speed = json_number_value(download_speed);
+
+  json_deref(download_speed);
+
+  json_t *download_progress = json_object_get_literal_utf8(download, (utf8_t *) "progress", -1);
+
+  if (download_progress == NULL || !json_is_number(download_progress)) {
+    if (download_progress) json_deref(download_progress);
+    json_deref(download);
+    json_deref(data);
+    return;
+  }
+
+  progress.download_progress = json_number_value(download_progress);
+
+  json_deref(download_progress);
+
+  json_t *downloaded_bytes = json_object_get_literal_utf8(download, (utf8_t *) "bytes", -1);
+
+  if (downloaded_bytes == NULL || !json_is_number(downloaded_bytes)) {
+    if (downloaded_bytes) json_deref(downloaded_bytes);
+    json_deref(download);
+    json_deref(data);
+    return;
+  }
+
+  progress.downloaded_bytes = (int64_t) json_number_value(downloaded_bytes);
+
+  json_deref(downloaded_bytes);
+
+  json_t *downloaded_blocks = json_object_get_literal_utf8(download, (utf8_t *) "blocks", -1);
+
+  if (downloaded_blocks == NULL || !json_is_number(downloaded_blocks)) {
+    if (downloaded_blocks) json_deref(downloaded_blocks);
+    json_deref(download);
+    json_deref(data);
+    return;
+  }
+
+  progress.downloaded_blocks = (int64_t) json_number_value(downloaded_blocks);
+
+  json_deref(downloaded_blocks);
+
+  json_deref(download);
+
+  json_t *upload = json_object_get_literal_utf8(data, (utf8_t *) "upload", -1);
+
+  if (upload == NULL || !json_is_object(upload)) {
+    if (upload) json_deref(upload);
+    json_deref(data);
+    return;
+  }
+
+  json_t *upload_speed = json_object_get_literal_utf8(upload, (utf8_t *) "speed", -1);
+
+  if (upload_speed == NULL || !json_is_number(upload_speed)) {
+    if (upload_speed) json_deref(upload_speed);
+    json_deref(upload);
+    json_deref(data);
+    return;
+  }
+
+  progress.upload_speed = json_number_value(upload_speed);
+
+  json_deref(upload_speed);
+
+  json_t *uploaded_bytes = json_object_get_literal_utf8(upload, (utf8_t *) "bytes", -1);
+
+  if (uploaded_bytes == NULL || !json_is_number(uploaded_bytes)) {
+    if (uploaded_bytes) json_deref(uploaded_bytes);
+    json_deref(upload);
+    json_deref(data);
+    return;
+  }
+
+  progress.uploaded_bytes = (int64_t) json_number_value(uploaded_bytes);
+
+  json_deref(uploaded_bytes);
+
+  json_t *uploaded_blocks = json_object_get_literal_utf8(upload, (utf8_t *) "blocks", -1);
+
+  if (uploaded_blocks == NULL || !json_is_number(uploaded_blocks)) {
+    if (uploaded_blocks) json_deref(uploaded_blocks);
+    json_deref(upload);
+    json_deref(data);
+    return;
+  }
+
+  progress.uploaded_blocks = (int64_t) json_number_value(uploaded_blocks);
+
+  json_deref(uploaded_blocks);
+
+  json_deref(upload);
+
+  info->progress(&progress);
+}
+
+static void
+appling_preflight__on_data(const appling_preflight_info_t *info, appling_line_parser_t *parser, uint8_t *data, size_t len) {
+  if (info->progress == NULL) return;
+
+  for (size_t i = 0; i < len; i++) {
+    uint8_t c = data[i];
+
+    if (c == '\n') {
+      if (!parser->skip) appling_preflight__on_line(info, parser->buffer, parser->len);
+
+      parser->len = 0;
+      parser->skip = false;
+    } else if (!parser->skip) {
+      if (parser->len < sizeof(parser->buffer)) {
+        parser->buffer[parser->len++] = c;
+      } else {
+        parser->skip = true;
+      }
+    }
+  }
 }
 
 int
@@ -418,19 +610,53 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   return success && status == 0 ? 0 : -1;
 #else
-  pid_t pid = fork();
-  if (pid < 0) return -1;
-  if (pid != 0) {
-    int status;
-    err = waitpid(pid, &status, 0);
-    if (err < 0) return -1;
+  int fd[2];
+  if (pipe(fd) < 0) return -1;
 
-    return WIFEXITED(status) && WEXITSTATUS(status) == 0 ? 0 : -1;
+  pid_t pid = fork();
+
+  if (pid < 0) {
+    close(fd[0]);
+    close(fd[1]);
+    return -1;
   }
 
-  execv(file, argv);
+  if (pid == 0) {
+    dup2(fd[1], STDOUT_FILENO);
+    dup2(fd[1], STDERR_FILENO);
 
-  _exit(1);
+    close(fd[0]);
+    close(fd[1]);
+
+    execv(file, argv);
+    _exit(1);
+  }
+
+  close(fd[1]);
+
+  appling_line_parser_t parser = {{}, 0, false};
+
+  uint8_t buffer[16384];
+
+  for (;;) {
+    ssize_t len = read(fd[0], buffer, sizeof(buffer));
+
+    if (len < 0) {
+      if (errno == EINTR) continue;
+      close(fd[0]);
+      break;
+    }
+
+    if (len == 0) break;
+
+    appling_preflight__on_data(info, &parser, buffer, len);
+  }
+
+  int status;
+  err = waitpid(pid, &status, 0);
+  if (err < 0) return -1;
+
+  return WIFEXITED(status) && WEXITSTATUS(status) == 0 ? 0 : -1;
 #endif
 }
 

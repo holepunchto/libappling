@@ -14,6 +14,7 @@ fetch_package("github:libuv/libuv@1.51.0")
 fetch_package("github:holepunchto/libpath")
 fetch_package("github:holepunchto/liblog")
 fetch_package("github:holepunchto/libcompact")
+fetch_package("github:holepunchto/libjson")
 
 add_library(appling OBJECT)
 
@@ -143,6 +144,7 @@ target_link_libraries(
     appling
     log
     path
+    json
 )
 
 add_library(appling_launch_shared SHARED)
@@ -162,6 +164,7 @@ target_link_libraries(
   PRIVATE
     log_static
     path_static
+    json_static
 )
 
 install(TARGETS appling_static appling_launch_shared)

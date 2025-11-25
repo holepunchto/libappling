@@ -268,14 +268,6 @@ appling_ready_v0(const appling_ready_info_t *info) {
   argv[i] = NULL;
 
 #if defined(APPLING_OS_WIN32)
-  STARTUPINFOW si;
-  ZeroMemory(&si, sizeof(si));
-
-  si.cb = sizeof(si);
-
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&pi, sizeof(pi));
-
   WCHAR *application_name;
   err = appling__utf8_to_utf16(file, &application_name);
   if (err < 0) return err;
@@ -287,6 +279,14 @@ appling_ready_v0(const appling_ready_info_t *info) {
 
     return err;
   }
+
+  STARTUPINFOW si;
+  ZeroMemory(&si, sizeof(si));
+
+  si.cb = sizeof(si);
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
 
   BOOL success = CreateProcessW(
     application_name,
@@ -500,7 +500,11 @@ appling_preflight__on_data(const appling_preflight_info_t *info, appling_line_pa
     uint8_t c = data[i];
 
     if (c == '\n') {
-      if (!parser->skip) appling_preflight__on_line(info, parser->buffer, parser->len);
+      if (!parser->skip) {
+        if (parser->buffer[parser->len - 1] == '\r') parser->len--;
+
+        appling_preflight__on_line(info, parser->buffer, parser->len);
+      }
 
       parser->len = 0;
       parser->skip = false;
@@ -565,14 +569,6 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   argv[i] = NULL;
 
 #if defined(APPLING_OS_WIN32)
-  STARTUPINFOW si;
-  ZeroMemory(&si, sizeof(si));
-
-  si.cb = sizeof(si);
-
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&pi, sizeof(pi));
-
   WCHAR *application_name;
   err = appling__utf8_to_utf16(file, &application_name);
   if (err < 0) return err;
@@ -585,12 +581,44 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
     return err;
   }
 
+  SECURITY_ATTRIBUTES sa;
+  ZeroMemory(&sa, sizeof(sa));
+
+  sa.nLength = sizeof(sa);
+  sa.bInheritHandle = TRUE;
+
+  HANDLE read, write;
+
+  if (!CreatePipe(&read, &write, &sa, 0)) return -1;
+
+  if (!SetHandleInformation(read, HANDLE_FLAG_INHERIT, 0)) {
+    free(application_name);
+    free(command_line);
+
+    CloseHandle(read);
+    CloseHandle(write);
+
+    return -1;
+  }
+
+  STARTUPINFOW si;
+  ZeroMemory(&si, sizeof(si));
+
+  si.cb = sizeof(si);
+  si.dwFlags |= STARTF_USESTDHANDLES;
+  si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+  si.hStdOutput = write;
+  si.hStdError = write;
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
+
   BOOL success = CreateProcessW(
     application_name,
     command_line,
     NULL,
     NULL,
-    FALSE,
+    TRUE,
     CREATE_NO_WINDOW,
     NULL,
     NULL,
@@ -601,7 +629,29 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   free(application_name);
   free(command_line);
 
-  if (!success) return -1;
+  CloseHandle(write);
+
+  if (!success) {
+    CloseHandle(read);
+
+    return -1;
+  }
+
+  appling_line_parser_t parser = {{}, 0, false};
+
+  uint8_t buffer[16384];
+
+  while (true) {
+    DWORD len;
+
+    if (!ReadFile(read, buffer, sizeof(buffer), &len, NULL)) break;
+
+    if (len == 0) continue;
+
+    appling_preflight__on_data(info, &parser, buffer, len);
+  }
+
+  CloseHandle(read);
 
   WaitForSingleObject(pi.hProcess, INFINITE);
 
@@ -621,6 +671,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   if (pid < 0) {
     close(fd[0]);
     close(fd[1]);
+
     return -1;
   }
 
@@ -644,16 +695,12 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   for (;;) {
     ssize_t len = read(fd[0], buffer, sizeof(buffer));
 
-    if (len < 0) {
-      if (errno == EINTR) continue;
-      close(fd[0]);
-      break;
-    }
-
-    if (len == 0) break;
+    if (len <= 0) break;
 
     appling_preflight__on_data(info, &parser, buffer, len);
   }
+
+  close(fd[0]);
 
   int status;
   err = waitpid(pid, &status, 0);
@@ -734,14 +781,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
   argv[i] = NULL;
 
 #if defined(APPLING_OS_WIN32)
-  STARTUPINFOW si;
-  ZeroMemory(&si, sizeof(si));
-
-  si.cb = sizeof(si);
-
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&pi, sizeof(pi));
-
   WCHAR *application_name;
   err = appling__utf8_to_utf16(file, &application_name);
   if (err < 0) return err;
@@ -753,6 +792,14 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
     return err;
   }
+
+  STARTUPINFOW si;
+  ZeroMemory(&si, sizeof(si));
+
+  si.cb = sizeof(si);
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
 
   BOOL success = CreateProcessW(
     application_name,

@@ -439,7 +439,6 @@ appling_preflight__on_line(const appling_preflight_info_t *info, uint8_t *line, 
   progress.downloaded_blocks = (int64_t) json_number_value(downloaded_blocks);
 
   json_deref(downloaded_blocks);
-
   json_deref(download);
 
   json_t *upload = json_object_get_literal_utf8(data, (utf8_t *) "upload", -1);
@@ -488,7 +487,6 @@ appling_preflight__on_line(const appling_preflight_info_t *info, uint8_t *line, 
   progress.uploaded_blocks = (int64_t) json_number_value(uploaded_blocks);
 
   json_deref(uploaded_blocks);
-
   json_deref(upload);
 
   info->progress(&progress);

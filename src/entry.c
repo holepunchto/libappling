@@ -557,7 +557,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   log_debug("appling_preflight() running for link %s", link);
 
-  char *argv[6];
+  char *argv[7];
 
   size_t i = 0;
 
@@ -565,6 +565,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   argv[i++] = "run";
   argv[i++] = "--trusted";
   argv[i++] = "--preflight";
+  argv[i++] = "--json";
   argv[i++] = link;
   argv[i] = NULL;
 

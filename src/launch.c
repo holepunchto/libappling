@@ -44,5 +44,7 @@ appling_launch(const appling_platform_t *platform, const appling_app_t *app, con
 
   uv_dlclose(&library);
 
-  return err;
+  if (err < 0) return err;
+
+  exit(0);
 }

@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <json.h>
-#include <log.h>
 #include <path.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -254,8 +253,6 @@ appling_ready_v0(const appling_ready_info_t *info) {
     strcat(link, "/");
     strcat(link, info->link->data);
   }
-
-  log_debug("appling_ready() running for link %s", link);
 
   char *argv[5];
 
@@ -555,8 +552,6 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
     strcat(link, info->link->data);
   }
 
-  log_debug("appling_preflight() running for link %s", link);
-
   char *argv[7];
 
   size_t i = 0;
@@ -750,8 +745,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
   strcpy(appling, app->path);
 #endif
 
-  log_debug("appling_launch() launching application shell %s", appling);
-
   char link[7 /* pear:// */ + APPLING_ID_MAX + 1 /* / */ + APPLING_LINK_DATA_MAX + 1 /* NULL */] = {'\0'};
 
   strcat(link, "pear://");
@@ -761,8 +754,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
     strcat(link, "/");
     strcat(link, info->link->data);
   }
-
-  log_debug("appling_launch() launching link %s", link);
 
   char *argv[8];
 

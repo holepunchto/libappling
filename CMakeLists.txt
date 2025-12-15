@@ -12,7 +12,6 @@ endif()
 fetch_package("github:libuv/libuv@1.51.0")
 
 fetch_package("github:holepunchto/libpath")
-fetch_package("github:holepunchto/liblog")
 fetch_package("github:holepunchto/libcompact")
 fetch_package("github:holepunchto/libjson")
 
@@ -99,7 +98,6 @@ target_link_libraries(
   appling
   PUBLIC
     compact
-    log
     path
 )
 
@@ -119,7 +117,6 @@ target_link_libraries(
   PRIVATE
     uv_a
     compact_static
-    log_static
     path_static
 )
 
@@ -142,7 +139,6 @@ target_link_libraries(
   appling_launch
   PUBLIC
     appling
-    log
     path
     json
 )
@@ -162,7 +158,6 @@ target_link_libraries(
   PUBLIC
     appling_launch
   PRIVATE
-    log_static
     path_static
     json_static
 )

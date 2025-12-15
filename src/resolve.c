@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <compact.h>
-#include <log.h>
 #include <path.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -187,8 +186,6 @@ appling_resolve__open(appling_resolve_t *req) {
   );
   assert(err == 0);
 
-  log_debug("appling_resolve() opening checkout file at %s", path);
-
   err = uv_fs_open(req->loop, &req->fs, path, 0, UV_FS_READ, appling_resolve__on_open);
   assert(err == 0);
 }
@@ -238,8 +235,6 @@ appling_resolve__realpath(appling_resolve_t *req) {
     path_behavior_system
   );
   assert(err == 0);
-
-  log_debug("appling_resolve() accessing platform at %s", path);
 
   err = uv_fs_realpath(req->loop, &req->fs, path, appling_resolve__on_realpath);
   assert(err == 0);

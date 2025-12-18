@@ -583,28 +583,28 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   sa.nLength = sizeof(sa);
   sa.bInheritHandle = TRUE;
 
-  HANDLE read, write;
+  HANDLE in_read = NULL;
+  HANDLE in_write = NULL;
 
-  if (!CreatePipe(&read, &write, &sa, 0)) return -1;
+  HANDLE out_read = NULL;
+  HANDLE out_write = NULL;
 
-  if (!SetHandleInformation(read, HANDLE_FLAG_INHERIT, 0)) {
-    free(application_name);
-    free(command_line);
+  if (!CreatePipe(&in_read, &in_write, &sa, 0)) goto err;
 
-    CloseHandle(read);
-    CloseHandle(write);
+  if (!SetHandleInformation(in_write, HANDLE_FLAG_INHERIT, 0)) goto err;
 
-    return -1;
-  }
+  if (!CreatePipe(&out_read, &out_write, &sa, 0)) goto err;
+
+  if (!SetHandleInformation(out_read, HANDLE_FLAG_INHERIT, 0)) goto err;
 
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
   si.dwFlags |= STARTF_USESTDHANDLES;
-  si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
-  si.hStdOutput = write;
-  si.hStdError = write;
+  si.hStdInput = in_read;
+  si.hStdOutput = out_write;
+  si.hStdError = out_write;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -625,13 +625,17 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   free(application_name);
   free(command_line);
 
-  CloseHandle(write);
+  CloseHandle(in_read);
+  CloseHandle(out_write);
 
   if (!success) {
-    CloseHandle(read);
+    CloseHandle(in_write);
+    CloseHandle(out_read);
 
     return -1;
   }
+
+  CloseHandle(in_write);
 
   appling_line_parser_t parser = {{}, 0, false};
 
@@ -640,14 +644,14 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   while (true) {
     DWORD len;
 
-    if (!ReadFile(read, buffer, sizeof(buffer), &len, NULL)) break;
+    if (!ReadFile(out_read, buffer, sizeof(buffer), &len, NULL)) break;
 
     if (len == 0) continue;
 
     appling_preflight__on_data(info, &parser, buffer, len);
   }
 
-  CloseHandle(read);
+  CloseHandle(out_read);
 
   WaitForSingleObject(pi.hProcess, INFINITE);
 
@@ -658,6 +662,17 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
   CloseHandle(pi.hThread);
 
   return success && status == 0 ? 0 : -1;
+
+err:
+  free(application_name);
+  free(command_line);
+
+  if (in_read) CloseHandle(in_read);
+  if (in_write) CloseHandle(in_write);
+  if (out_read) CloseHandle(out_read);
+  if (out_write) CloseHandle(out_write);
+
+  return -1;
 #else
   int fd[2];
   if (pipe(fd) < 0) return -1;

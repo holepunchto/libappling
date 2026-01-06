@@ -27,7 +27,6 @@ struct appling_line_parser_s {
   uint8_t buffer[1024];
   size_t len;
   bool skip;
-  bool ended;
 };
 
 #if defined(APPLING_OS_WIN32)
@@ -332,8 +331,10 @@ appling_ready_v0(const appling_ready_info_t *info) {
 }
 
 static void
-appling_preflight__on_line(const appling_preflight_info_t *info, appling_line_parser_t *parser, uint8_t *line, size_t len) {
+appling_preflight__on_line(const appling_preflight_info_t *info, uint8_t *line, size_t len) {
   int err;
+
+  appling_progress_info_t progress = {.version = 0};
 
   json_t *value;
   err = json_decode_utf8(line, len, &value);
@@ -346,34 +347,13 @@ appling_preflight__on_line(const appling_preflight_info_t *info, appling_line_pa
 
   json_t *tag = json_object_get_literal_utf8(value, (utf8_t *) "tag", -1);
 
-  if (tag == NULL || !json_is_string(tag)) {
+  if (tag == NULL || !json_is_string(tag) || strcmp((const char *) json_string_value_utf8(tag), "stats") != 0) {
     if (tag) json_deref(tag);
     json_deref(value);
     return;
   }
 
-  if (strcmp((const char *) json_string_value_utf8(tag), "final") == 0) {
-    parser->ended = true;
-
-    json_deref(tag);
-    json_deref(value);
-    return;
-  }
-
-  if (strcmp((const char *) json_string_value_utf8(tag), "stats") != 0) {
-    json_deref(tag);
-    json_deref(value);
-    return;
-  }
-
   json_deref(tag);
-
-  if (info->progress == NULL) {
-    json_deref(value);
-    return;
-  }
-
-  appling_progress_info_t progress = {.version = 0};
 
   json_t *data = json_object_get_literal_utf8(value, (utf8_t *) "data", -1);
 
@@ -511,6 +491,8 @@ appling_preflight__on_line(const appling_preflight_info_t *info, appling_line_pa
 
 static void
 appling_preflight__on_data(const appling_preflight_info_t *info, appling_line_parser_t *parser, uint8_t *data, size_t len) {
+  if (info->progress == NULL) return;
+
   for (size_t i = 0; i < len; i++) {
     uint8_t c = data[i];
 
@@ -518,7 +500,7 @@ appling_preflight__on_data(const appling_preflight_info_t *info, appling_line_pa
       if (!parser->skip) {
         if (parser->buffer[parser->len - 1] == '\r') parser->len--;
 
-        appling_preflight__on_line(info, parser, parser->buffer, parser->len);
+        appling_preflight__on_line(info, parser->buffer, parser->len);
       }
 
       parser->len = 0;
@@ -655,7 +637,7 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
 
   CloseHandle(in_write);
 
-  appling_line_parser_t parser = {{}, 0, false, false};
+  appling_line_parser_t parser = {{}, 0, false};
 
   uint8_t buffer[16384];
 
@@ -667,8 +649,6 @@ appling_preflight_v0(const appling_preflight_info_t *info) {
     if (len == 0) continue;
 
     appling_preflight__on_data(info, &parser, buffer, len);
-
-    if (parser.ended) break;
   }
 
   CloseHandle(out_read);
@@ -689,7 +669,6 @@ err:
 
   if (in_read) CloseHandle(in_read);
   if (in_write) CloseHandle(in_write);
-
   if (out_read) CloseHandle(out_read);
   if (out_write) CloseHandle(out_write);
 
@@ -720,7 +699,7 @@ err:
 
   close(fd[1]);
 
-  appling_line_parser_t parser = {{}, 0, false, false};
+  appling_line_parser_t parser = {{}, 0, false};
 
   uint8_t buffer[16384];
 
@@ -730,8 +709,6 @@ err:
     if (len <= 0) break;
 
     appling_preflight__on_data(info, &parser, buffer, len);
-
-    if (parser.ended) break;
   }
 
   close(fd[0]);

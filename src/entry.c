@@ -14,7 +14,6 @@
 #include <wchar.h>
 #include <windows.h>
 #else
-#include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -277,10 +276,26 @@ appling_ready_v0(const appling_ready_info_t *info) {
     return err;
   }
 
+  HANDLE stdin = NULL;
+  HANDLE stdout = NULL;
+  HANDLE stderr = NULL;
+
+  HANDLE self = GetCurrentProcess();
+
+  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+
+  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+
+  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
+  si.dwFlags |= STARTF_USESTDHANDLES;
+  si.hStdInput = stdin;
+  si.hStdOutput = stdout;
+  si.hStdError = stderr;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -290,7 +305,7 @@ appling_ready_v0(const appling_ready_info_t *info) {
     command_line,
     NULL,
     NULL,
-    FALSE,
+    TRUE,
     CREATE_NO_WINDOW,
     NULL,
     NULL,
@@ -300,6 +315,10 @@ appling_ready_v0(const appling_ready_info_t *info) {
 
   free(application_name);
   free(command_line);
+
+  CloseHandle(stdin);
+  CloseHandle(stdout);
+  CloseHandle(stderr);
 
   if (!success) return -1;
 
@@ -312,15 +331,51 @@ appling_ready_v0(const appling_ready_info_t *info) {
   CloseHandle(pi.hThread);
 
   return success ? status == 0 : -1;
+
+err:
+  free(application_name);
+  free(command_line);
+
+  if (stdin) CloseHandle(stdin);
+  if (stdout) CloseHandle(stdout);
+  if (stderr) CloseHandle(stderr);
+
+  return -1;
 #else
+  int stdin = dup(STDIN_FILENO);
+  int stdout = dup(STDOUT_FILENO);
+  int stderr = dup(STDERR_FILENO);
+
+  fcntl(stdin, F_SETFD, 0);
+  fcntl(stdout, F_SETFD, 0);
+  fcntl(stderr, F_SETFD, 0);
+
   pid_t pid = fork();
 
-  if (pid < 0) return -1;
+  if (pid < 0) {
+    close(stdin);
+    close(stdout);
+    close(stderr);
+
+    return -1;
+  }
 
   if (pid == 0) {
+    dup2(stdin, STDIN_FILENO);
+    dup2(stdout, STDOUT_FILENO);
+    dup2(stderr, STDERR_FILENO);
+
+    close(stdin);
+    close(stdout);
+    close(stderr);
+
     execv(file, argv);
     _exit(1);
   }
+
+  close(stdin);
+  close(stdout);
+  close(stderr);
 
   int status;
   err = waitpid(pid, &status, 0);
@@ -800,10 +855,26 @@ appling_launch_v0(const appling_launch_info_t *info) {
     return err;
   }
 
+  HANDLE stdin = NULL;
+  HANDLE stdout = NULL;
+  HANDLE stderr = NULL;
+
+  HANDLE self = GetCurrentProcess();
+
+  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+
+  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+
+  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
+  si.dwFlags |= STARTF_USESTDHANDLES;
+  si.hStdInput = stdin;
+  si.hStdOutput = stdout;
+  si.hStdError = stderr;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -813,7 +884,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
     command_line,
     NULL,
     NULL,
-    FALSE,
+    TRUE,
     CREATE_NO_WINDOW,
     NULL,
     NULL,
@@ -823,6 +894,10 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   free(application_name);
   free(command_line);
+
+  CloseHandle(stdin);
+  CloseHandle(stdout);
+  CloseHandle(stderr);
 
   if (!success) return -1;
 
@@ -836,6 +911,22 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   return success && status == 0 ? 0 : -1;
 #else
+  int stdin = dup(STDIN_FILENO);
+  int stdout = dup(STDOUT_FILENO);
+  int stderr = dup(STDERR_FILENO);
+
+  fcntl(stdin, F_SETFD, 0);
+  fcntl(stdout, F_SETFD, 0);
+  fcntl(stderr, F_SETFD, 0);
+
+  dup2(stdin, STDIN_FILENO);
+  dup2(stdout, STDOUT_FILENO);
+  dup2(stderr, STDERR_FILENO);
+
+  close(stdin);
+  close(stdout);
+  close(stderr);
+
   return execv(file, argv);
 #endif
 }

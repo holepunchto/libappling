@@ -276,26 +276,39 @@ appling_ready_v0(const appling_ready_info_t *info) {
     return err;
   }
 
-  HANDLE stdin_dup = NULL;
-  HANDLE stdout_dup = NULL;
-  HANDLE stderr_dup = NULL;
+  SECURITY_ATTRIBUTES sa;
+  ZeroMemory(&sa, sizeof(sa));
 
-  HANDLE self = GetCurrentProcess();
+  sa.nLength = sizeof(sa);
+  sa.bInheritHandle = TRUE;
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  HANDLE io = CreateFileW(
+    L"NUL",
+    FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+    FILE_SHARE_READ | FILE_SHARE_WRITE,
+    &sa,
+    OPEN_EXISTING,
+    FILE_ATTRIBUTE_NORMAL,
+    NULL
+  );
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (io == INVALID_HANDLE_VALUE) {
+    free(application_name);
+    free(command_line);
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+    CloseHandle(io);
+
+    return -1;
+  }
 
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
   si.dwFlags |= STARTF_USESTDHANDLES;
-  si.hStdInput = stdin_dup;
-  si.hStdOutput = stdout_dup;
-  si.hStdError = stderr_dup;
+  si.hStdInput = io;
+  si.hStdOutput = io;
+  si.hStdError = io;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -316,9 +329,7 @@ appling_ready_v0(const appling_ready_info_t *info) {
   free(application_name);
   free(command_line);
 
-  CloseHandle(stdin_dup);
-  CloseHandle(stdout_dup);
-  CloseHandle(stderr_dup);
+  CloseHandle(io);
 
   if (!success) return -1;
 
@@ -331,51 +342,25 @@ appling_ready_v0(const appling_ready_info_t *info) {
   CloseHandle(pi.hThread);
 
   return success ? status == 0 : -1;
-
-err:
-  free(application_name);
-  free(command_line);
-
-  if (stdin_dup) CloseHandle(stdin_dup);
-  if (stdout_dup) CloseHandle(stdout_dup);
-  if (stderr_dup) CloseHandle(stderr_dup);
-
-  return -1;
 #else
-  int stdin_dup = dup(STDIN_FILENO);
-  int stdout_dup = dup(STDOUT_FILENO);
-  int stderr_dup = dup(STDERR_FILENO);
-
-  fcntl(stdin_dup, F_SETFD, 0);
-  fcntl(stdout_dup, F_SETFD, 0);
-  fcntl(stderr_dup, F_SETFD, 0);
-
   pid_t pid = fork();
 
-  if (pid < 0) {
-    close(stdin_dup);
-    close(stdout_dup);
-    close(stderr_dup);
-
-    return -1;
-  }
+  if (pid < 0) return -1;
 
   if (pid == 0) {
-    dup2(stdin_dup, STDIN_FILENO);
-    dup2(stdout_dup, STDOUT_FILENO);
-    dup2(stderr_dup, STDERR_FILENO);
+    int io = open("/dev/null", O_RDWR);
 
-    close(stdin_dup);
-    close(stdout_dup);
-    close(stderr_dup);
+    if (io != -1) {
+      dup2(io, STDIN_FILENO);
+      dup2(io, STDOUT_FILENO);
+      dup2(io, STDERR_FILENO);
+
+      if (io > 2) close(io);
+    }
 
     execv(file, argv);
     _exit(1);
   }
-
-  close(stdin_dup);
-  close(stdout_dup);
-  close(stderr_dup);
 
   int status;
   err = waitpid(pid, &status, 0);

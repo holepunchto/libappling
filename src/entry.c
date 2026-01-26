@@ -886,15 +886,12 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   if (!success) return -1;
 
-  WaitForSingleObject(pi.hProcess, INFINITE);
-
-  DWORD status;
-  success = GetExitCodeProcess(pi.hProcess, &status);
-
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
 
-  return success && status == 0 ? 0 : -1;
+  _exit(0);
+
+  return -1;
 
 err:
   free(application_name);

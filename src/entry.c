@@ -276,39 +276,10 @@ appling_ready_v0(const appling_ready_info_t *info) {
     return err;
   }
 
-  SECURITY_ATTRIBUTES sa;
-  ZeroMemory(&sa, sizeof(sa));
-
-  sa.nLength = sizeof(sa);
-  sa.bInheritHandle = TRUE;
-
-  HANDLE io = CreateFileW(
-    L"NUL",
-    FILE_GENERIC_READ | FILE_GENERIC_WRITE,
-    FILE_SHARE_READ | FILE_SHARE_WRITE,
-    &sa,
-    OPEN_EXISTING,
-    FILE_ATTRIBUTE_NORMAL,
-    NULL
-  );
-
-  if (io == INVALID_HANDLE_VALUE) {
-    free(application_name);
-    free(command_line);
-
-    CloseHandle(io);
-
-    return -1;
-  }
-
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
-  si.dwFlags |= STARTF_USESTDHANDLES;
-  si.hStdInput = io;
-  si.hStdOutput = io;
-  si.hStdError = io;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -318,7 +289,7 @@ appling_ready_v0(const appling_ready_info_t *info) {
     command_line,
     NULL,
     NULL,
-    TRUE,
+    FALSE,
     CREATE_NO_WINDOW,
     NULL,
     NULL,
@@ -328,8 +299,6 @@ appling_ready_v0(const appling_ready_info_t *info) {
 
   free(application_name);
   free(command_line);
-
-  CloseHandle(io);
 
   if (!success) return -1;
 
@@ -840,26 +809,10 @@ appling_launch_v0(const appling_launch_info_t *info) {
     return err;
   }
 
-  HANDLE stdin_dup = NULL;
-  HANDLE stdout_dup = NULL;
-  HANDLE stderr_dup = NULL;
-
-  HANDLE self = GetCurrentProcess();
-
-  DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin_dup, 0, TRUE, DUPLICATE_SAME_ACCESS);
-
-  DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout_dup, 0, TRUE, DUPLICATE_SAME_ACCESS);
-
-  DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr_dup, 0, TRUE, DUPLICATE_SAME_ACCESS);
-
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
-  si.dwFlags |= STARTF_USESTDHANDLES;
-  si.hStdInput = stdin_dup;
-  si.hStdOutput = stdout_dup;
-  si.hStdError = stderr_dup;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -869,7 +822,7 @@ appling_launch_v0(const appling_launch_info_t *info) {
     command_line,
     NULL,
     NULL,
-    TRUE,
+    FALSE,
     CREATE_NO_WINDOW,
     NULL,
     NULL,
@@ -879,10 +832,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   free(application_name);
   free(command_line);
-
-  CloseHandle(stdin_dup);
-  CloseHandle(stdout_dup);
-  CloseHandle(stderr_dup);
 
   if (!success) return -1;
 

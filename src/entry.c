@@ -317,15 +317,17 @@ appling_ready_v0(const appling_ready_info_t *info) {
   if (pid < 0) return -1;
 
   if (pid == 0) {
-    int io = open("/dev/null", O_RDWR);
+    int stdin_dup = open("/dev/null", O_RDONLY);
+    int stdout_dup = open("/dev/null", O_WRONLY);
+    int stderr_dup = open("/dev/null", O_WRONLY);
 
-    if (io != -1) {
-      dup2(io, STDIN_FILENO);
-      dup2(io, STDOUT_FILENO);
-      dup2(io, STDERR_FILENO);
+    dup2(stdin_dup, STDIN_FILENO);
+    dup2(stdout_dup, STDOUT_FILENO);
+    dup2(stderr_dup, STDERR_FILENO);
 
-      if (io > 2) close(io);
-    }
+    close(stdin_dup);
+    close(stdout_dup);
+    close(stderr_dup);
 
     execv(file, argv);
     _exit(1);
@@ -842,13 +844,9 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   return -1;
 #else
-  int stdin_dup = dup(STDIN_FILENO);
-  int stdout_dup = dup(STDOUT_FILENO);
-  int stderr_dup = dup(STDERR_FILENO);
-
-  fcntl(stdin_dup, F_SETFD, 0);
-  fcntl(stdout_dup, F_SETFD, 0);
-  fcntl(stderr_dup, F_SETFD, 0);
+  int stdin_dup = open("/dev/null", O_RDONLY);
+  int stdout_dup = open("/dev/null", O_WRONLY);
+  int stderr_dup = open("/dev/null", O_WRONLY);
 
   dup2(stdin_dup, STDIN_FILENO);
   dup2(stdout_dup, STDOUT_FILENO);

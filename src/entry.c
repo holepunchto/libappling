@@ -846,11 +846,11 @@ appling_launch_v0(const appling_launch_info_t *info) {
 
   HANDLE self = GetCurrentProcess();
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin_dup, 0, TRUE, DUPLICATE_SAME_ACCESS);
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout_dup, 0, TRUE, DUPLICATE_SAME_ACCESS);
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr_dup, 0, TRUE, DUPLICATE_SAME_ACCESS);
 
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
@@ -890,16 +890,6 @@ appling_launch_v0(const appling_launch_info_t *info) {
   CloseHandle(pi.hThread);
 
   _exit(0);
-
-  return -1;
-
-err:
-  free(application_name);
-  free(command_line);
-
-  if (stdin_dup) CloseHandle(stdin_dup);
-  if (stdout_dup) CloseHandle(stdout_dup);
-  if (stderr_dup) CloseHandle(stderr_dup);
 
   return -1;
 #else

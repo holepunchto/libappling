@@ -276,26 +276,26 @@ appling_ready_v0(const appling_ready_info_t *info) {
     return err;
   }
 
-  HANDLE stdin = NULL;
-  HANDLE stdout = NULL;
-  HANDLE stderr = NULL;
+  HANDLE stdin_dup = NULL;
+  HANDLE stdout_dup = NULL;
+  HANDLE stderr_dup = NULL;
 
   HANDLE self = GetCurrentProcess();
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
 
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
   si.dwFlags |= STARTF_USESTDHANDLES;
-  si.hStdInput = stdin;
-  si.hStdOutput = stdout;
-  si.hStdError = stderr;
+  si.hStdInput = stdin_dup;
+  si.hStdOutput = stdout_dup;
+  si.hStdError = stderr_dup;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -316,9 +316,9 @@ appling_ready_v0(const appling_ready_info_t *info) {
   free(application_name);
   free(command_line);
 
-  CloseHandle(stdin);
-  CloseHandle(stdout);
-  CloseHandle(stderr);
+  CloseHandle(stdin_dup);
+  CloseHandle(stdout_dup);
+  CloseHandle(stderr_dup);
 
   if (!success) return -1;
 
@@ -336,46 +336,46 @@ err:
   free(application_name);
   free(command_line);
 
-  if (stdin) CloseHandle(stdin);
-  if (stdout) CloseHandle(stdout);
-  if (stderr) CloseHandle(stderr);
+  if (stdin_dup) CloseHandle(stdin_dup);
+  if (stdout_dup) CloseHandle(stdout_dup);
+  if (stderr_dup) CloseHandle(stderr_dup);
 
   return -1;
 #else
-  int stdin = dup(STDIN_FILENO);
-  int stdout = dup(STDOUT_FILENO);
-  int stderr = dup(STDERR_FILENO);
+  int stdin_dup = dup(STDIN_FILENO);
+  int stdout_dup = dup(STDOUT_FILENO);
+  int stderr_dup = dup(STDERR_FILENO);
 
-  fcntl(stdin, F_SETFD, 0);
-  fcntl(stdout, F_SETFD, 0);
-  fcntl(stderr, F_SETFD, 0);
+  fcntl(stdin_dup, F_SETFD, 0);
+  fcntl(stdout_dup, F_SETFD, 0);
+  fcntl(stderr_dup, F_SETFD, 0);
 
   pid_t pid = fork();
 
   if (pid < 0) {
-    close(stdin);
-    close(stdout);
-    close(stderr);
+    close(stdin_dup);
+    close(stdout_dup);
+    close(stderr_dup);
 
     return -1;
   }
 
   if (pid == 0) {
-    dup2(stdin, STDIN_FILENO);
-    dup2(stdout, STDOUT_FILENO);
-    dup2(stderr, STDERR_FILENO);
+    dup2(stdin_dup, STDIN_FILENO);
+    dup2(stdout_dup, STDOUT_FILENO);
+    dup2(stderr_dup, STDERR_FILENO);
 
-    close(stdin);
-    close(stdout);
-    close(stderr);
+    close(stdin_dup);
+    close(stdout_dup);
+    close(stderr_dup);
 
     execv(file, argv);
     _exit(1);
   }
 
-  close(stdin);
-  close(stdout);
-  close(stderr);
+  close(stdin_dup);
+  close(stdout_dup);
+  close(stderr_dup);
 
   int status;
   err = waitpid(pid, &status, 0);
@@ -855,26 +855,26 @@ appling_launch_v0(const appling_launch_info_t *info) {
     return err;
   }
 
-  HANDLE stdin = NULL;
-  HANDLE stdout = NULL;
-  HANDLE stderr = NULL;
+  HANDLE stdin_dup = NULL;
+  HANDLE stdout_dup = NULL;
+  HANDLE stderr_dup = NULL;
 
   HANDLE self = GetCurrentProcess();
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (!DuplicateHandle(self, GetStdHandle(STD_INPUT_HANDLE), self, &stdin_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (!DuplicateHandle(self, GetStdHandle(STD_OUTPUT_HANDLE), self, &stdout_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
 
-  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
+  if (!DuplicateHandle(self, GetStdHandle(STD_ERROR_HANDLE), self, &stderr_dup, 0, TRUE, DUPLICATE_SAME_ACCESS)) goto err;
 
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
 
   si.cb = sizeof(si);
   si.dwFlags |= STARTF_USESTDHANDLES;
-  si.hStdInput = stdin;
-  si.hStdOutput = stdout;
-  si.hStdError = stderr;
+  si.hStdInput = stdin_dup;
+  si.hStdOutput = stdout_dup;
+  si.hStdError = stderr_dup;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
@@ -895,9 +895,9 @@ appling_launch_v0(const appling_launch_info_t *info) {
   free(application_name);
   free(command_line);
 
-  CloseHandle(stdin);
-  CloseHandle(stdout);
-  CloseHandle(stderr);
+  CloseHandle(stdin_dup);
+  CloseHandle(stdout_dup);
+  CloseHandle(stderr_dup);
 
   if (!success) return -1;
 
@@ -910,22 +910,32 @@ appling_launch_v0(const appling_launch_info_t *info) {
   CloseHandle(pi.hThread);
 
   return success && status == 0 ? 0 : -1;
+
+err:
+  free(application_name);
+  free(command_line);
+
+  if (stdin_dup) CloseHandle(stdin_dup);
+  if (stdout_dup) CloseHandle(stdout_dup);
+  if (stderr_dup) CloseHandle(stderr_dup);
+
+  return -1;
 #else
-  int stdin = dup(STDIN_FILENO);
-  int stdout = dup(STDOUT_FILENO);
-  int stderr = dup(STDERR_FILENO);
+  int stdin_dup = dup(STDIN_FILENO);
+  int stdout_dup = dup(STDOUT_FILENO);
+  int stderr_dup = dup(STDERR_FILENO);
 
-  fcntl(stdin, F_SETFD, 0);
-  fcntl(stdout, F_SETFD, 0);
-  fcntl(stderr, F_SETFD, 0);
+  fcntl(stdin_dup, F_SETFD, 0);
+  fcntl(stdout_dup, F_SETFD, 0);
+  fcntl(stderr_dup, F_SETFD, 0);
 
-  dup2(stdin, STDIN_FILENO);
-  dup2(stdout, STDOUT_FILENO);
-  dup2(stderr, STDERR_FILENO);
+  dup2(stdin_dup, STDIN_FILENO);
+  dup2(stdout_dup, STDOUT_FILENO);
+  dup2(stderr_dup, STDERR_FILENO);
 
-  close(stdin);
-  close(stdout);
-  close(stderr);
+  close(stdin_dup);
+  close(stdout_dup);
+  close(stderr_dup);
 
   return execv(file, argv);
 #endif
